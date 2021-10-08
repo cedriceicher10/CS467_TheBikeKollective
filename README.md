@@ -7,3 +7,6 @@ The authors are:
   - Cedric Eicher
   - Lennard Gorter
   - Connor Pollock
+
+Source idea/requirements:
+  - https://eecs.oregonstate.edu/capstone/submission/pages/viewSingleProject.php?id=fwLB9vuGfnzCqzmb
