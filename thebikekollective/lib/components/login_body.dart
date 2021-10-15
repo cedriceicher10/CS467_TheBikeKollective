@@ -12,8 +12,9 @@ class LoginBody extends StatelessWidget {
     final double buttonWidth = 260;
     final double buttonSpacing = 8;
 
-    return Center(
-        child: Column(children: [
+    return SingleChildScrollView(
+        child: Center(
+            child: Column(children: [
       SizedBox(height: imageHeadSpace),
       LoginForm(),
       SizedBox(height: buttonSpacing * 2),
@@ -41,6 +42,6 @@ class LoginBody extends StatelessWidget {
                   ));
                 },
               )))
-    ]));
+    ])));
   }
 }

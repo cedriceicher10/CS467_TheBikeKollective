@@ -26,16 +26,15 @@ class _LoginFormState extends State<LoginForm> {
     final double buttonHeight = 60;
     final double buttonWidth = 260;
 
-    return SingleChildScrollView(
-        child: Form(
-            key: formKey,
-            child: Column(children: [
-              Container(width: 325, child: usernameEntry()),
-              SizedBox(height: 10),
-              Container(width: 325, child: passwordEntry()),
-              SizedBox(height: 10),
-              loginButton(buttonWidth, buttonHeight),
-            ])));
+    return Form(
+        key: formKey,
+        child: Column(children: [
+          Container(width: 325, child: usernameEntry()),
+          SizedBox(height: 10),
+          Container(width: 325, child: passwordEntry()),
+          SizedBox(height: 10),
+          loginButton(buttonWidth, buttonHeight),
+        ]));
   }
 
   Widget usernameEntry() {
@@ -44,11 +43,16 @@ class _LoginFormState extends State<LoginForm> {
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
             labelText: 'Username',
+            labelStyle: TextStyle(
+                color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
             hintText: 'E.g. BikeLover3000',
             hintStyle: TextStyle(color: Color(s_jungleGreen)),
             errorStyle: TextStyle(
                 color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
-            border: OutlineInputBorder()),
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+                borderSide:
+                    const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
         onSaved: (value) {
           LoginFields().username = value;
         },
@@ -64,14 +68,19 @@ class _LoginFormState extends State<LoginForm> {
   Widget passwordEntry() {
     return TextFormField(
         autofocus: true,
+        obscureText: true,
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
             labelText: 'Password',
-            hintText: '********',
+            labelStyle: TextStyle(
+                color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
             hintStyle: TextStyle(color: Color(s_jungleGreen)),
             errorStyle: TextStyle(
                 color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
-            border: OutlineInputBorder()),
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+                borderSide:
+                    const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
         onSaved: (value) {
           LoginFields().password = value;
         },
@@ -90,14 +99,16 @@ class _LoginFormState extends State<LoginForm> {
           if (formKey.currentState!.validate()) {
             formKey.currentState?.save();
 
-            // TO DO: Save to database
+            // TO DO: Check database for username/login combo
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      SplashScreen()), // TO DO: Go to main UI screen
-            );
+            // TO DO: Navigate based on database agree/disagree
+
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) =>
+            //           SplashScreen()), // TO DO: Go to main UI screen
+            // );
           }
         },
         style: ElevatedButton.styleFrom(
