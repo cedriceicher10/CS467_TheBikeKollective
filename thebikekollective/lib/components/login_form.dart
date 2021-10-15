@@ -108,7 +108,7 @@ class _LoginFormState extends State<LoginForm> {
             // //   context,
             // //   MaterialPageRoute(
             // //       builder: (context) =>
-            // //           MainScreen()), // TO DO: Go to main UI screen
+            // //           MainScreen()), // TO DO: Go to waiver screen
             // // );
             // } else {
             //   // TO DO: Stay on screen?

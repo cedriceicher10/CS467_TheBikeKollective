@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'login_form.dart';
+import 'create_account_form.dart';
 import 'styles.dart';
 
-class LoginBody extends StatelessWidget {
-  const LoginBody({Key? key}) : super(key: key);
+class CreateAccountBody extends StatelessWidget {
+  const CreateAccountBody({Key? key}) : super(key: key);
 
   Widget build(BuildContext context) {
     final double buttonSpacing = 8;
@@ -12,7 +12,7 @@ class LoginBody extends StatelessWidget {
         child: Center(
             child: Column(children: [
       SizedBox(height: headspaceFactor(context)),
-      LoginForm(),
+      CreateAccountForm(),
       SizedBox(height: buttonSpacing * 2),
       FractionallySizedBox(
           widthFactor: imageSizeFactor(context),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../screens/login_screen.dart';
+import '../screens/create_account_screen.dart';
 import 'styles.dart';
 
 class SplashBody extends StatelessWidget {
@@ -53,7 +54,7 @@ Widget oneColumn(BuildContext context) {
     SizedBox(height: buttonSpacing * 2),
     loginButton(context, 'Login', buttonWidth, buttonHeight),
     SizedBox(height: buttonSpacing),
-    createAccountButton('Create Account', buttonWidth, buttonHeight),
+    createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
     SizedBox(height: buttonSpacing),
     googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
   ]));
@@ -96,7 +97,8 @@ Widget twoColumn(BuildContext context) {
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           loginButton(context, 'Login', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
-          createAccountButton('Create Account', buttonWidth, buttonHeight),
+          createAccountButton(
+              context, 'Create Account', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
           googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
         ]))
@@ -118,10 +120,15 @@ Widget loginButton(BuildContext context, String text, double buttonWidth,
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
 
-Widget createAccountButton(
-    String text, double buttonWidth, double buttonHeight) {
+Widget createAccountButton(BuildContext context, String text,
+    double buttonWidth, double buttonHeight) {
   return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CreateAccountScreen()),
+        );
+      },
       child: createAccountText(text),
       style: ElevatedButton.styleFrom(
           primary: Color(s_jungleGreen),
