@@ -7,19 +7,16 @@ class LoginBody extends StatelessWidget {
   const LoginBody({Key? key}) : super(key: key);
 
   Widget build(BuildContext context) {
-    final double imageHeadSpace = 60;
-    final double buttonHeight = 60;
-    final double buttonWidth = 260;
     final double buttonSpacing = 8;
 
     return SingleChildScrollView(
         child: Center(
             child: Column(children: [
-      SizedBox(height: imageHeadSpace),
+      SizedBox(height: headspaceFactor(context)),
       LoginForm(),
       SizedBox(height: buttonSpacing * 2),
       FractionallySizedBox(
-          widthFactor: 0.5,
+          widthFactor: imageSizeFactor(context),
           child: Container(
               decoration: BoxDecoration(
                   border: Border.all(width: 3, color: Color(s_jungleGreen)),
@@ -41,7 +38,24 @@ class LoginBody extends StatelessWidget {
                         : null,
                   ));
                 },
-              )))
+              ))),
+      SizedBox(height: buttonSpacing * 2)
     ])));
+  }
+
+  double imageSizeFactor(BuildContext context) {
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      return 0.5;
+    } else {
+      return 0.15;
+    }
+  }
+
+  double headspaceFactor(BuildContext context) {
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      return 60;
+    } else {
+      return 20;
+    }
   }
 }

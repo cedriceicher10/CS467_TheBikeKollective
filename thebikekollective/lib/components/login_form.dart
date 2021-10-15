@@ -102,13 +102,18 @@ class _LoginFormState extends State<LoginForm> {
             // TO DO: Check database for username/login combo
 
             // TO DO: Navigate based on database agree/disagree
+            // bool loginCheck = false;
+            // if (loginCheck) {
+            //   // Navigator.push(
+            // //   context,
+            // //   MaterialPageRoute(
+            // //       builder: (context) =>
+            // //           MainScreen()), // TO DO: Go to main UI screen
+            // // );
+            // } else {
+            //   // TO DO: Stay on screen?
+            // }
 
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) =>
-            //           SplashScreen()), // TO DO: Go to main UI screen
-            // );
           }
         },
         style: ElevatedButton.styleFrom(
