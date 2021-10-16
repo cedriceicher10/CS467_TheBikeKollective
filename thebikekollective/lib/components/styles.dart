@@ -16,6 +16,7 @@ const double s_fontSizeExtraSmall = 12;
 
 // Colors
 const int s_jungleGreen = 0xFF2EAD65;
+const int s_declineRed = 0xFFf2301b;
 
 // Color Swatch
 const MaterialColor s_whiteSwatch = const MaterialColor(

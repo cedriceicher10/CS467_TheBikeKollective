@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/splash_screen.dart';
+import '../screens/waiver_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
@@ -170,14 +170,11 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
 
             // TO DO: Add new account info to database
 
-            // TO DO: Navigate to Main UI screen
-            // Navigator.push(
-            // //   context,
-            // //   MaterialPageRoute(
-            // //       builder: (context) =>
-            // //           MainScreen()), // TO DO: Go to waiver screen
-            // // );
-
+            // TO DO: Navigate to waiver screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => WaiverScreen()),
+            );
           }
         },
         style: ElevatedButton.styleFrom(

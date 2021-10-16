@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../screens/splash_screen.dart';
+import '../screens/waiver_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
-final formKey = GlobalKey<FormState>();
+GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
 class LoginFields {
   String? username;
@@ -104,12 +104,12 @@ class _LoginFormState extends State<LoginForm> {
             // TO DO: Navigate based on database agree/disagree
             // bool loginCheck = false;
             // if (loginCheck) {
-            //   // Navigator.push(
-            // //   context,
-            // //   MaterialPageRoute(
-            // //       builder: (context) =>
-            // //           MainScreen()), // TO DO: Go to waiver screen
-            // // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      WaiverScreen()), // TO DO: Go to waiver screen
+            );
             // } else {
             //   // TO DO: Stay on screen?
             // }
