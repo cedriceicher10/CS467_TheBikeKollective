@@ -26,11 +26,11 @@ class _WaiverBodyState extends State<WaiverBody> {
 
   @override
   Widget build(BuildContext context) {
-    final double imageHeadSpace = 30;
-    final double textHorizPadding = 20;
+    final double imageHeadSpace = 20;
+    final double textHorizPadding = 15;
     final double buttonHeight = 60;
     final double buttonWidth = 175;
-    final double buttonSpacing = 20;
+    final double buttonSpacing = 10;
 
     loadWaiverText();
     if (isLoading) {
@@ -43,6 +43,7 @@ class _WaiverBodyState extends State<WaiverBody> {
           child: Column(
         children: [
           SizedBox(height: imageHeadSpace),
+          importantText('IMPORTANT'),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
               child: waiverText(waiverTextFromFile)),
@@ -54,7 +55,8 @@ class _WaiverBodyState extends State<WaiverBody> {
               SizedBox(width: 20),
               declineButton(context, 'Decline', buttonWidth, buttonHeight),
             ],
-          )
+          ),
+          SizedBox(height: buttonSpacing)
         ],
       ));
     }
@@ -83,12 +85,22 @@ class _WaiverBodyState extends State<WaiverBody> {
               context,
               MaterialPageRoute(builder: (context) => SplashScreen()),
               (Route<dynamic> route) => false);
-          //Navigator.of(context).popUntil((route) => route.isFirst);
         },
         child: declineButtonText(text),
         style: ElevatedButton.styleFrom(
             primary: Color(s_declineRed),
             fixedSize: Size(buttonWidth, buttonHeight)));
+  }
+
+  Widget importantText(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      size: s_fontSizeLarge,
+      color: Color(s_declineRed),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+    );
   }
 
   Widget waiverText(String text) {

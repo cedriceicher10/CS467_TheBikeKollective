@@ -3,8 +3,6 @@ import '../screens/waiver_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
-GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
 class LoginFields {
   String? username;
   String? password;
@@ -21,6 +19,7 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final double buttonHeight = 60;
