@@ -3,9 +3,6 @@ import '../screens/waiver_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
-final formKey = GlobalKey<FormState>();
-final passwordKey = GlobalKey<FormFieldState>();
-
 class NewAccountFields {
   String? email;
   String? username;
@@ -23,6 +20,9 @@ class CreateAccountForm extends StatefulWidget {
 }
 
 class _CreateAccountFormState extends State<CreateAccountForm> {
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  GlobalKey<FormFieldState> passwordKey = GlobalKey<FormFieldState>();
+
   @override
   Widget build(BuildContext context) {
     final double buttonHeight = 60;
