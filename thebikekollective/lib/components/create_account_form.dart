@@ -98,6 +98,10 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
             return 'Please enter a username.';
             // } else if (alreadyTaken) {
             //   return 'Username is already taken!';
+          } else if (value.contains(' ')) {
+            return 'Username may not contain spaces.';
+          } else if (value.length > 20) {
+            return 'Username may not be greater than 20 characters.';
           } else {
             return null;
           }
