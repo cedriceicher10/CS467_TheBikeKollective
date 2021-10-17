@@ -91,8 +91,13 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
           NewAccountFields().username = value;
         },
         validator: (value) {
+          // TO DO: Query database for value, to check if the username is already taken
+          // bool alreadyTaken = false;
+
           if (value!.isEmpty) {
             return 'Please enter a username.';
+            // } else if (alreadyTaken) {
+            //   return 'Username is already taken!';
           } else {
             return null;
           }
@@ -166,11 +171,8 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
           if (formKey.currentState!.validate()) {
             formKey.currentState?.save();
 
-            // TO DO: Generate unique identifier for user account
-
             // TO DO: Add new account info to database
 
-            // TO DO: Navigate to waiver screen
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => WaiverScreen()),
