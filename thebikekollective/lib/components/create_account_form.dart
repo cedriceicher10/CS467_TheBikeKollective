@@ -5,10 +5,9 @@ import 'styles.dart';
 
 class NewAccountFields {
   String? email;
-  String? username;
   String? password;
   String toString() {
-    return 'Email: $email, Username: $username, Password: $password';
+    return 'Email: $email, Password: $password';
   }
 }
 
@@ -32,8 +31,6 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
         key: formKey,
         child: Column(children: [
           Container(width: 325, child: emailEntry()),
-          SizedBox(height: 10),
-          Container(width: 325, child: usernameEntry()),
           SizedBox(height: 10),
           Container(width: 325, child: passwordEntry()),
           SizedBox(height: 10),
@@ -63,45 +60,16 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
           NewAccountFields().email = value;
         },
         validator: (value) {
+          // TO DO: Query to ensure email is unique
+
           if ((value!.isEmpty) | !(value.contains('@'))) {
             return 'Please enter a valid email address.';
-          } else {
-            return null;
-          }
-        });
-  }
-
-  Widget usernameEntry() {
-    return TextFormField(
-        autofocus: true,
-        style: TextStyle(color: Color(s_jungleGreen)),
-        decoration: InputDecoration(
-            labelText: 'Username',
-            labelStyle: TextStyle(
-                color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
-            hintText: 'E.g. BikeLover3000',
-            hintStyle: TextStyle(color: Color(s_jungleGreen)),
-            errorStyle: TextStyle(
-                color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
-            border: OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-                borderSide:
-                    const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
-        onSaved: (value) {
-          NewAccountFields().username = value;
-        },
-        validator: (value) {
-          // TO DO: Query database for value, to check if the username is already taken
-          // bool alreadyTaken = false;
-
-          if (value!.isEmpty) {
-            return 'Please enter a username.';
-            // } else if (alreadyTaken) {
-            //   return 'Username is already taken!';
           } else if (value.contains(' ')) {
-            return 'Username may not contain spaces.';
-          } else if (value.length > 20) {
-            return 'Username may not be greater than 20 characters.';
+            return 'Email may not contain spaces.';
+          } else if (value.length > 30) {
+            return 'Email may not be greater than 30 characters.';
+            // } else if !(uniqueEmail) {
+            //   return 'Email is already registered.';
           } else {
             return null;
           }

@@ -41,7 +41,7 @@ class _LoginFormState extends State<LoginForm> {
         autofocus: true,
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
-            labelText: 'Username',
+            labelText: 'Email',
             labelStyle: TextStyle(
                 color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
             hintText: 'E.g. BikeLover3000',
