@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'styles.dart';
 
@@ -13,14 +12,14 @@ class CreateMapBody extends StatefulWidget{
 }
 
 class _CreateMapBody extends State<CreateMapBody> {
-    // Initialized using chunhunghan's answer here:
+    final PopupController _popupLayerController = PopupController();
+
+    // Zoom functions from chunhunghan's answer here:
     // https://stackoverflow.com/questions/64034365/flutter-map-zoom-not-updating
 
     double currentZoom = 13.0;
     MapController mapController = MapController();
     LatLng currentCenter = LatLng(39.276, -74.576);
-
-    final PopupController _popupLayerController = PopupController();
 
     void _zoom() {
       currentZoom = currentZoom - 1;
@@ -43,45 +42,52 @@ class _CreateMapBody extends State<CreateMapBody> {
               // debug: true,
             ),
             children: <Widget>[
-            TileLayerWidget(options: TileLayerOptions(
-              overrideTilesWhenUrlChanges: false,
-              urlTemplate:
-              "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?source=${DateTime.now().millisecondsSinceEpoch}",
-              subdomains: ['a', 'b', 'c'],
-              attributionBuilder: (_) {
-                return Text("© OpenStreetMap contributors");
-              },
-              additionalOptions: {},
-            ))
-              ,
-        PopupMarkerLayerWidget(options: PopupMarkerLayerOptions(
-          markers: <Marker>[
-            MonumentMarker(
-              monument: Monument(
-                name: 'My First Bike',
-                imagePath: 'assets/images/louis-tricot-gp1mbqUy5HI-unsplash.jpg',
-                lat: 39.278,
-                long: -74.576,
-              ),
-            ),
-            Marker(
-              anchorPos: AnchorPos.align(AnchorAlign.top),
-              point: LatLng(39.276, -74.580),
-              height: Monument.size,
-              width: Monument.size,
-              builder: (BuildContext ctx) => Icon(Icons.shop),
-            ),
-          ],
-          popupController: _popupLayerController,
-          popupBuilder: (_, Marker marker) {
-            if (marker is MonumentMarker) {
-              return MonumentMarkerPopup(monument: marker.monument);
-            }
-            return Card(child: const Text('Not a bike'));
-          },
-        ),)
+            TileLayerWidget(
+                options:
+                  TileLayerOptions(
+                    overrideTilesWhenUrlChanges: false,
+                    urlTemplate:
+                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?source=${DateTime.now().millisecondsSinceEpoch}",
+                    subdomains: ['a', 'b', 'c'],
+                    attributionBuilder: (_) {
+                      return Text("© OpenStreetMap contributors");
+                    },
+                    additionalOptions: {},
+            )),
+            PopupMarkerLayerWidget(options: PopupMarkerLayerOptions(
 
-      ]),
+              // Based off example_popup_with_data.dart from
+              // flutter_map_marker_popup repository (the
+              // plugin used here)
+              // https://github.com/rorystephenson/flutter_map_marker_popup/blob/master/example/lib/example_popup_with_data.dart
+
+              markers: <Marker>[
+                  MonumentMarker(
+                    monument: Monument(
+                      name: 'My First Bike',
+                      imagePath: 'assets/images/louis-tricot-gp1mbqUy5HI-unsplash.jpg',
+                      lat: 39.278,
+                      long: -74.576,
+                    ),
+                  ),
+                  Marker(
+                    anchorPos: AnchorPos.align(AnchorAlign.top),
+                    point: LatLng(39.276, -74.580),
+                    height: Monument.size,
+                    width: Monument.size,
+                    builder: (BuildContext ctx) => Icon(Icons.shop),
+                  ),
+                ],
+                popupController: _popupLayerController,
+                popupBuilder: (_, Marker marker) {
+                  if (marker is MonumentMarker) {
+                    return MonumentMarkerPopup(monument: marker.monument);
+                  }
+                  return Card(child: const Text('Not a bike'));
+                },
+              ),
+            )
+        ]),
         floatingActionButton: FloatingActionButton(
           onPressed: _zoom,
           tooltip: 'Zoom',
@@ -147,65 +153,20 @@ class MonumentMarkerPopup extends StatelessWidget {
   }
 }
 
-  /*Widget build(BuildContext context) {
-    return  OSMFlutter(
-      controller:mapController,
-      trackMyPosition: false,
-      initZoom: 12,
-      minZoomLevel: 8,
-      maxZoomLevel: 14,
-      stepZoom: 1.0,
-      userLocationMarker: UserLocationMaker(
-        personMarker: MarkerIcon(
-          icon: Icon(
-            Icons.location_history_rounded,
-            color: Colors.red,
-            size: 48,
-          ),
-        ),
-        directionArrowMarker: MarkerIcon(
-          icon: Icon(
-            Icons.double_arrow,
-            size: 48,
-          ),
-        ),
-      ),
-      road: Road(
-        startIcon: MarkerIcon(
-          icon: Icon(
-            Icons.person,
-            size: 64,
-            color: Colors.brown,
-          ),
-        ),
-        roadColor: Colors.yellowAccent,
-      ),
-      markerOption: MarkerOption(
-          defaultMarker: MarkerIcon(
-            icon: Icon(
-              Icons.person_pin_circle,
-              color: Colors.blue,
-              size: 56,
-            ),
-          )
-      ),
-    );
-  }*/
-
-  double imageSizeFactor(BuildContext context) {
-    if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      return 0.5;
-    } else {
-      return 0.15;
-    }
+double imageSizeFactor(BuildContext context) {
+  if (MediaQuery.of(context).orientation == Orientation.portrait) {
+    return 0.5;
+  } else {
+    return 0.15;
   }
+}
 
-  double headspaceFactor(BuildContext context) {
-    if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      return 60;
-    } else {
-      return 20;
-    }
+double headspaceFactor(BuildContext context) {
+  if (MediaQuery.of(context).orientation == Orientation.portrait) {
+    return 60;
+  } else {
+    return 20;
   }
+}
 
 
