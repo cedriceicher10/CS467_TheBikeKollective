@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'formatted_text.dart';
 import '../screens/login_screen.dart';
 import '../screens/create_account_screen.dart';
+import '../screens/map.dart';
 import 'styles.dart';
 
 class SplashBody extends StatelessWidget {
@@ -57,6 +58,8 @@ Widget oneColumn(BuildContext context) {
     createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
     SizedBox(height: buttonSpacing),
     googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
+    SizedBox(height: buttonSpacing),
+    mapButton(context, 'Map', buttonWidth, buttonHeight),
   ]));
 }
 
@@ -101,6 +104,8 @@ Widget twoColumn(BuildContext context) {
               context, 'Create Account', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
           googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
+          SizedBox(height: buttonSpacing),
+          mapButton(context, 'Map', buttonWidth, buttonHeight),
         ]))
   ]);
 }
@@ -144,6 +149,21 @@ Widget googleAuthButton(String text, double buttonWidth, double buttonHeight) {
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
 
+Widget mapButton(BuildContext context, String text,
+    double buttonWidth, double buttonHeight) {
+  return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MapScreen()),
+        );
+      },
+      child: mapText(text),
+      style: ElevatedButton.styleFrom(
+          primary: Color(s_jungleGreen),
+          fixedSize: Size(buttonWidth, buttonHeight)));
+}
+
 double imageSizeFactor(BuildContext context) {
   if (MediaQuery.of(context).orientation == Orientation.portrait) {
     return 0.8;
@@ -173,6 +193,16 @@ Widget createAccountText(String text) {
 }
 
 Widget googleAuthText(String text) {
+  return FormattedText(
+    text: text,
+    size: s_fontSizeLarge,
+    color: Colors.white,
+    font: s_font_AmaticSC,
+    weight: FontWeight.bold,
+  );
+}
+
+Widget mapText(String text) {
   return FormattedText(
     text: text,
     size: s_fontSizeLarge,

@@ -26,6 +26,10 @@ dependencies:
   url_launcher: ^6.0.0
   shared_preferences: ^2.0.0
   intl: ^0.17.0
+  flutter_map: any
+  flutter_map_marker_popup:
+    path: 'lib/flutter_map_marker_popup'
+  latlong: any
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -84,6 +88,14 @@ flutter:
         - asset: assets/fonts/BonaNova-Italic.ttf
           style: italic
         - asset: assets/fonts/BonaNova-Regular.ttf
+          style: normal
+    - family: RedOctober
+      fonts:
+        - asset: assets/fonts/RedOctober.ttf
+          style: normal
+    - family: SpecialElite
+      fonts:
+        - asset: assets/fonts/SpecialElite-Regular.ttf
           style: normal
   
   # For details regarding fonts from package dependencies,
