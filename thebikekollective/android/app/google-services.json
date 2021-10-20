@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "209138542092",
+    "project_id": "thebikekollective",
+    "storage_bucket": "thebikekollective.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209138542092:android:a3b69f01a805735c7d7029",
+        "android_client_info": {
+          "package_name": "com.example.thebikekollective"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "209138542092-c1pgpsanhq5u86mlqo0cgahc95qsviao.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxHRKjyf-EGnkoiqKJ0-scAmuOCC-cbRE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "209138542092-c1pgpsanhq5u86mlqo0cgahc95qsviao.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
