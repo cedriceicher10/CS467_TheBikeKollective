@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice1/components/formatted_text.dart';
+import 'formatted_text.dart';
+import '../screens/login_screen.dart';
+import '../screens/create_account_screen.dart';
 import 'styles.dart';
 
 class SplashBody extends StatelessWidget {
@@ -50,11 +52,11 @@ Widget oneColumn(BuildContext context) {
               },
             ))),
     SizedBox(height: buttonSpacing * 2),
-    loginButton(buttonWidth, buttonHeight),
+    loginButton(context, 'Login', buttonWidth, buttonHeight),
     SizedBox(height: buttonSpacing),
-    createAccountButton(buttonWidth, buttonHeight),
+    createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
     SizedBox(height: buttonSpacing),
-    googleAuthButton(buttonWidth, buttonHeight),
+    googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
   ]));
 }
 
@@ -93,37 +95,50 @@ Widget twoColumn(BuildContext context) {
         flex: 1,
         fit: FlexFit.tight,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          loginButton(buttonWidth, buttonHeight),
+          loginButton(context, 'Login', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
-          createAccountButton(buttonWidth, buttonHeight),
+          createAccountButton(
+              context, 'Create Account', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
-          googleAuthButton(buttonWidth, buttonHeight),
+          googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
         ]))
   ]);
 }
 
-Widget loginButton(double buttonWidth, double buttonHeight) {
+Widget loginButton(BuildContext context, String text, double buttonWidth,
+    double buttonHeight) {
   return ElevatedButton(
-      onPressed: () {},
-      child: loginText(),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      },
+      child: loginText(text),
       style: ElevatedButton.styleFrom(
           primary: Color(s_jungleGreen),
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
 
-Widget createAccountButton(double buttonWidth, double buttonHeight) {
+Widget createAccountButton(BuildContext context, String text,
+    double buttonWidth, double buttonHeight) {
   return ElevatedButton(
-      onPressed: () {},
-      child: createAccountText(),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CreateAccountScreen()),
+        );
+      },
+      child: createAccountText(text),
       style: ElevatedButton.styleFrom(
           primary: Color(s_jungleGreen),
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
 
-Widget googleAuthButton(double buttonWidth, double buttonHeight) {
+Widget googleAuthButton(String text, double buttonWidth, double buttonHeight) {
   return ElevatedButton(
       onPressed: () {},
-      child: googleAuthText(),
+      child: googleAuthText(text),
       style: ElevatedButton.styleFrom(
           primary: Color(s_jungleGreen),
           fixedSize: Size(buttonWidth, buttonHeight)));
@@ -137,9 +152,9 @@ double imageSizeFactor(BuildContext context) {
   }
 }
 
-Widget loginText() {
+Widget loginText(String text) {
   return FormattedText(
-    text: 'Login',
+    text: text,
     size: s_fontSizeLarge,
     color: Colors.white,
     font: s_font_AmaticSC,
@@ -147,9 +162,9 @@ Widget loginText() {
   );
 }
 
-Widget createAccountText() {
+Widget createAccountText(String text) {
   return FormattedText(
-    text: 'Create Account',
+    text: text,
     size: s_fontSizeLarge,
     color: Colors.white,
     font: s_font_AmaticSC,
@@ -157,9 +172,9 @@ Widget createAccountText() {
   );
 }
 
-Widget googleAuthText() {
+Widget googleAuthText(String text) {
   return FormattedText(
-    text: 'Sign in with Google',
+    text: text,
     size: s_fontSizeLarge,
     color: Colors.white,
     font: s_font_AmaticSC,
