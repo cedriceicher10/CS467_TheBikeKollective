@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../screens/waiver_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
@@ -8,6 +9,11 @@ class NewAccountFields {
   String? password;
   String toString() {
     return 'Email: $email, Password: $password';
+  }
+
+  NewAccountFields() {
+    email = "";
+    password = "";
   }
 }
 
@@ -21,6 +27,8 @@ class CreateAccountForm extends StatefulWidget {
 class _CreateAccountFormState extends State<CreateAccountForm> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   GlobalKey<FormFieldState> passwordKey = GlobalKey<FormFieldState>();
+
+  NewAccountFields collectInfo = NewAccountFields();
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +65,7 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
                 borderSide:
                     const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
         onSaved: (value) {
-          NewAccountFields().email = value;
+          collectInfo.email = value;
         },
         validator: (value) {
           // TO DO: Query to ensure email is unique
@@ -94,7 +102,7 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
                 borderSide:
                     const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
         onSaved: (value) {
-          NewAccountFields().password = value;
+          collectInfo.password = value;
         },
         validator: (value) {
           if (value!.isEmpty) {
@@ -124,7 +132,7 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
                 borderSide:
                     const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
         onSaved: (value) {
-          NewAccountFields().password = value;
+          collectInfo.password = value;
         },
         validator: (value) {
           if (value!.isEmpty) {
@@ -142,9 +150,11 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
         onPressed: () async {
           if (formKey.currentState!.validate()) {
             formKey.currentState?.save();
-
-            // TO DO: Add new account info to database
-
+            FirebaseFirestore.instance.collection('users').add({
+              'email': collectInfo.email,
+              'password': collectInfo.password,
+              'verified': false,
+            });
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => WaiverScreen()),
