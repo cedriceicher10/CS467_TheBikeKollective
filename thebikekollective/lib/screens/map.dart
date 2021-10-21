@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
-import '../components/splash_body.dart';
+import '../components/create_map_body.dart';
 
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+class MapScreen extends StatelessWidget {
+  const MapScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Splash Screen',
+      title: 'Map Screen',
       home: Scaffold(
         appBar: AppBar(
-          title: splashTitle(),
+          title: createMapTitle(),
           backgroundColor: Color(s_jungleGreen),
           centerTitle: true,
         ),
-        body: SplashBody(),
+        body: CreateMapBody(),
       ),
     );
   }
 }
 
-Widget splashTitle() {
+Widget createMapTitle() {
   return FormattedText(
-    text: 'The Bike Kollective',
-    size: s_fontSizeMedLarge,
+    text: 'Map',
+    size: s_fontSizeExtraLarge,
     color: Colors.white,
-    font: s_font_RedOctober,
+    font: s_font_AmaticSC,
     weight: FontWeight.bold,
   );
 }
+
+

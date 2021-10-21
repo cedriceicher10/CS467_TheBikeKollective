@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 const String s_font_MajorMonoDisplay = 'MajorMonoDisplay';
 const String s_font_BonaNova = 'BonaNova';
 const String s_font_AmaticSC = 'AmaticSC';
+const String s_font_RedOctober = "RedOctober";
+const String s_font_SpecialElite = "SpecialElite";
 
 // Font Sizes
 const double s_fontSizeExtraLarge = 44;
