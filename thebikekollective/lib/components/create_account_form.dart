@@ -26,9 +26,11 @@ class CreateAccountForm extends StatefulWidget {
 
 class _CreateAccountFormState extends State<CreateAccountForm> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  GlobalKey<FormFieldState> emailKey = GlobalKey<FormFieldState>();
   GlobalKey<FormFieldState> passwordKey = GlobalKey<FormFieldState>();
 
   NewAccountFields collectInfo = NewAccountFields();
+  bool emailTaken = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,7 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
   Widget emailEntry() {
     return TextFormField(
         autofocus: true,
+        key: emailKey,
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
             labelText: 'Email',
@@ -68,16 +71,14 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
           collectInfo.email = value;
         },
         validator: (value) {
-          // TO DO: Query to ensure email is unique
-
           if ((value!.isEmpty) | !(value.contains('@'))) {
             return 'Please enter a valid email address.';
           } else if (value.contains(' ')) {
             return 'Email may not contain spaces.';
           } else if (value.length > 30) {
             return 'Email may not be greater than 30 characters.';
-            // } else if !(uniqueEmail) {
-            //   return 'Email is already registered.';
+          } else if (emailTaken) {
+            return 'Email is already taken!';
           } else {
             return null;
           }
@@ -148,10 +149,12 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
   Widget createAccountButton(double buttonWidth, double buttonHeight) {
     return ElevatedButton(
         onPressed: () async {
+          emailTaken = await uniqueCheck(emailKey.currentState!.value);
+          setState(() {});
           if (formKey.currentState!.validate()) {
             formKey.currentState?.save();
             FirebaseFirestore.instance.collection('users').add({
-              'email': collectInfo.email,
+              'username': collectInfo.email,
               'password': collectInfo.password,
               'verified': false,
             });
@@ -171,5 +174,17 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
           font: s_font_AmaticSC,
           weight: FontWeight.bold,
         ));
+  }
+
+  Future<bool> uniqueCheck(String? value) async {
+    bool alreadyTaken = false;
+    var snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: value)
+        .get();
+    snapshot.docs.forEach((result) {
+      alreadyTaken = true;
+    });
+    return alreadyTaken;
   }
 }
