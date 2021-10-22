@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/waiver_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
@@ -158,6 +159,9 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
               'password': collectInfo.password,
               'verified': false,
             });
+            SharedPreferences preferences =
+                await SharedPreferences.getInstance();
+            preferences.setBool('loggedIn', true);
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => WaiverScreen()),
