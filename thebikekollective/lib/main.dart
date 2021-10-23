@@ -13,7 +13,12 @@ Future<void> main() async {
   ]);
   await Firebase.initializeApp();
   SharedPreferences preferences = await SharedPreferences.getInstance();
-  //print(preferences.setBool('loggedIn', false));
+
+  // Manual sign out
+  print(preferences.setBool('loggedIn', false));
+  print(preferences.setString('username', 'no username'));
+
   print(preferences.getBool('loggedIn'));
+  print(preferences.getString('username'));
   runApp(App());
 }

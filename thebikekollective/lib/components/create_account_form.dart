@@ -162,6 +162,7 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
             SharedPreferences preferences =
                 await SharedPreferences.getInstance();
             preferences.setBool('loggedIn', true);
+            preferences.setString('username', emailKey.currentState!.value);
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => WaiverScreen()),

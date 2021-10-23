@@ -5,14 +5,6 @@ import '../screens/waiver_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
-class LoginFields {
-  String? username;
-  String? password;
-  String toString() {
-    return 'Username: $username, Password: $password';
-  }
-}
-
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
 
@@ -24,6 +16,8 @@ class _LoginFormState extends State<LoginForm> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   GlobalKey<FormFieldState> usernameKey = GlobalKey<FormFieldState>();
   GlobalKey<FormFieldState> passwordKey = GlobalKey<FormFieldState>();
+  String username = '';
+  String password = '';
 
   bool loginSuccessful = false;
 
@@ -61,7 +55,7 @@ class _LoginFormState extends State<LoginForm> {
                 borderSide:
                     const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
         onSaved: (value) {
-          LoginFields().username = value;
+          username = value!;
         },
         validator: (value) {
           if (value!.isEmpty) {
@@ -92,7 +86,7 @@ class _LoginFormState extends State<LoginForm> {
                 borderSide:
                     const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
         onSaved: (value) {
-          LoginFields().password = value;
+          password = value!;
         },
         validator: (value) {
           if (value!.isEmpty) {
@@ -116,6 +110,7 @@ class _LoginFormState extends State<LoginForm> {
             SharedPreferences preferences =
                 await SharedPreferences.getInstance();
             preferences.setBool('loggedIn', true);
+            preferences.setString('username', usernameKey.currentState!.value);
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => WaiverScreen()),

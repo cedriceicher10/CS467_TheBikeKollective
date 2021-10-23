@@ -41,10 +41,8 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
               setState(() {
                 _isSigningIn = true;
               });
-
               User? user =
                   await Authentication.signInWithGoogle(context: context);
-
               setState(() {
                 _isSigningIn = false;
               });
@@ -63,6 +61,7 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
                   SharedPreferences preferences =
                       await SharedPreferences.getInstance();
                   preferences.setBool('loggedIn', true);
+                  preferences.setString('username', email!);
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) => WaiverScreen(),
