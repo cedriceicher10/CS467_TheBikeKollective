@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "209138542092-eqtroc7vnmpvcklep3lclok6dmppnvod.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.thebikekollective",
+            "certificate_hash": "5ed026ad5ee388b2b873f1188c5d51c2ea2f3593"
+          }
+        },
+        {
           "client_id": "209138542092-c1pgpsanhq5u86mlqo0cgahc95qsviao.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:practice1/screens/waiver_screen.dart';
-import 'formatted_text.dart';
 import '../screens/login_screen.dart';
 import '../screens/create_account_screen.dart';
 import 'styles.dart';
+import 'formatted_text.dart';
+import 'google_auth_button.dart';
 
 class SplashBody extends StatelessWidget {
   const SplashBody({Key? key}) : super(key: key);
@@ -56,7 +57,10 @@ class SplashBody extends StatelessWidget {
       SizedBox(height: buttonSpacing),
       createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
-      googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
+      GoogleAuthButton(
+          text: 'Sign in with Google',
+          buttonWidth: buttonWidth,
+          buttonHeight: buttonHeight),
       SizedBox(height: buttonSpacing),
       testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
     ]));
@@ -102,7 +106,10 @@ class SplashBody extends StatelessWidget {
             createAccountButton(
                 context, 'Create Account', buttonWidth, buttonHeight),
             SizedBox(height: buttonSpacing),
-            googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
+            GoogleAuthButton(
+                text: 'Sign in with Google',
+                buttonWidth: buttonWidth,
+                buttonHeight: buttonHeight),
           ]))
     ]);
   }
@@ -132,16 +139,6 @@ class SplashBody extends StatelessWidget {
           );
         },
         child: createAccountText(text),
-        style: ElevatedButton.styleFrom(
-            primary: Color(s_jungleGreen),
-            fixedSize: Size(buttonWidth, buttonHeight)));
-  }
-
-  Widget googleAuthButton(
-      String text, double buttonWidth, double buttonHeight) {
-    return ElevatedButton(
-        onPressed: () {},
-        child: googleAuthText(text),
         style: ElevatedButton.styleFrom(
             primary: Color(s_jungleGreen),
             fixedSize: Size(buttonWidth, buttonHeight)));
@@ -180,16 +177,6 @@ class SplashBody extends StatelessWidget {
   }
 
   Widget createAccountText(String text) {
-    return FormattedText(
-      text: text,
-      size: s_fontSizeLarge,
-      color: Colors.white,
-      font: s_font_AmaticSC,
-      weight: FontWeight.bold,
-    );
-  }
-
-  Widget googleAuthText(String text) {
     return FormattedText(
       text: text,
       size: s_fontSizeLarge,
