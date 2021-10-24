@@ -7,35 +7,31 @@ import 'package:location/location.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
 
-class AddBikeScreen extends StatefulWidget {
+class AddBikeScreen extends StatelessWidget {
   const AddBikeScreen({ Key? key }) : super(key: key);
 
   @override
-  _AddBikeScreenState createState() => _AddBikeScreenState();
-}
-
-class _AddBikeScreenState extends State<AddBikeScreen> {
-  
-  final formKey = GlobalKey<FormState>();
-  var postFields = Post();
-  LocationData? locationData;
-
-  @override
-
-  void initState() {
-    super.initState();
-    retrieveLocation();
-  }
-
-  void retrieveLocation() async{
-    var locationService = Location();
-    locationData = await locationService.getLocation();
-    setState(() {});
-  }
-
-  Widget build(BuildContext context) {
-    return Container(
-      
+    return MaterialApp(
+      title: 'Add your Bike',
+      home: Scaffold(
+        appBar: AppBar(
+          title: addBikeTitle(),
+          backgroundColor: Color(s_jungleGreen),
+          centerTitle: true,
+        ),
+        body: AddBikeForm(),
+      ),
     );
   }
+}
+
+Widget addBikeTitle() {
+  return FormattedText(
+    text: 'Add your Bike',
+    size: s_fontSizeExtraLarge,
+    color: Colors.white,
+    font: s_font_AmaticSC,
+    weight: FontWeight.bold,
+  );
+}
 }
