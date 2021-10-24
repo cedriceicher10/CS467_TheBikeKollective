@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:location/location.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
-import '../components/add_bike_form.dart';
+import '../components/add_bike_body.dart';
 
 class AddBikeScreen extends StatelessWidget {
   const AddBikeScreen({ Key? key }) : super(key: key);
@@ -21,7 +21,7 @@ class AddBikeScreen extends StatelessWidget {
           backgroundColor: Color(s_jungleGreen),
           centerTitle: true,
         ),
-        body: AddBikeForm(),
+        body: AddBikeBody(),
       ),
     );
   }
