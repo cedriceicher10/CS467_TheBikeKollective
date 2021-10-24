@@ -6,11 +6,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:location/location.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
+import '../components/add_bike_form.dart';
 
 class AddBikeScreen extends StatelessWidget {
   const AddBikeScreen({ Key? key }) : super(key: key);
 
   @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Add your Bike',
       home: Scaffold(
@@ -23,15 +25,14 @@ class AddBikeScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-Widget addBikeTitle() {
-  return FormattedText(
-    text: 'Add your Bike',
-    size: s_fontSizeExtraLarge,
-    color: Colors.white,
-    font: s_font_AmaticSC,
-    weight: FontWeight.bold,
-  );
-}
+  Widget addBikeTitle() {
+    return FormattedText(
+      text: 'Add your Bike',
+      size: s_fontSizeExtraLarge,
+      color: Colors.white,
+      font: s_font_AmaticSC,
+      weight: FontWeight.bold,
+    );
+  }
 }

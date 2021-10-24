@@ -23,7 +23,7 @@ class AddBikeForm extends StatefulWidget {
   _AddBikeFormState createState() => _AddBikeFormState();
 }
 
-class _AddBikeFormState extends State AddBikeForm> {
+class _AddBikeFormState extends State <AddBikeForm> {
   
   final formKey = GlobalKey<FormState>();
   LocationData? locationData;
@@ -50,13 +50,13 @@ class _AddBikeFormState extends State AddBikeForm> {
       child: Column(children: [
         Container(width: 325, child: bikeNameEntry()),
         SizedBox(height: 10),
-        Container(width: 325, child: bikeConditionEntry()),
+        //Container(width: 325, child: bikeConditionEntry()),
         SizedBox(height: 10),
-        Container(width: 325, child: bikeCombinationEntry()),
+        //Container(width: 325, child: bikeCombinationEntry()),
         SizedBox(height: 10),
-        Container(width: 325, child: bikeDescriptionEntry()),
+        //Container(width: 325, child: bikeDescriptionEntry()),
         SizedBox(height: 10),
-        addBikeButton(buttonWidth, buttonHeight),
+        //addBikeButton(buttonWidth, buttonHeight),
       ])
     );
   }

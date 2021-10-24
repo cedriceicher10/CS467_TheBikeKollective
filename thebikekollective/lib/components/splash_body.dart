@@ -3,6 +3,7 @@ import 'formatted_text.dart';
 import '../screens/login_screen.dart';
 import '../screens/create_account_screen.dart';
 import '../screens/map.dart';
+import '../screens/add_bike_screen.dart';
 import 'styles.dart';
 
 class SplashBody extends StatelessWidget {
@@ -60,6 +61,8 @@ Widget oneColumn(BuildContext context) {
     googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
     SizedBox(height: buttonSpacing),
     mapButton(context, 'Map', buttonWidth, buttonHeight),
+    SizedBox(height: buttonSpacing),
+    addBikeButton(context, 'Add Bike', buttonWidth, buttonHeight),
   ]));
 }
 
@@ -106,6 +109,9 @@ Widget twoColumn(BuildContext context) {
           googleAuthButton('Sign in with Google', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
           mapButton(context, 'Map', buttonWidth, buttonHeight),
+          SizedBox(height: buttonSpacing),
+          addBikeButton(context, 'Add your bike to the Kollective!', buttonWidth, buttonHeight),
+          SizedBox(height: buttonSpacing),
         ]))
   ]);
 }
@@ -164,6 +170,21 @@ Widget mapButton(BuildContext context, String text,
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
 
+Widget addBikeButton(BuildContext context, String text, double buttonWidth,
+    double buttonHeight) {
+  return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AddBikeScreen()),
+        );
+      },
+      child: addBikeText(text),
+      style: ElevatedButton.styleFrom(
+          primary: Color(s_jungleGreen),
+          fixedSize: Size(buttonWidth, buttonHeight)));
+}
+
 double imageSizeFactor(BuildContext context) {
   if (MediaQuery.of(context).orientation == Orientation.portrait) {
     return 0.8;
@@ -203,6 +224,16 @@ Widget googleAuthText(String text) {
 }
 
 Widget mapText(String text) {
+  return FormattedText(
+    text: text,
+    size: s_fontSizeLarge,
+    color: Colors.white,
+    font: s_font_AmaticSC,
+    weight: FontWeight.bold,
+  );
+}
+
+Widget addBikeText(String text) {
   return FormattedText(
     text: text,
     size: s_fontSizeLarge,
