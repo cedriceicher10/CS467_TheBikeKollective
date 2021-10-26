@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'formatted_text.dart';
 import '../screens/login_screen.dart';
 import '../screens/create_account_screen.dart';
 import '../screens/map.dart';
-import '../screens/add_bike_screen.dart';
 import 'styles.dart';
 
 class SplashBody extends StatefulWidget {

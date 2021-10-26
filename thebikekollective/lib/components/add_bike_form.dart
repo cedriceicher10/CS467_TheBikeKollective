@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:location/location.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
@@ -49,7 +46,7 @@ class _AddBikeFormState extends State <AddBikeForm> {
   Widget build(BuildContext context) {
     final double buttonHeight = 60;
     final double buttonWidth = 260;
-    final url = ModalRoute.of(context)!.settings.arguments as String?;
+    //final url = ModalRoute.of(context)!.settings.arguments as String?;
 
     return Form(
       key: formKey,
