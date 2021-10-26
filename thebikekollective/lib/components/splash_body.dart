@@ -1,4 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'formatted_text.dart';
 import '../screens/login_screen.dart';
 import '../screens/create_account_screen.dart';
@@ -6,9 +10,16 @@ import '../screens/map.dart';
 import '../screens/add_bike_screen.dart';
 import 'styles.dart';
 
-class SplashBody extends StatelessWidget {
+class SplashBody extends StatefulWidget {
   const SplashBody({Key? key}) : super(key: key);
 
+  @override
+  State<SplashBody> createState() => _SplashBodyState();
+}
+
+class _SplashBodyState extends State<SplashBody> {
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       if (MediaQuery.of(context).orientation == Orientation.portrait) {
@@ -110,7 +121,7 @@ Widget twoColumn(BuildContext context) {
           SizedBox(height: buttonSpacing),
           mapButton(context, 'Map', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
-          addBikeButton(context, 'Add your bike to the Kollective!', buttonWidth, buttonHeight),
+          addBikeButton(context, 'Add your Bike to the Kollective!', buttonWidth, buttonHeight),
           SizedBox(height: buttonSpacing),
         ]))
   ]);
@@ -172,12 +183,25 @@ Widget mapButton(BuildContext context, String text,
 
 Widget addBikeButton(BuildContext context, String text, double buttonWidth,
     double buttonHeight) {
+  File? image;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    image = File(pickedFile!.path);
+
+    var fileName = DateTime.now().toString() + '.jpg';
+    Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
+    UploadTask uploadTask = storageReference.putFile(image!);
+    await uploadTask;
+    final url = await storageReference.getDownloadURL();
+    return url;
+  }
+
   return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AddBikeScreen()),
-        );
+      onPressed: () async{
+        final url = await getImage();
+        Navigator.of(context).pushNamed('addBike', arguments: url);
       },
       child: addBikeText(text),
       style: ElevatedButton.styleFrom(

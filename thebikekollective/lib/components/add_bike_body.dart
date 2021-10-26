@@ -7,6 +7,7 @@ class AddBikeBody extends StatelessWidget {
 
   Widget build(BuildContext context) {
     final double buttonSpacing = 8;
+    final url = ModalRoute.of(context)!.settings.arguments as String?;
 
     return SingleChildScrollView(
         child: Center(
@@ -21,7 +22,7 @@ class AddBikeBody extends StatelessWidget {
                   border: Border.all(width: 3, color: Color(s_jungleGreen)),
                   borderRadius: BorderRadius.circular(5)),
               child: Image(
-                image: AssetImage('assets/images/bike_clipart.jpg'),
+                image: NetworkImage(url!),
                 loadingBuilder: (BuildContext context, Widget child,
                     ImageChunkEvent? loadingProgress) {
                   if (loadingProgress == null) {

@@ -16,7 +16,8 @@ class BikeFields {
   int? bikeCombination;
   double? latitude;
   double? longitude;
-  BikeFields({this. bikeName, this.bikeDescription, this.bikeCondition, this.bikeCombination, this.latitude, this.longitude});
+  String? imageURL;
+  BikeFields({this. bikeName, this.bikeDescription, this.bikeCondition, this.bikeCombination, this.latitude, this.longitude, this.imageURL});
 }
 
 class AddBikeForm extends StatefulWidget {
@@ -48,6 +49,7 @@ class _AddBikeFormState extends State <AddBikeForm> {
   Widget build(BuildContext context) {
     final double buttonHeight = 60;
     final double buttonWidth = 260;
+    final url = ModalRoute.of(context)!.settings.arguments as String?;
 
     return Form(
       key: formKey,
@@ -209,6 +211,9 @@ class _AddBikeFormState extends State <AddBikeForm> {
   );}
 
   Widget addBikeButton(double buttonWidth, double buttonHeight) {
+    final url = ModalRoute.of(context)!.settings.arguments as String;
+    bikeFields.imageURL = url;
+
     return ElevatedButton(
       onPressed: () async {
         if (formKey.currentState!.validate()) {
@@ -216,13 +221,14 @@ class _AddBikeFormState extends State <AddBikeForm> {
 
           bikeFields.latitude = locationData!.latitude;
           bikeFields.longitude = locationData!.longitude;
+          bikeFields.imageURL = url;
 
           print (
             Text(bikeFields.toString())
           );
           await FirebaseFirestore.instance
             .collection('bikes')
-            .add({'Name': bikeFields.bikeName, 'Description': bikeFields.bikeDescription, 'Condition': bikeFields.bikeCondition, 'Combination': bikeFields.bikeCombination, 'Latitude': bikeFields.latitude, 'Longitude': bikeFields.longitude, 'imageURL': 'Test URL'});
+            .add({'Name': bikeFields.bikeName, 'Description': bikeFields.bikeDescription, 'Condition': bikeFields.bikeCondition, 'Combination': bikeFields.bikeCombination, 'Latitude': bikeFields.latitude, 'Longitude': bikeFields.longitude, 'imageURL': bikeFields.imageURL});
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SplashScreen()),
