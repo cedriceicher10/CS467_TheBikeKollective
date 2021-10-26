@@ -14,7 +14,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   SharedPreferences preferences = await SharedPreferences.getInstance();
 
-  // Manual sign out
+  // Manual sign out (Turn this off to enable persistent login)
   print(preferences.setBool('loggedIn', false));
   print(preferences.setString('username', 'no username'));
 

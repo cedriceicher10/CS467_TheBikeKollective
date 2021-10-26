@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:practice1/screens/waiver_screen.dart';
+import '../screens/waiver_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/create_account_screen.dart';
 import 'styles.dart';

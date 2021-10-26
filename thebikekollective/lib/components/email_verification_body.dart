@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
-import '/../screens/email_verification_screen.dart';
+import '../screens/email_verification_screen.dart';
 
 class EmailVerificationBody extends StatelessWidget {
   const EmailVerificationBody({Key? key}) : super(key: key);

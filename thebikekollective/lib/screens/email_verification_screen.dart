@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:email_auth/email_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '/../components/styles.dart';
-import '/../components/formatted_text.dart';
+import '../components/styles.dart';
+import '../components/formatted_text.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({Key? key}) : super(key: key);
@@ -22,24 +22,38 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   double buttonSpace = 5;
   String otpCode = '0';
 
+  bool codeSent = false;
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-          child: Column(children: [
-        SizedBox(height: headSpace),
-        sendOTPButton(
-            context, 'Send Verification Code', buttonWidth, buttonHeight),
-        SizedBox(height: buttonSpace * 10),
-        Form(
-            key: formKey,
+    if (codeSent) {
+      return SingleChildScrollView(
+        child: Center(
             child: Column(children: [
-              Container(width: 200, child: otpCodeEntry()),
-              SizedBox(height: buttonSpace),
-              verifyButton(buttonWidth * 0.4, buttonHeight * 0.4),
-            ])),
-      ])),
-    );
+          SizedBox(height: headSpace),
+          sendOTPButton(
+              context, 'Send Verification Code', buttonWidth, buttonHeight),
+          SizedBox(height: buttonSpace * 10),
+          Form(
+              key: formKey,
+              child: Column(children: [
+                Container(width: 200, child: otpCodeEntry()),
+                SizedBox(height: buttonSpace),
+                verifyButton(buttonWidth * 0.4, buttonHeight * 0.4),
+              ])),
+        ])),
+      );
+    } else {
+      return SingleChildScrollView(
+        child: Center(
+            child: Column(children: [
+          SizedBox(height: headSpace),
+          sendOTPButton(
+              context, 'Send Verification Code', buttonWidth, buttonHeight),
+          SizedBox(height: buttonSpace * 10)
+        ])),
+      );
+    }
   }
 
   Widget sendOTPButton(BuildContext context, String text, double buttonWidth,
@@ -49,6 +63,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           SharedPreferences preferences = await SharedPreferences.getInstance();
           String? email = preferences.getString('username');
           sendOTP(email!);
+          codeSent = true;
+          setState(() {});
         },
         child: sendOTPButtonText(text),
         style: ElevatedButton.styleFrom(
@@ -59,19 +75,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget otpCodeEntry() {
     return TextFormField(
         autofocus: false,
-        style: TextStyle(color: Color(s_jungleGreen)),
+        style: TextStyle(color: Color(s_periwinkleBlue)),
         textAlign: TextAlign.center,
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
             labelText: 'Verification Code',
             labelStyle: TextStyle(
-                color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+                color: Color(s_periwinkleBlue), fontWeight: FontWeight.bold),
             errorStyle: TextStyle(
                 color: Color(s_declineRed), fontWeight: FontWeight.bold),
             border: OutlineInputBorder(),
             focusedBorder: OutlineInputBorder(
-                borderSide:
-                    const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
+                borderSide: const BorderSide(
+                    color: Color(s_periwinkleBlue), width: 2.0))),
         onSaved: (value) {
           otpCode = value!;
         },

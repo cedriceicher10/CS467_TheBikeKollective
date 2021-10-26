@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'email_verification_body.dart';
+import '../screens/main_screen.dart';
 import '../screens/splash_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
@@ -71,10 +72,10 @@ class _WaiverBodyState extends State<WaiverBody> {
       double buttonHeight) {
     return ElevatedButton(
         onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => MainUIScreen()),
-          // );
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+              (Route<dynamic> route) => false);
         },
         child: acceptButtonText(text),
         style: ElevatedButton.styleFrom(

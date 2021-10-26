@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:practice1/components/formatted_text.dart';
+import '../components/formatted_text.dart';
 import '../components/styles.dart';
 import '../components/waiver_body.dart';
 
