@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/formatted_text.dart';
 import '../components/styles.dart';
-import '../components/main_body.dart';
+import '../components/home_body.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: Icon(Icons.settings, color: Color(s_lightPurple)),
                   onPressed: () {})
             ]),
-        body: MainBody(),
+        body: HomeBody(),
       ),
     );
   }

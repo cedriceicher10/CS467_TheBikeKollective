@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:practice1/components/styles.dart';
+import 'styles.dart';
 
-class MainBody extends StatefulWidget {
-  const MainBody({Key? key}) : super(key: key);
+class HomeBody extends StatefulWidget {
+  const HomeBody({Key? key}) : super(key: key);
 
   @override
-  _MainBodyState createState() => _MainBodyState();
+  _HomeBodyState createState() => _HomeBodyState();
 }
 
-class _MainBodyState extends State<MainBody> {
+class _HomeBodyState extends State<HomeBody> {
   double headSpace = 30;
   double edgePadding = 50;
   double searchBarWidth = 0;
