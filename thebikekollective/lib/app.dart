@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '/screens/home_screen.dart';
 import '/screens/splash_screen.dart';
-import '/screens/waiver_screen.dart';
 import '/components/styles.dart';
 
 class App extends StatefulWidget {
@@ -19,7 +19,7 @@ class _AppState extends State<App> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (loggedIn) {
-            return SplashScreen(); // When LIVE, turn this to WaiverScreen()
+            return HomeScreen(); // When LIVE, turn this to HomeScreen()
           } else {
             return SplashScreen();
           }

@@ -3,14 +3,14 @@ import '../components/formatted_text.dart';
 import '../components/styles.dart';
 import '../components/home_body.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

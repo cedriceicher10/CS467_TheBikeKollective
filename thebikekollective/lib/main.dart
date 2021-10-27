@@ -15,8 +15,8 @@ Future<void> main() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
 
   // Manual sign out (Turn this off to enable persistent login)
-  print(preferences.setBool('loggedIn', false));
-  print(preferences.setString('username', 'no username'));
+  preferences.setBool('loggedIn', false);
+  preferences.setString('username', 'no username');
 
   print(preferences.getBool('loggedIn'));
   print(preferences.getString('username'));

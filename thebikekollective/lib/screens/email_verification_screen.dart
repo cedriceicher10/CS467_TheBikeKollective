@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/styles.dart';
 import '../components/formatted_text.dart';
+import 'home_screen.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({Key? key}) : super(key: key);
@@ -179,6 +180,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             align: TextAlign.center,
           ));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeScreen()));
     } else {
       print('EMAIL NOT VERIFIED VIA OTP, BAD CODE');
       SnackBar snackBar = SnackBar(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../screens/waiver_screen.dart';
+import '../screens/home_screen.dart';
 import '../utils/authentication.dart';
 import 'styles.dart';
 import 'formatted_text.dart';
@@ -62,11 +62,15 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
                       await SharedPreferences.getInstance();
                   preferences.setBool('loggedIn', true);
                   preferences.setString('username', email!);
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => WaiverScreen(),
-                    ),
-                  );
+                  // Navigator.of(context).pushReplacement(
+                  //   MaterialPageRoute(
+                  //     builder: (context) => HomeScreen(),
+                  //   ),
+                  // );
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                      (Route<dynamic> route) => false);
                 } else {
                   final snackBar = SnackBar(
                       backgroundColor: Color(s_declineRed),

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import '../screens/waiver_screen.dart';
-import '../screens/login_screen.dart';
-import '../screens/create_account_screen.dart';
 import 'styles.dart';
 import 'formatted_text.dart';
-import 'google_auth_button.dart';
+import '../screens/home_screen.dart';
+import '../screens/login_screen.dart';
+import '../screens/waiver_screen.dart';
 
 class SplashBody extends StatelessWidget {
   const SplashBody({Key? key}) : super(key: key);
@@ -57,12 +56,11 @@ class SplashBody extends StatelessWidget {
       SizedBox(height: buttonSpacing),
       createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
-      GoogleAuthButton(
-          text: 'Sign in with Google',
-          buttonWidth: buttonWidth,
-          buttonHeight: buttonHeight),
+      googleAuthButton(
+          context, 'Sign in with Google', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
       testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
+      SizedBox(height: buttonSpacing)
     ]));
   }
 
@@ -106,10 +104,12 @@ class SplashBody extends StatelessWidget {
             createAccountButton(
                 context, 'Create Account', buttonWidth, buttonHeight),
             SizedBox(height: buttonSpacing),
-            GoogleAuthButton(
-                text: 'Sign in with Google',
-                buttonWidth: buttonWidth,
-                buttonHeight: buttonHeight),
+            googleAuthButton(
+                context, 'Sign in with Google', buttonWidth, buttonHeight),
+            SizedBox(height: buttonSpacing),
+            testUserButton(
+                context, 'Test User', buttonWidth / 2, buttonHeight / 2),
+            SizedBox(height: buttonSpacing)
           ]))
     ]);
   }
@@ -135,7 +135,23 @@ class SplashBody extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CreateAccountScreen()),
+            MaterialPageRoute(
+                builder: (context) => WaiverScreen(google: false)),
+          );
+        },
+        child: createAccountText(text),
+        style: ElevatedButton.styleFrom(
+            primary: Color(s_jungleGreen),
+            fixedSize: Size(buttonWidth, buttonHeight)));
+  }
+
+  Widget googleAuthButton(BuildContext context, String text, double buttonWidth,
+      double buttonHeight) {
+    return ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => WaiverScreen(google: true)),
           );
         },
         child: createAccountText(text),
@@ -150,7 +166,7 @@ class SplashBody extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => WaiverScreen()),
+            MaterialPageRoute(builder: (context) => HomeScreen()),
           );
         },
         child: testUserLogin(text),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../screens/waiver_screen.dart';
+import '../screens/home_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
@@ -163,10 +163,8 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
                 await SharedPreferences.getInstance();
             preferences.setBool('loggedIn', true);
             preferences.setString('username', emailKey.currentState!.value);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => WaiverScreen()),
-            );
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => HomeScreen()));
           }
         },
         style: ElevatedButton.styleFrom(
