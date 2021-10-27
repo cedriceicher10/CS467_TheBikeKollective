@@ -61,7 +61,7 @@ class _CreateMapBody extends State<CreateMapBody>{
     // Zoom functions from chunhunghan's answer here:
     // https://stackoverflow.com/questions/64034365/flutter-map-zoom-not-updating
 
-    double currentZoom = 13.0;
+    double currentZoom = 14.5;
     MapController? mapController = new MapController();
     LatLng currentCenter = LatLng(39.276, -74.576);
 
@@ -183,11 +183,10 @@ class BikeMarker extends Marker {
     height: Bike.size,
     width: Bike.size,
     point: LatLng(bike.lat, bike.long),
-    builder: (BuildContext ctx) => Icon(Icons.location_pin,
-        color: MarkerColor,
-        size:30),
-
-  );
+    builder: (BuildContext ctx) => new Container(
+      child: new Icon(Icons.location_pin, color: MarkerColor, size: 30.0),
+      )
+    );
 
   final Bike bike;
 }
@@ -252,8 +251,6 @@ Container portraitLayout(BuildContext context, bike){
                 ]
             )
           )
-
-
         ],
       ),
     ),
@@ -276,7 +273,8 @@ Container landscapeLayout(BuildContext context, bike){
 
             Padding(
               padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
-              child: Column(              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                     Image(image: NetworkImage(bike.imagePath),
                       width:150 * imageSizeFactor(context),
