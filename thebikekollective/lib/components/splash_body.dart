@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/waiver_screen.dart';
-import '../screens/create_account_screen.dart';
 import '../screens/map.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
@@ -18,7 +17,6 @@ class SplashBody extends StatefulWidget {
 }
 
 class _SplashBodyState extends State<SplashBody> {
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -127,7 +125,8 @@ class _SplashBodyState extends State<SplashBody> {
             SizedBox(height: buttonSpacing),
             mapButton(context, 'Map', buttonWidth, buttonHeight),
             SizedBox(height: buttonSpacing),
-            addBikeButton(context, 'Add your Bike to the Kollective!', buttonWidth, buttonHeight),
+            addBikeButton(context, 'Add your Bike to the Kollective!',
+                buttonWidth, buttonHeight),
             SizedBox(height: buttonSpacing)
           ]))
     ]);
@@ -179,7 +178,6 @@ class _SplashBodyState extends State<SplashBody> {
             fixedSize: Size(buttonWidth, buttonHeight)));
   }
 
-
   Widget testUserButton(BuildContext context, String text, double buttonWidth,
       double buttonHeight) {
     return ElevatedButton(
@@ -192,57 +190,50 @@ class _SplashBodyState extends State<SplashBody> {
         child: testUserLogin(text),
         style: ElevatedButton.styleFrom(
             primary: Colors.black, fixedSize: Size(buttonWidth, buttonHeight)));
-}
-
-Widget mapButton(BuildContext context, String text,
-    double buttonWidth, double buttonHeight) {
-  return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MapScreen()),
-        );
-      },
-      child: mapText(text),
-      style: ElevatedButton.styleFrom(
-          primary: Color(s_jungleGreen),
-          fixedSize: Size(buttonWidth, buttonHeight)));
-}
-
-Widget addBikeButton(BuildContext context, String text, double buttonWidth,
-    double buttonHeight) {
-  File? image;
-  final picker = ImagePicker();
-
-  Future getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    image = File(pickedFile!.path);
-
-    var fileName = DateTime.now().toString() + '.jpg';
-    Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
-    UploadTask uploadTask = storageReference.putFile(image!);
-    await uploadTask;
-    final url = await storageReference.getDownloadURL();
-    return url;
   }
 
-  return ElevatedButton(
-      onPressed: () async{
-        final url = await getImage();
-        Navigator.of(context).pushNamed('addBike', arguments: url);
-      },
-      child: addBikeText(text),
-      style: ElevatedButton.styleFrom(
-          primary: Color(s_jungleGreen),
-          fixedSize: Size(buttonWidth, buttonHeight)));
-}
+  Widget mapButton(BuildContext context, String text, double buttonWidth,
+      double buttonHeight) {
+    return ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MapScreen()),
+          );
+        },
+        child: mapText(text),
+        style: ElevatedButton.styleFrom(
+            primary: Color(s_jungleGreen),
+            fixedSize: Size(buttonWidth, buttonHeight)));
+  }
 
-double imageSizeFactor(BuildContext context) {
-  if (MediaQuery.of(context).orientation == Orientation.portrait) {
-    return 0.8;
-  } else {
-    return 0.85;
+  Widget addBikeButton(BuildContext context, String text, double buttonWidth,
+      double buttonHeight) {
+    File? image;
+    final picker = ImagePicker();
 
+    Future getImage() async {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      image = File(pickedFile!.path);
+
+      var fileName = DateTime.now().toString() + '.jpg';
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child(fileName);
+      UploadTask uploadTask = storageReference.putFile(image!);
+      await uploadTask;
+      final url = await storageReference.getDownloadURL();
+      return url;
+    }
+
+    return ElevatedButton(
+        onPressed: () async {
+          final url = await getImage();
+          Navigator.of(context).pushNamed('addBike', arguments: url);
+        },
+        child: addBikeText(text),
+        style: ElevatedButton.styleFrom(
+            primary: Color(s_jungleGreen),
+            fixedSize: Size(buttonWidth, buttonHeight)));
   }
 
   double imageSizeFactor(BuildContext context) {
