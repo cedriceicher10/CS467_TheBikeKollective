@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../screens/create_account_screen.dart';
 import '../screens/splash_screen.dart';
+import 'google_auth_button.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
 const WAIVER_TEXT_PATH = 'assets/text/waiver.txt';
 
 class WaiverBody extends StatefulWidget {
-  const WaiverBody({Key? key}) : super(key: key);
+  final bool google;
+  const WaiverBody({Key? key, required this.google}) : super(key: key);
 
   @override
   _WaiverBodyState createState() => _WaiverBodyState();
@@ -39,26 +42,52 @@ class _WaiverBodyState extends State<WaiverBody> {
         color: Color(s_jungleGreen),
       ));
     } else {
-      return SingleChildScrollView(
-          child: Column(
-        children: [
-          SizedBox(height: imageHeadSpace),
-          importantText('IMPORTANT'),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
-              child: waiverText(waiverTextFromFile)),
-          SizedBox(height: buttonSpacing),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              acceptButton(context, 'Accept', buttonWidth, buttonHeight),
-              SizedBox(width: 20),
-              declineButton(context, 'Decline', buttonWidth, buttonHeight),
-            ],
-          ),
-          SizedBox(height: buttonSpacing)
-        ],
-      ));
+      if (widget.google) {
+        return SingleChildScrollView(
+            child: Column(
+          children: [
+            SizedBox(height: imageHeadSpace),
+            importantText('IMPORTANT'),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
+                child: waiverText(waiverTextFromFile)),
+            SizedBox(height: buttonSpacing),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GoogleAuthButton(
+                    text: 'Accept',
+                    buttonWidth: buttonWidth,
+                    buttonHeight: buttonHeight),
+                SizedBox(width: 20),
+                declineButton(context, 'Decline', buttonWidth, buttonHeight),
+              ],
+            ),
+            SizedBox(height: buttonSpacing * 10)
+          ],
+        ));
+      } else {
+        return SingleChildScrollView(
+            child: Column(
+          children: [
+            SizedBox(height: imageHeadSpace),
+            importantText('IMPORTANT'),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
+                child: waiverText(waiverTextFromFile)),
+            SizedBox(height: buttonSpacing),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                acceptButton(context, 'Accept', buttonWidth, buttonHeight),
+                SizedBox(width: 20),
+                declineButton(context, 'Decline', buttonWidth, buttonHeight),
+              ],
+            ),
+            SizedBox(height: buttonSpacing * 10)
+          ],
+        ));
+      }
     }
   }
 
@@ -66,10 +95,10 @@ class _WaiverBodyState extends State<WaiverBody> {
       double buttonHeight) {
     return ElevatedButton(
         onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => MainUIScreen()),
-          // );
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => CreateAccountScreen()),
+              (Route<dynamic> route) => false);
         },
         child: acceptButtonText(text),
         style: ElevatedButton.styleFrom(
