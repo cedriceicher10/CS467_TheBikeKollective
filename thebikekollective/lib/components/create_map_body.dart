@@ -1,8 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'styles.dart';
+import 'dart:developer';
+
+Future<List<BikeMarker>> GetBikes( BuildContext context ) async{
+  List<BikeMarker> bikeMarkers = <BikeMarker>[];
+  var bikes = [];
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('bikes').get();
+  querySnapshot.docs.forEach((doc) {
+    bikes.add(new Bike(
+        name: doc['Name'],
+        imagePath: doc['imageURL'],
+        lat: doc['Latitude'],
+        long: doc['Longitude'],
+        description: doc['Description'],
+        condition: doc['Condition']
+      )
+    );
+
+  });
+  bikes.forEach((bike){
+    bikeMarkers.add(new BikeMarker(bike: bike));
+  });
+  return bikeMarkers;
+}
+
+List<BikeMarker> ConvertMarkers(BuildContext context, List<BikeMarker> bmFuture){
+  var list = <BikeMarker>[];
+  bmFuture.forEach((item){
+      list.add(item);
+  });
+  return list;
+}
+
+/*class GetBikes extends StatelessWidget{
+
+  final String documentId;
+  GetBikes(this.documentId);
+  @override
+  Widget build(BuildContext context) {
+    CollectionReference bikes = FirebaseFirestore.instance.collection('bikes');
+
+    return FutureBuilder<QuerySnapshot>(
+        future: bikes.get(),
+        builder:
+            (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text("Error");
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+
+            });
+          }
+        });
+  }
+}*/
+
+
+
 
 class CreateMapBody extends StatefulWidget{
   CreateMapBody({Key? key}) : super(key: key);
@@ -11,7 +69,23 @@ class CreateMapBody extends StatefulWidget{
   _CreateMapBody createState() => _CreateMapBody();
 }
 
-class _CreateMapBody extends State<CreateMapBody> {
+class _CreateMapBody extends State<CreateMapBody>{
+/*
+    void initState(){
+      super.initState();
+      GetBikes(context).then((results) {
+        setState(() {
+          bikes = results;
+
+        });
+      });
+    }
+*/
+
+    List<BikeMarker> bikes = <BikeMarker>[];
+
+
+
     final PopupController _popupLayerController = PopupController();
 
     // Zoom functions from chunhunghan's answer here:
@@ -27,137 +101,207 @@ class _CreateMapBody extends State<CreateMapBody> {
     }
 
     @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        body: FlutterMap(
-            mapController: mapController,
-            options: MapOptions(
-              center: currentCenter,
-              zoom: currentZoom,
-              interactiveFlags: InteractiveFlag.all,
-              onTap: (a, b)
-              {
-                _popupLayerController.hideAllPopups();
-              }
-              // debug: true,
-            ),
-            children: <Widget>[
-            TileLayerWidget(
-                options:
-                  TileLayerOptions(
-                    overrideTilesWhenUrlChanges: false,
-                    urlTemplate:
-                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?source=${DateTime.now().millisecondsSinceEpoch}",
-                    subdomains: ['a', 'b', 'c'],
-                    attributionBuilder: (_) {
-                      return Text("© OpenStreetMap contributors");
-                    },
-                    additionalOptions: {},
-            )),
-            PopupMarkerLayerWidget(options: PopupMarkerLayerOptions(
+    Widget build(BuildContext context){
+      List<BikeMarker> a = <BikeMarker>[];
+      return FutureBuilder<List<BikeMarker>>(
+        future: GetBikes(context),
+        builder: (context, snapshot){
+          List<BikeMarker>? b;
+          if(snapshot.connectionState == ConnectionState.done){
+            if(snapshot.hasData){
+              b = snapshot.data;
+              b!.forEach((el){
+                a.add(el);
+              });
+            }
 
-              // Based off example_popup_with_data.dart from
-              // flutter_map_marker_popup repository (the
-              // plugin used here)
-              // https://github.com/rorystephenson/flutter_map_marker_popup/blob/master/example/lib/example_popup_with_data.dart
+            return Scaffold(
+              body: FlutterMap(
+                  mapController: mapController,
+                  options: MapOptions(
+                      center: currentCenter,
+                      zoom: currentZoom,
+                      interactiveFlags: InteractiveFlag.all,
+                      onTap: (a, b)
+                      {
+                        _popupLayerController.hideAllPopups();
+                      }
+                    // debug: true,
+                  ),
+                  children: <Widget>[
+                    TileLayerWidget(
+                        options:
+                        TileLayerOptions(
+                          overrideTilesWhenUrlChanges: false,
+                          urlTemplate:
+                          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?source=${DateTime.now().millisecondsSinceEpoch}",
+                          subdomains: ['a', 'b', 'c'],
+                          attributionBuilder: (_) {
+                            return Text("© OpenStreetMap contributors");
+                          },
+                          additionalOptions: {},
+                        )),
+                    PopupMarkerLayerWidget(options: PopupMarkerLayerOptions(
 
-              markers: <Marker>[
-                  MonumentMarker(
-                    monument: Monument(
-                      name: 'My First Bike',
-                      imagePath: 'assets/images/louis-tricot-gp1mbqUy5HI-unsplash.jpg',
-                      lat: 39.278,
-                      long: -74.576,
+                      // Based off example_popup_with_data.dart from
+                      // flutter_map_marker_popup repository (the
+                      // plugin used here)
+                      // https://github.com/rorystephenson/flutter_map_marker_popup/blob/master/example/lib/example_popup_with_data.dart
+
+                      markers: a,
+                      popupSnap: PopupSnap.mapTop,
+                      popupAnimation: PopupAnimation.fade(duration: Duration(milliseconds: 300)),
+                      popupController: _popupLayerController,
+                      popupBuilder: (_, Marker marker) {
+                        if (marker is BikeMarker) {
+                          return BikeMarkerPopup(bike: marker.bike);
+                        }
+                        return Card(child: const Text('Not a bike'));
+                      },
                     ),
-                  ),
-                  Marker(
-                    anchorPos: AnchorPos.align(AnchorAlign.top),
-                    point: LatLng(39.276, -74.580),
-                    height: Monument.size,
-                    width: Monument.size,
-                    builder: (BuildContext ctx) => Icon(Icons.shop),
-                  ),
-                ],
-                popupController: _popupLayerController,
-                popupBuilder: (_, Marker marker) {
-                  if (marker is MonumentMarker) {
-                    return MonumentMarkerPopup(monument: marker.monument);
-                  }
-                  return Card(child: const Text('Not a bike'));
-                },
+                    )
+                  ]),
+              floatingActionButton: FloatingActionButton(
+                onPressed: _zoom,
+                tooltip: 'Zoom',
+                backgroundColor: Color(s_jungleGreen),
+                child: Icon(Icons.zoom_out_map_outlined),
               ),
-            )
-        ]),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _zoom,
-          tooltip: 'Zoom',
-          backgroundColor: Color(s_jungleGreen),
-          child: Icon(Icons.zoom_out_map_outlined),
-        ),
+            );
+
+          }
+          return Center(child: Text('Loading...'));
+        }
       );
+
     }
   }
 
-class Monument {
+class Bike {
   static const double size = 25;
 
-  Monument({
+  Bike({
     required this.name,
     required this.imagePath,
     required this.lat,
     required this.long,
+    required this.description,
+    required this.condition
   });
 
   final String name;
   final String imagePath;
   final double lat;
   final double long;
+  final String description;
+  final String condition;
 }
 
-class MonumentMarker extends Marker {
-  MonumentMarker({required this.monument})
+class BikeMarker extends Marker {
+  BikeMarker({required this.bike})
       : super(
     anchorPos: AnchorPos.align(AnchorAlign.top),
-    height: Monument.size,
-    width: Monument.size,
-    point: LatLng(monument.lat, monument.long),
-    builder: (BuildContext ctx) => Icon(Icons.camera_alt),
+    height: Bike.size,
+    width: Bike.size,
+    point: LatLng(bike.lat, bike.long),
+    builder: (BuildContext ctx) => Icon(Icons.location_pin, color: Color(s_jungleGreen), size:30),
   );
 
-  final Monument monument;
+  final Bike bike;
 }
 
-class MonumentMarkerPopup extends StatelessWidget {
-  const MonumentMarkerPopup({Key? key, required this.monument})
+class BikeMarkerPopup extends StatelessWidget {
+  const BikeMarkerPopup({Key? key, required this.bike})
       : super(key: key);
-  final Monument monument;
+  final Bike bike;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 200,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+    if(!isLandscape(context)){
+      return Container(
+        width: double.infinity,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child:
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Image(image: NetworkImage(bike.imagePath),
+                        width:150 * imageSizeFactor(context),
+                        height:150 * imageSizeFactor(context)),
+                    Column(
+                        children: <Widget>[
+                          Text(bike.name, style: TextStyle(fontWeight:FontWeight.bold), textAlign: TextAlign.end),
+                          SizedBox(height: 8),
+                          Text('${bike.description}'),
+                          SizedBox(height: 8),
+                          Text('Condition: ${bike.condition}')
+                        ])
+                  ]
+              )
+
+            ],
+          ),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Image(image: AssetImage(monument.imagePath), width: 200),
-            Text(monument.name),
-            Text('${monument.lat}-${monument.long}'),
-          ],
+      );
+    } else {
+      return Container(
+        alignment: Alignment.topLeft,
+        height: double.infinity,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child:
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Image(image: NetworkImage(bike.imagePath),
+                        width:150 * imageSizeFactor(context),
+                        height:150 * imageSizeFactor(context)),
+                    Column(
+                        children: <Widget>[
+                          Text(bike.name, style: TextStyle(fontWeight:FontWeight.bold), textAlign: TextAlign.end),
+                          SizedBox(height: 8),
+                          Text('${bike.description}'),
+                          SizedBox(height: 8),
+                          Text('Condition: ${bike.condition}')
+                        ])
+                  ]
+              )
+
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
+
   }
 }
 
 double imageSizeFactor(BuildContext context) {
   if (MediaQuery.of(context).orientation == Orientation.portrait) {
-    return 0.5;
+    return 1;
   } else {
-    return 0.15;
+    return 1;
+  }
+}
+
+bool isLandscape(BuildContext context) {
+  if (MediaQuery.of(context).orientation == Orientation.landscape) {
+    return true;
+  } else {
+    return false;
   }
 }
 
