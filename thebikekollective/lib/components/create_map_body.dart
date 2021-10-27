@@ -4,7 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'styles.dart';
+import 'formatted_text.dart';
 import 'dart:developer';
+
+const Color MarkerColor = Color(s_jungleGreen);
+
 
 Future<List<BikeMarker>> GetBikes( BuildContext context ) async{
   List<BikeMarker> bikeMarkers = <BikeMarker>[];
@@ -43,6 +47,7 @@ List<BikeMarker> ConvertMarkers(BuildContext context, List<BikeMarker> bmFuture)
 
 class CreateMapBody extends StatefulWidget{
   CreateMapBody({Key? key}) : super(key: key);
+
 
   @override
   _CreateMapBody createState() => _CreateMapBody();
@@ -115,7 +120,6 @@ class _CreateMapBody extends State<CreateMapBody>{
                       // flutter_map_marker_popup repository (the
                       // plugin used here)
                       // https://github.com/rorystephenson/flutter_map_marker_popup/blob/master/example/lib/example_popup_with_data.dart
-
                       markers: markerList,
                       popupSnap: PopupSnap.mapTop,
                       popupAnimation: PopupAnimation.fade(duration: Duration(milliseconds: 300)),
@@ -126,6 +130,11 @@ class _CreateMapBody extends State<CreateMapBody>{
                         }
                         return Card(child: const Text('Not a bike'));
                       },
+                      markerTapBehavior: MarkerTapBehavior.custom((marker, popupController) => {
+                        popupController.hideAllPopups(),
+                        popupController.togglePopup(marker),
+                      }
+                      )
                     ),
                     )
                   ]),
@@ -165,6 +174,8 @@ class Bike {
   final String condition;
 }
 
+
+
 class BikeMarker extends Marker {
   BikeMarker({required this.bike})
       : super(
@@ -173,8 +184,9 @@ class BikeMarker extends Marker {
     width: Bike.size,
     point: LatLng(bike.lat, bike.long),
     builder: (BuildContext ctx) => Icon(Icons.location_pin,
-        color: Color(s_jungleGreen),
+        color: MarkerColor,
         size:30),
+
   );
 
   final Bike bike;
@@ -208,27 +220,39 @@ Container portraitLayout(BuildContext context, bike){
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Image(image: NetworkImage(bike.imagePath),
-                    width:150 * imageSizeFactor(context),
-                    height:150 * imageSizeFactor(context)),
-                Column(
-                    children: <Widget>[
-                      Text(
-                          bike.name,
-                          style:
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Column(
+                      children: <Widget>[
+                        Image(image: NetworkImage(bike.imagePath),
+                            width:150 * imageSizeFactor(context),
+                            height:150 * imageSizeFactor(context)),
+
+                      ]
+                  ),
+
+                  Column(
+                      children: <Widget>[
+                        Text(
+                            bike.name,
+                            style:
                             TextStyle(fontWeight:FontWeight.bold),
                             textAlign: TextAlign.end
-                      ),
-                      SizedBox(height: 8),
-                      Text('${bike.description}'),
-                      SizedBox(height: 8),
-                      Text('Condition: ${bike.condition}')
-                    ])
-              ]
+                        ),
+                        SizedBox(height: 8),
+                        Text('${bike.description}'),
+                        SizedBox(height: 8),
+                        Text('Condition: ${bike.condition}'),
+                        SizedBox(height: 8),
+                        rideButton(context, "Ride me!", 100, 25)
+                      ])
+                ]
+            )
           )
+
 
         ],
       ),
@@ -249,28 +273,54 @@ Container landscapeLayout(BuildContext context, bike){
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Image(image: NetworkImage(bike.imagePath),
-                    width:150 * imageSizeFactor(context),
-                    height:150 * imageSizeFactor(context)),
-                Column(
-                    children: <Widget>[
-                      Text(bike.name, style:
-                        TextStyle(fontWeight:FontWeight.bold),
-                          textAlign: TextAlign.end),
-                      SizedBox(height: 8),
-                      Text('${bike.description}'),
-                      SizedBox(height: 8),
-                      Text('Condition: ${bike.condition}')
-                    ])
-              ]
-          )
 
+            Padding(
+              padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
+              child: Column(              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                    Image(image: NetworkImage(bike.imagePath),
+                      width:150 * imageSizeFactor(context),
+                      height:150 * imageSizeFactor(context)),
+                    Column(
+                        children: <Widget>[
+                          Text(bike.name, style:
+                          TextStyle(fontWeight:FontWeight.bold),
+                              textAlign: TextAlign.end),
+                          SizedBox(height: 8),
+                          Text('${bike.description}'),
+                          SizedBox(height: 8),
+                          Text('Condition: ${bike.condition}'),
+                          SizedBox(height: 8),
+                          rideButton(context, "Ride me!", 100, 25)
+                        ])
+              ]
+            )
+          )
         ],
       ),
     ),
+  );
+}
+
+Widget rideButton(BuildContext context, String text,
+    double buttonWidth, double buttonHeight) {
+  return ElevatedButton(
+      onPressed: () {
+        return;
+      },
+      child: rideButtonText(text),
+      style: ElevatedButton.styleFrom(
+          primary: Color(s_jungleGreen),
+          fixedSize: Size(buttonWidth, buttonHeight)));
+}
+
+Widget rideButtonText(String text) {
+  return FormattedText(
+    text: text,
+    size: s_fontSizeSmall,
+    color: Colors.white,
+
+    weight: FontWeight.bold,
   );
 }
 
