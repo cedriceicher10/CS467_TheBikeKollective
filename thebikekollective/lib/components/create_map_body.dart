@@ -70,6 +70,11 @@ class _CreateMapBody extends State<CreateMapBody> with TickerProviderStateMixin{
       mapController!.move(currentCenter, currentZoom);
     }
 
+    // This is pretty much entirely from the flutter_map's
+    // `animated_map_controller.dart` example in their repository.
+    // it can be viewed here:
+    // https://github.com/rorystephenson/flutter_map/blob/master/example/lib/pages/animated_map_controller.dart
+    
     void _animatedMapMove(LatLng destLocation, double destZoom) {
       // Create some tweens. These serve to split up the transition from one location to another.
       // In our case, we want to split the transition be<tween> our current map center and the destination.
