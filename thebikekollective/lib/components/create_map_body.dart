@@ -57,12 +57,12 @@ class _CreateMapBody extends State<CreateMapBody>{
     // https://stackoverflow.com/questions/64034365/flutter-map-zoom-not-updating
 
     double currentZoom = 13.0;
-    MapController mapController = MapController();
+    MapController? mapController = new MapController();
     LatLng currentCenter = LatLng(39.276, -74.576);
 
     void _zoom() {
       currentZoom = currentZoom - 1;
-      mapController.move(currentCenter, currentZoom);
+      mapController!.move(currentCenter, currentZoom);
     }
 
     @override
@@ -82,8 +82,11 @@ class _CreateMapBody extends State<CreateMapBody>{
 
             return Scaffold(
               body: FlutterMap(
-                  mapController: mapController,
+                  mapController: new MapController(),
                   options: MapOptions(
+                      onMapCreated: (c){
+                        mapController = c;
+                      },
                       center: currentCenter,
                       zoom: currentZoom,
                       interactiveFlags: InteractiveFlag.all,
