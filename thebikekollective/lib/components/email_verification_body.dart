@@ -1,5 +1,7 @@
+import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:email_auth/email_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'styles.dart';
@@ -15,12 +17,17 @@ class EmailVerificationBody extends StatefulWidget {
 
 class _EmailVerificationBodyState extends State<EmailVerificationBody> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  EmailAuth emailAuth = EmailAuth(sessionName: "Email Verification Session");
+  //EmailAuth emailAuth = EmailAuth(sessionName: "Email Verification Session");
+  final serviceId = 'service_k5j0ufv';
+  final templateId = 'template_svjbi9l';
+  final userId = 'user_lbirH0qOMwQ1RghLQ9LrB';
+
   double buttonWidth = 275;
   double buttonHeight = 65;
   double headSpace = 100;
   double buttonSpace = 5;
-  String otpCode = '0';
+  int otpCodeOrig = 0;
+  String optCodeUser = '0';
 
   bool codeSent = false;
 
@@ -37,7 +44,7 @@ class _EmailVerificationBodyState extends State<EmailVerificationBody> {
           Form(
               key: formKey,
               child: Column(children: [
-                Container(width: 200, child: otpCodeEntry()),
+                Container(width: 200, child: optCodeUserEntry()),
                 SizedBox(height: buttonSpace),
                 verifyButton(buttonWidth * 0.4, buttonHeight * 0.4),
               ])),
@@ -72,9 +79,10 @@ class _EmailVerificationBodyState extends State<EmailVerificationBody> {
             fixedSize: Size(buttonWidth, buttonHeight)));
   }
 
-  Widget otpCodeEntry() {
+  Widget optCodeUserEntry() {
     return TextFormField(
         autofocus: false,
+        keyboardType: TextInputType.number,
         style: TextStyle(color: Color(s_periwinkleBlue)),
         textAlign: TextAlign.center,
         textAlignVertical: TextAlignVertical.center,
@@ -89,11 +97,14 @@ class _EmailVerificationBodyState extends State<EmailVerificationBody> {
                 borderSide: const BorderSide(
                     color: Color(s_periwinkleBlue), width: 2.0))),
         onSaved: (value) {
-          otpCode = value!;
+          optCodeUser = value!;
         },
         validator: (value) {
-          if (value!.isEmpty) {
+          final result = num.tryParse(value!);
+          if (value.isEmpty) {
             return 'Please enter a verification code.';
+          } else if (result == null) {
+            return 'Code must be integers.';
           } else {
             return null;
           }
@@ -108,7 +119,7 @@ class _EmailVerificationBodyState extends State<EmailVerificationBody> {
             SharedPreferences preferences =
                 await SharedPreferences.getInstance();
             String? email = preferences.getString('username');
-            verifyOTP(email!, otpCode);
+            verifyOTP(email!, optCodeUser);
           }
         },
         style: ElevatedButton.styleFrom(
@@ -124,40 +135,39 @@ class _EmailVerificationBodyState extends State<EmailVerificationBody> {
   }
 
   void sendOTP(String email) async {
-    var response = await emailAuth.sendOtp(recipientMail: email);
-    if (response) {
+    var seed = new Random();
+    otpCodeOrig = seed.nextInt(899999) + 100000; // Ensure 6 digit code
+
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    final response = await http.post(
+      url,
+      headers: {
+        'origin': 'http://localhost',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'service_id': serviceId,
+        'template_id': templateId,
+        'user_id': userId,
+        'template_params': {
+          'otp_code': otpCodeOrig,
+          'to_email': email,
+        },
+      }),
+    );
+    print("http response: ${response.statusCode}:${response.body}");
+    if (response.statusCode <= 200) {
       print('EMAIL OTP SENT SUCCESSFULLY');
-      SnackBar snackBar = SnackBar(
-          backgroundColor: Color(s_periwinkleBlue),
-          content: FormattedText(
-            text: 'Email verification code sent!',
-            size: s_fontSizeSmall,
-            color: Colors.white,
-            font: s_font_BonaNova,
-            weight: FontWeight.bold,
-            align: TextAlign.center,
-          ));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(emailSentSuccessSnackBar(email));
     } else {
       print('EMAIL NOT SENT SUCCESSFULLY');
-      SnackBar snackBar = SnackBar(
-          backgroundColor: Color(s_declineRed),
-          content: FormattedText(
-            text: 'Error sending email address!',
-            size: s_fontSizeSmall,
-            color: Colors.white,
-            font: s_font_BonaNova,
-            weight: FontWeight.bold,
-            align: TextAlign.center,
-          ));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(emailSentFailSnackBar(email));
     }
   }
 
   void verifyOTP(String email, String userOPT) async {
-    bool response =
-        await emailAuth.validateOtp(recipientMail: email, userOtp: userOPT);
-    if (response) {
+    if (int.parse(userOPT) == otpCodeOrig) {
       print('EMAIL VERIFIED VIA OTP');
       var snapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -168,33 +178,66 @@ class _EmailVerificationBodyState extends State<EmailVerificationBody> {
           .collection('users')
           .doc(docId)
           .update({'verified': true});
-      SnackBar snackBar = SnackBar(
-          backgroundColor: Color(s_periwinkleBlue),
-          content: FormattedText(
-            text: 'Email has been verified!',
-            size: s_fontSizeSmall,
-            color: Colors.white,
-            font: s_font_BonaNova,
-            weight: FontWeight.bold,
-            align: TextAlign.center,
-          ));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(otpVerfieidSnackBar(email));
+      await Future.delayed(Duration(seconds: 2)); // Lets the snackbar show
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => HomeScreen()));
     } else {
       print('EMAIL NOT VERIFIED VIA OTP, BAD CODE');
-      SnackBar snackBar = SnackBar(
-          backgroundColor: Color(s_declineRed),
-          content: FormattedText(
-            text: 'Incorrect verification code!',
-            size: s_fontSizeSmall,
-            color: Colors.white,
-            font: s_font_BonaNova,
-            weight: FontWeight.bold,
-            align: TextAlign.center,
-          ));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(otpFailedSnackBar());
     }
+  }
+
+  SnackBar emailSentSuccessSnackBar(String email) {
+    return SnackBar(
+        backgroundColor: Color(s_periwinkleBlue),
+        content: FormattedText(
+          text: 'Email verification code sent successfully to $email!',
+          size: s_fontSizeSmall,
+          color: Colors.white,
+          font: s_font_BonaNova,
+          weight: FontWeight.bold,
+          align: TextAlign.center,
+        ));
+  }
+
+  SnackBar emailSentFailSnackBar(String email) {
+    return SnackBar(
+        backgroundColor: Color(s_declineRed),
+        content: FormattedText(
+          text: 'Error sending email to $email!',
+          size: s_fontSizeSmall,
+          color: Colors.white,
+          font: s_font_BonaNova,
+          weight: FontWeight.bold,
+          align: TextAlign.center,
+        ));
+  }
+
+  SnackBar otpVerfieidSnackBar(String email) {
+    return SnackBar(
+        backgroundColor: Color(s_periwinkleBlue),
+        content: FormattedText(
+          text: 'The email $email has been verified!',
+          size: s_fontSizeSmall,
+          color: Colors.white,
+          font: s_font_BonaNova,
+          weight: FontWeight.bold,
+          align: TextAlign.center,
+        ));
+  }
+
+  SnackBar otpFailedSnackBar() {
+    return SnackBar(
+        backgroundColor: Color(s_declineRed),
+        content: FormattedText(
+          text: 'Incorrect verification code!',
+          size: s_fontSizeSmall,
+          color: Colors.white,
+          font: s_font_BonaNova,
+          weight: FontWeight.bold,
+          align: TextAlign.center,
+        ));
   }
 
   Widget sendOTPButtonText(String text) {

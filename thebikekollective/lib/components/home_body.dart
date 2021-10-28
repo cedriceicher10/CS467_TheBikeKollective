@@ -73,7 +73,7 @@ class _HomeBodyState extends State<HomeBody> {
     searchBarWidth = screenWidth * 0.80;
     searchBarHeight = screenHeight * 0.05;
     mapWidth = screenWidth * 0.80;
-    mapHeight = screenHeight * 0.50;
+    mapHeight = screenHeight * 0.45;
     addBikeWidth = screenWidth * 0.50;
     addBikeHeight = screenHeight * 0.05;
   }
@@ -84,32 +84,27 @@ class _HomeBodyState extends State<HomeBody> {
         onPressed: () async {
           SharedPreferences preferences = await SharedPreferences.getInstance();
           String? username = preferences.getString('username');
-          var snapshot = await FirebaseFirestore.instance
-              .collection('users')
-              .where('username', isEqualTo: username)
-              .get();
-          snapshot.docs.forEach((result) {
-            if (result.data()['verified'] == true) {
-              print('EMAIL ALREADY VERIFIED');
-              final snackBar = SnackBar(
-                  backgroundColor: Color(s_jungleGreen),
-                  content: FormattedText(
-                    text: 'Email is already verified!',
-                    size: s_fontSizeSmall,
-                    color: Colors.white,
-                    font: s_font_BonaNova,
-                    weight: FontWeight.bold,
-                    align: TextAlign.center,
-                  ));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            } else {
-              print('EMAIL IS NOT VERIFIED');
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EmailVerificationScreen()));
-            }
-          });
+          if (username == 'no username') {
+            ScaffoldMessenger.of(context).showSnackBar(testUserSnackBar());
+          } else {
+            var snapshot = await FirebaseFirestore.instance
+                .collection('users')
+                .where('username', isEqualTo: username)
+                .get();
+            snapshot.docs.forEach((result) {
+              if (result.data()['verified'] == true) {
+                print('EMAIL ALREADY VERIFIED');
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(alreadyVerifiedSnackBar());
+              } else {
+                print('EMAIL IS NOT VERIFIED');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EmailVerificationScreen()));
+              }
+            });
+          }
         },
         child: emailVerificationButtonText(text),
         style: ElevatedButton.styleFrom(
@@ -125,5 +120,31 @@ class _HomeBodyState extends State<HomeBody> {
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
     );
+  }
+
+  SnackBar alreadyVerifiedSnackBar() {
+    return SnackBar(
+        backgroundColor: Color(s_jungleGreen),
+        content: FormattedText(
+          text: 'Email is already verified!',
+          size: s_fontSizeSmall,
+          color: Colors.white,
+          font: s_font_BonaNova,
+          weight: FontWeight.bold,
+          align: TextAlign.center,
+        ));
+  }
+
+  SnackBar testUserSnackBar() {
+    return SnackBar(
+        backgroundColor: Color(s_declineRed),
+        content: FormattedText(
+          text: 'You are using the test user bypass!',
+          size: s_fontSizeSmall,
+          color: Colors.white,
+          font: s_font_BonaNova,
+          weight: FontWeight.bold,
+          align: TextAlign.center,
+        ));
   }
 }
