@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'email_verification_body.dart';
+import '../screens/email_verification_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
@@ -92,7 +92,7 @@ class _HomeBodyState extends State<HomeBody> {
             if (result.data()['verified'] == true) {
               print('EMAIL ALREADY VERIFIED');
               final snackBar = SnackBar(
-                  backgroundColor: Color(s_periwinkleBlue),
+                  backgroundColor: Color(s_jungleGreen),
                   content: FormattedText(
                     text: 'Email is already verified!',
                     size: s_fontSizeSmall,
@@ -107,7 +107,7 @@ class _HomeBodyState extends State<HomeBody> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => EmailVerificationBody()));
+                      builder: (context) => EmailVerificationScreen()));
             }
           });
         },
