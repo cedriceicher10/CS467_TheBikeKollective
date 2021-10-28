@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:practice1/components/formatted_text.dart';
+import '../components/formatted_text.dart';
 import '../components/styles.dart';
 import '../components/waiver_body.dart';
 
 class WaiverScreen extends StatelessWidget {
-  const WaiverScreen({Key? key}) : super(key: key);
+  final bool google;
+  const WaiverScreen({Key? key, required this.google}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class WaiverScreen extends StatelessWidget {
           backgroundColor: Color(s_jungleGreen),
           centerTitle: true,
         ),
-        body: WaiverBody(),
+        body: WaiverBody(google: google),
       ),
     );
   }
