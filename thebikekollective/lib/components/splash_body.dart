@@ -61,7 +61,9 @@ class _SplashBodyState extends State<SplashBody> {
                   ));
                 },
               ))),
-      SizedBox(height: buttonSpacing * 2),
+      SizedBox(height: buttonSpacing),
+      disclaimer('NOTE: Persistent login is DISABLED for testing'),
+      SizedBox(height: buttonSpacing),
       loginButton(context, 'Login', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
       createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
@@ -108,27 +110,35 @@ class _SplashBodyState extends State<SplashBody> {
                       ));
                     },
                   )))),
-      Flexible(
-          flex: 1,
-          fit: FlexFit.tight,
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            loginButton(context, 'Login', buttonWidth, buttonHeight),
-            SizedBox(height: buttonSpacing),
-            createAccountButton(
-                context, 'Create Account', buttonWidth, buttonHeight),
-            SizedBox(height: buttonSpacing),
-            googleAuthButton(
-                context, 'Sign in with Google', buttonWidth, buttonHeight),
-            SizedBox(height: buttonSpacing),
-            testUserButton(
-                context, 'Test User', buttonWidth / 2, buttonHeight / 2),
-            SizedBox(height: buttonSpacing),
-            mapButton(context, 'Map', buttonWidth, buttonHeight),
-            SizedBox(height: buttonSpacing),
-            addBikeButton(context, 'Add your Bike to the Kollective!',
-                buttonWidth, buttonHeight),
-            SizedBox(height: buttonSpacing)
-          ]))
+      SingleChildScrollView(
+          child: Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        disclaimer(
+                            'NOTE: Persistent login is DISABLED for testing'),
+                        SizedBox(height: buttonSpacing),
+                        loginButton(
+                            context, 'Login', buttonWidth, buttonHeight),
+                        SizedBox(height: buttonSpacing),
+                        createAccountButton(context, 'Create Account',
+                            buttonWidth, buttonHeight),
+                        SizedBox(height: buttonSpacing),
+                        googleAuthButton(context, 'Sign in with Google',
+                            buttonWidth, buttonHeight),
+                        SizedBox(height: buttonSpacing),
+                        mapButton(context, 'Map', buttonWidth, buttonHeight),
+                        SizedBox(height: buttonSpacing),
+                        addBikeButton(
+                            context, 'Add Bike', buttonWidth, buttonHeight),
+                        SizedBox(height: buttonSpacing),
+                        testUserButton(context, 'Test User', buttonWidth / 2,
+                            buttonHeight / 2),
+                      ]))))
     ]);
   }
 
@@ -293,4 +303,14 @@ Widget addBikeText(String text) {
     font: s_font_AmaticSC,
     weight: FontWeight.bold,
   );
+}
+
+Widget disclaimer(String text) {
+  return FormattedText(
+      text: text,
+      size: s_fontSizeExtraSmall,
+      color: Color(s_declineRed),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+      align: TextAlign.center);
 }
