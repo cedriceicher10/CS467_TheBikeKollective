@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/formatted_text.dart';
 import '../components/styles.dart';
 import '../components/home_body.dart';
+import '../components/side_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -17,14 +18,11 @@ class _HomeScreenState extends State<HomeScreen> {
       title: 'Main Screen',
       home: Scaffold(
         appBar: AppBar(
-            title: mainTitle(),
-            backgroundColor: Color(s_jungleGreen),
-            centerTitle: true,
-            actions: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.settings, color: Color(s_lightPurple)),
-                  onPressed: () {})
-            ]),
+          title: mainTitle(),
+          backgroundColor: Color(s_jungleGreen),
+          centerTitle: true,
+        ),
+        drawer: SideMenu(),
         body: HomeBody(),
       ),
     );
