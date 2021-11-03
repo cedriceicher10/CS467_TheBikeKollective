@@ -238,7 +238,7 @@ class _SplashBodyState extends State<SplashBody> {
     return ElevatedButton(
         onPressed: () async {
           final url = await getImage();
-          Navigator.of(context).pushNamed('addBike', arguments: url);
+          Navigator.of(context).pushNamed('interestForm', arguments: url);
         },
         child: addBikeText(text),
         style: ElevatedButton.styleFrom(
