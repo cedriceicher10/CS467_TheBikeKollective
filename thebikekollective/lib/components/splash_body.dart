@@ -61,9 +61,7 @@ class _SplashBodyState extends State<SplashBody> {
                   ));
                 },
               ))),
-      SizedBox(height: buttonSpacing),
-      disclaimer('NOTE: Persistent login is DISABLED for testing'),
-      SizedBox(height: buttonSpacing),
+      SizedBox(height: buttonSpacing * 2),
       loginButton(context, 'Login', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
       createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
@@ -119,8 +117,6 @@ class _SplashBodyState extends State<SplashBody> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        disclaimer(
-                            'NOTE: Persistent login is DISABLED for testing'),
                         SizedBox(height: buttonSpacing),
                         loginButton(
                             context, 'Login', buttonWidth, buttonHeight),
@@ -303,14 +299,4 @@ Widget addBikeText(String text) {
     font: s_font_AmaticSC,
     weight: FontWeight.bold,
   );
-}
-
-Widget disclaimer(String text) {
-  return FormattedText(
-      text: text,
-      size: s_fontSizeExtraSmall,
-      color: Color(s_declineRed),
-      font: s_font_BonaNova,
-      weight: FontWeight.bold,
-      align: TextAlign.center);
 }

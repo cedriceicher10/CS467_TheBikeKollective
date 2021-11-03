@@ -79,7 +79,7 @@ class _SideMenuState extends State<SideMenu> {
                     onTap: () {},
                   ),
                   ListTile(
-                    title: menuItemsText('Sign Out'),
+                    title: signOutText('Sign Out'),
                     onTap: () async {
                       await Authentication.signOut(context: context);
                       SharedPreferences preferences =
@@ -166,6 +166,16 @@ class _SideMenuState extends State<SideMenu> {
       text: text,
       size: s_fontSizeLarge,
       color: Color(s_jungleGreen),
+      font: s_font_AmaticSC,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget signOutText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeLarge,
+      color: Color(s_declineRed),
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
     );
