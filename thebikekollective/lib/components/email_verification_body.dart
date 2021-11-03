@@ -17,10 +17,9 @@ class EmailVerificationBody extends StatefulWidget {
 
 class _EmailVerificationBodyState extends State<EmailVerificationBody> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  //EmailAuth emailAuth = EmailAuth(sessionName: "Email Verification Session");
-  final serviceId = 'service_k5j0ufv';
-  final templateId = 'template_svjbi9l';
-  final userId = 'user_lbirH0qOMwQ1RghLQ9LrB';
+  final serviceId = 'service_k5j0ufv'; // per EmailJS/Email Services
+  final templateId = 'template_svjbi9l'; // per EmailJS/Email Templates
+  final userId = 'user_lbirH0qOMwQ1RghLQ9LrB'; // per EmailJS/Integration
 
   double buttonWidth = 275;
   double buttonHeight = 65;
