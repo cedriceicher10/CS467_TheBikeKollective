@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/waiver_screen.dart';
-import '../screens/map.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
@@ -69,8 +68,6 @@ class _SplashBodyState extends State<SplashBody> {
       googleAuthButton(
           context, 'Sign in with Google', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
-      mapButton(context, 'Map', buttonWidth, buttonHeight),
-      SizedBox(height: buttonSpacing),
       addBikeButton(context, 'Add Bike', buttonWidth, buttonHeight),
       testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
       SizedBox(height: buttonSpacing)
@@ -126,8 +123,6 @@ class _SplashBodyState extends State<SplashBody> {
                         SizedBox(height: buttonSpacing),
                         googleAuthButton(context, 'Sign in with Google',
                             buttonWidth, buttonHeight),
-                        SizedBox(height: buttonSpacing),
-                        mapButton(context, 'Map', buttonWidth, buttonHeight),
                         SizedBox(height: buttonSpacing),
                         addBikeButton(
                             context, 'Add Bike', buttonWidth, buttonHeight),
@@ -196,21 +191,6 @@ class _SplashBodyState extends State<SplashBody> {
         child: testUserLogin(text),
         style: ElevatedButton.styleFrom(
             primary: Colors.black, fixedSize: Size(buttonWidth, buttonHeight)));
-  }
-
-  Widget mapButton(BuildContext context, String text, double buttonWidth,
-      double buttonHeight) {
-    return ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MapScreen()),
-          );
-        },
-        child: mapText(text),
-        style: ElevatedButton.styleFrom(
-            primary: Color(s_jungleGreen),
-            fixedSize: Size(buttonWidth, buttonHeight)));
   }
 
   Widget addBikeButton(BuildContext context, String text, double buttonWidth,
