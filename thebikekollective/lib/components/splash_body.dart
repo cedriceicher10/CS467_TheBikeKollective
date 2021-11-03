@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/waiver_screen.dart';
-import '../screens/map.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
@@ -61,17 +60,13 @@ class _SplashBodyState extends State<SplashBody> {
                   ));
                 },
               ))),
-      SizedBox(height: buttonSpacing),
-      disclaimer('NOTE: Persistent login is DISABLED for testing'),
-      SizedBox(height: buttonSpacing),
+      SizedBox(height: buttonSpacing * 2),
       loginButton(context, 'Login', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
       createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
       googleAuthButton(
           context, 'Sign in with Google', buttonWidth, buttonHeight),
-      SizedBox(height: buttonSpacing),
-      mapButton(context, 'Map', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
       addBikeButton(context, 'Add Bike', buttonWidth, buttonHeight),
       testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
@@ -119,8 +114,6 @@ class _SplashBodyState extends State<SplashBody> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        disclaimer(
-                            'NOTE: Persistent login is DISABLED for testing'),
                         SizedBox(height: buttonSpacing),
                         loginButton(
                             context, 'Login', buttonWidth, buttonHeight),
@@ -130,8 +123,6 @@ class _SplashBodyState extends State<SplashBody> {
                         SizedBox(height: buttonSpacing),
                         googleAuthButton(context, 'Sign in with Google',
                             buttonWidth, buttonHeight),
-                        SizedBox(height: buttonSpacing),
-                        mapButton(context, 'Map', buttonWidth, buttonHeight),
                         SizedBox(height: buttonSpacing),
                         addBikeButton(
                             context, 'Add Bike', buttonWidth, buttonHeight),
@@ -200,21 +191,6 @@ class _SplashBodyState extends State<SplashBody> {
         child: testUserLogin(text),
         style: ElevatedButton.styleFrom(
             primary: Colors.black, fixedSize: Size(buttonWidth, buttonHeight)));
-  }
-
-  Widget mapButton(BuildContext context, String text, double buttonWidth,
-      double buttonHeight) {
-    return ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MapScreen()),
-          );
-        },
-        child: mapText(text),
-        style: ElevatedButton.styleFrom(
-            primary: Color(s_jungleGreen),
-            fixedSize: Size(buttonWidth, buttonHeight)));
   }
 
   Widget addBikeButton(BuildContext context, String text, double buttonWidth,
@@ -303,14 +279,4 @@ Widget addBikeText(String text) {
     font: s_font_AmaticSC,
     weight: FontWeight.bold,
   );
-}
-
-Widget disclaimer(String text) {
-  return FormattedText(
-      text: text,
-      size: s_fontSizeExtraSmall,
-      color: Color(s_declineRed),
-      font: s_font_BonaNova,
-      weight: FontWeight.bold,
-      align: TextAlign.center);
 }
