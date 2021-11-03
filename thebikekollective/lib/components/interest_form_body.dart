@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../screens/add_bike_screen.dart';
 import '../screens/splash_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
