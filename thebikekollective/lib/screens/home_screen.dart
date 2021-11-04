@@ -5,7 +5,9 @@ import '../components/home_body.dart';
 import '../components/side_menu.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final bool map;
+
+  const HomeScreen({Key? key, required this.map}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -15,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Main Screen',
+      title: 'Home Screen',
       home: Scaffold(
         appBar: AppBar(
           title: mainTitle(),
@@ -23,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
           centerTitle: true,
         ),
         drawer: SideMenu(),
-        body: HomeBody(),
+        body: HomeBody(map: widget.map),
       ),
     );
   }

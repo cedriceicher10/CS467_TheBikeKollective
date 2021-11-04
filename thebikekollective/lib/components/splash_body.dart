@@ -185,7 +185,7 @@ class _SplashBodyState extends State<SplashBody> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => HomeScreen(map: true)),
           );
         },
         child: testUserLogin(text),
