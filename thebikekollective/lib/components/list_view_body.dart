@@ -13,7 +13,24 @@ class ListViewBody extends StatefulWidget {
 
 class _ListViewBodyState extends State<ListViewBody> {
   String sortString = 'Sort by: Distance';
+  List<String> sortItems = <String>['Sort by: Distance', 'Sort by: Condition'];
   String filterString = 'No Filter';
+  List<String> filterItems = <String>[
+    'No Filter',
+    'Filter by: Condition',
+    'Filter by: Tag #1', // TO DO: Dynamically create this list from available tags
+    'Filter by: Tag #2'
+  ];
+  String conditionString = 'Excellent';
+  List<String> conditionItems = <String>[
+    'Excellent',
+    'Great',
+    'Good',
+    'Fair',
+    'Poor',
+    'Totaled'
+  ];
+  bool filterCondition = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +59,10 @@ class _ListViewBodyState extends State<ListViewBody> {
               color: Color(s_cadmiumOrange),
             ),
             onChanged: (String? newValue) {
-              setState(() {
-                sortString = newValue!;
-              });
+              sortString = newValue!;
+              setState(() {});
             },
-            items: <String>['Sort by: Distance', 'Sort by: Condition']
-                .map<DropdownMenuItem<String>>((String value) {
+            items: sortItems.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: dropDownText(value),
@@ -69,47 +84,70 @@ class _ListViewBodyState extends State<ListViewBody> {
               color: Color(s_cadmiumOrange),
             ),
             onChanged: (String? newValue) {
-              setState(() {
-                filterString = newValue!;
-              });
+              filterString = newValue!;
+              if (filterString == filterItems[1]) {
+                filterCondition = true;
+              } else {
+                filterCondition = false;
+              }
+              setState(() {});
             },
-            items: <String>[
-              'No Filter',
-              'Filter by: Condition',
-              'Filter by: Mountain Bike',
-              'Filter by: Road Bike'
-            ].map<DropdownMenuItem<String>>((String value) {
+            items: filterItems.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: dropDownText(value),
               );
             }).toList(),
-          ))
+          )),
+      SizedBox(width: 20),
+      filterCondition
+          ? Container(
+              height: 40,
+              child: DropdownButton<String>(
+                value: conditionString,
+                icon: const Icon(Icons.arrow_drop_down,
+                    color: Color(s_cadmiumOrange)),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Color(s_cadmiumOrange)),
+                underline: Container(
+                  height: 2,
+                  color: Color(s_cadmiumOrange),
+                ),
+                onChanged: (String? newValue) {
+                  conditionString = newValue!;
+                  setState(() {});
+                },
+                items: conditionItems
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: dropDownText(value),
+                  );
+                }).toList(),
+              ))
+          : Container() // Hides condition drop-down when filter isn't on Filter: Condition
     ]);
   }
 
   Widget listViewBikes() {
     return StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('bikes')
-            // .orderBy(
-            //     'epoch_seconds') // Should also order by distance, condition, etc.
-            .snapshots(),
-        //
-        // TO DO: Only show bikes that are within x distance
-        // TO DO: Sort by condition
-        // TO DO: Sort by distance
-        // TO DO: Filter by tags
-        //
+        stream: bikeQuery(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasData) {
-            //&& snapshot.data!.docs.length > 0
             return Flexible(
                 child: ListView.builder(
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
+                //
+                snapshot = sortSnapshot(snapshot);
+                // TO DO: Only show bikes that are within x distance
+                // TO DO: Sort by condition
+                // TO DO: Sort by distance
+                // TO DO: Filter by tags
+                //
                 var post = snapshot.data!.docs[index];
                 return Card(
                     elevation: 2,
@@ -124,7 +162,8 @@ class _ListViewBodyState extends State<ListViewBody> {
                             children: [
                               entryDescription(post['Description']),
                               conditionDescription(
-                                  'Condition: ' + post['Condition']),
+                                  'Distance: XX mi | Condition: ' + // TO DO: Add in actual distance per bike
+                                      post['Condition']),
                             ]),
                         trailing: Image(image: NetworkImage(post['imageURL'])),
                         contentPadding: EdgeInsets.all(10),
@@ -138,6 +177,30 @@ class _ListViewBodyState extends State<ListViewBody> {
             ));
           }
         });
+  }
+
+  AsyncSnapshot<QuerySnapshot<Object?>> sortSnapshot(
+      AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+    // Sort first
+    if (sortString == sortItems[0]) {
+      // Sort by distance
+    } else if (sortString == sortItems[1]) {
+      // Sort by condition
+      // snapshot.data!.docs
+      //     .sort((a, b) => a['Name'].length.compareTo(b['Name'].length));
+    }
+    return snapshot;
+  }
+
+  Stream<QuerySnapshot<Object?>> bikeQuery() {
+    if (filterString == filterItems[1]) {
+      return FirebaseFirestore.instance
+          .collection('bikes')
+          .where('Condition', isEqualTo: conditionString)
+          .snapshots();
+    } else {
+      return FirebaseFirestore.instance.collection('bikes').snapshots();
+    }
   }
 
   Widget dropDownText(String text) {
