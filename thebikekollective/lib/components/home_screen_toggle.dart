@@ -26,8 +26,24 @@ class _HomeScreenToggle extends State<HomeScreenToggle> {
         );
       },
       tooltip: 'List View',
-      backgroundColor: Color(s_lightPurple),
-      child: Icon(Icons.view_list),
+      backgroundColor: toggleColor(),
+      child: toggleIcon(),
     );
+  }
+
+  Icon toggleIcon() {
+    if (widget.map) {
+      return Icon(Icons.location_on, size: 30);
+    } else {
+      return Icon(Icons.view_list, size: 30);
+    }
+  }
+
+  Color toggleColor() {
+    if (widget.map) {
+      return Color(s_periwinkleBlue);
+    } else {
+      return Color(s_cadmiumOrange);
+    }
   }
 }

@@ -21,6 +21,7 @@ const int s_jungleGreen = 0xFF2EAD65;
 const int s_declineRed = 0xFFf2301b;
 const int s_periwinkleBlue = 0xFF4aa8ff;
 const int s_lightPurple = 0xFF8565c4;
+const int s_cadmiumOrange = 0xFFFF6500;
 
 // Color Swatch
 const MaterialColor s_whiteSwatch = const MaterialColor(
