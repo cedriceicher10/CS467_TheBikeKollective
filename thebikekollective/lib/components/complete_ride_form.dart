@@ -1,0 +1,178 @@
+//TO DO: Need to update bike collection in database to change the condition and location based on results from this form
+//TO DO: Need to finalize adding to rides collection making sure we pull lat long from the bike and store as startlat startlong also need start and end time for ride
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:location/location.dart';
+import 'package:practice1/components/formatted_text.dart';
+import '../components/styles.dart';
+import '../screens/splash_screen.dart';
+
+class RideFields {
+  String? riderName;
+  String? bikeName;
+  String? bikeCondition;
+  int? rideRating;
+  double? startLat;
+  double? startLong;
+  double? endLat;
+  double? endLong;
+  RideFields({this. riderName, this. bikeName, this.bikeCondition, this.rideRating, this.startLat, this.startLong, this.endLat, this.endLong,});
+}
+
+class CompleteRideForm extends StatefulWidget {
+  const CompleteRideForm({ Key? key }) : super(key: key);
+
+  @override
+  _CompletRideForm createState() => _CompletRideForm();
+}
+
+class _CompletRideForm extends State <CompleteRideForm> {
+  
+  final formKey = GlobalKey<FormState>();
+  var rideFields = RideFields();
+  LocationData? locationData;
+
+  @override
+
+  void initState() {
+    super.initState();
+    retrieveLocation();
+  }
+
+  void retrieveLocation() async{
+    var locationService = Location();
+    locationData = await locationService.getLocation();
+    setState(() {});
+  }
+
+  Widget build(BuildContext context) {
+    final double buttonHeight = 60;
+    final double buttonWidth = 260;
+    //final url = ModalRoute.of(context)!.settings.arguments as String?;
+
+    return Form(
+      key: formKey,
+      child: Column(children: [
+        Container(width: 325, child: bikeConditionEntry()),
+        SizedBox(height: 10),
+        Container(width: 325, child: rideRatingEntry()),
+        SizedBox(height: 10),
+        completeRideButton(buttonWidth, buttonHeight),
+      ])
+    );
+  }
+
+  Widget bikeConditionEntry() {
+    String? value;
+    List<String> conditionList = ['Totaled', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+    return DropdownButtonFormField(
+      value: value,
+      //decoration: InputDecoration(autofocus: true,
+      //style: TextStyle(color: Color(s_jungleGreen)),
+      decoration: InputDecoration(
+        labelText: 'Bike\'s Condition',
+        labelStyle: TextStyle(
+          color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+        hintText: 'Please select the condition of the Bike',
+        hintStyle: TextStyle(color: Color(s_jungleGreen)),
+        errorStyle: TextStyle(
+          color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+        border: OutlineInputBorder(),
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+            const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
+      onChanged: (value) {
+        setState(() {
+          rideFields.bikeCondition = value as String?;
+        });
+      },
+      onSaved: (value) {
+        rideFields.bikeCondition = value as String?;
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select a Condition for the Bike';
+        } 
+      },
+      items: conditionList.map((String value) {
+        return DropdownMenuItem(
+          value: value,
+          child: Text(value)
+        );
+      }).toList(),
+    );
+  }
+
+  Widget rideRatingEntry() {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      autofocus: true,
+      style: TextStyle(color: Color(s_jungleGreen)),
+      decoration: InputDecoration(
+        labelText: 'Ride Rating',
+        labelStyle: TextStyle(
+          color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+        hintText: 'Rate your ride from 1 - 10!',
+        hintStyle: TextStyle(color: Color(s_jungleGreen)),
+        errorStyle: TextStyle(
+          color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+        border: OutlineInputBorder(),
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+            const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
+    onSaved: (value) {
+      rideFields.rideRating = int.parse(value!);
+    },
+    validator: (value) {
+      if (value!.isEmpty) {
+        return 'Please enter a rating.';
+      } 
+      else if (int.parse(value) > 10) {
+        return 'The rating may not be greater than 10.';
+      }
+      else if (int.parse(value) < 0) {
+        return 'The rating may not be lower than 0.';
+      } 
+      else {
+        return null;
+      }
+    }
+  );}
+
+  Widget completeRideButton(double buttonWidth, double buttonHeight) {
+    return ElevatedButton(
+      onPressed: () async {
+        if (formKey.currentState!.validate()) {
+          formKey.currentState!.save();
+
+          rideFields.endLat = locationData!.latitude;
+          rideFields.endLong = locationData!.longitude;
+
+          print (
+            Text(rideFields.toString())
+          );
+
+          //TO DO: timeStart and timeEnd, startLat and startLong
+          await FirebaseFirestore.instance
+            .collection('rides')
+            .add({'bike': rideFields.bikeName, 'Condition': rideFields.bikeCondition, 'endLat' : rideFields.endLat, 'endLong': rideFields.endLong, 'rating': rideFields.rideRating, 'rider': rideFields.riderName});
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SplashScreen()),
+          );
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        primary: Color(s_jungleGreen),
+        fixedSize: Size(buttonWidth, buttonHeight)),
+      child: FormattedText(
+        text: 'Complete Ride',
+        size: s_fontSizeLarge,
+        color: Colors.white,
+        font: s_font_AmaticSC,
+        weight: FontWeight.bold,
+      )
+    );
+  }
+}
