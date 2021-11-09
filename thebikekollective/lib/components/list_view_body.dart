@@ -6,6 +6,8 @@ import 'styles.dart';
 import 'formatted_text.dart';
 import '../utils/haversine_calculator.dart';
 
+const GEOFENCE_DISTANCE = 10.0; // mi
+
 class PostTile {
   String name;
   String description;
@@ -184,16 +186,16 @@ class _ListViewBodyState extends State<ListViewBody> {
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshotBikes) {
                   if (snapshotBikes.hasData) {
+                    var snapList = snapshotBikes.data!.docs.toList();
+                    var snapMap = postBuilder(
+                        snapList); // Converts to custom List<Map> that's easier to pass around
+                    var posts = sortSnapshot(snapMap);
                     return Flexible(
                         child: ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      itemCount: snapshotBikes.data!.docs.length,
+                      itemCount: posts.length,
                       itemBuilder: (context, index) {
-                        var snapList = snapshotBikes.data!.docs.toList();
-                        var snapMap = postBuilder(
-                            snapList); // Converts to custom List<Map> that's easier to pass around
-                        var posts = sortSnapshot(snapMap);
                         var post = posts[index];
                         return Card(
                             elevation: 2,
@@ -252,16 +254,24 @@ class _ListViewBodyState extends State<ListViewBody> {
   }
 
   List<PostTile> sortSnapshot(List<PostTile> postList) {
+    List<PostTile> geoFencedPosts = [];
+    // Add distance to user for each bike
     postList.forEach((bike) {
       bike.distanceToUser =
           haversineCalculator(userLat, userLon, bike.latitude, bike.longitude);
+      // Cut off bikes that are more than GEOFENCE_DISTANCE
+      if (bike.distanceToUser < GEOFENCE_DISTANCE) {
+        geoFencedPosts.add(bike);
+      }
     });
+    // Sort
     if (sortString == 'Sort by: Distance') {
-      postList.sort((a, b) => a.distanceToUser.compareTo(b.distanceToUser));
+      geoFencedPosts
+          .sort((a, b) => a.distanceToUser.compareTo(b.distanceToUser));
     } else if (sortString == 'Sort by: Condition') {
-      postList.sort((a, b) => compareCondition(a.condition, b.condition));
+      geoFencedPosts.sort((a, b) => compareCondition(a.condition, b.condition));
     }
-    return postList;
+    return geoFencedPosts;
   }
 
   int compareCondition(String? a, String? b) {
