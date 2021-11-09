@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:location/location.dart';
 import 'home_screen_toggle.dart';
 import 'styles.dart';
 import 'formatted_text.dart';
+import '../utils/haversine_calculator.dart';
+
+class PostTile {
+  String name;
+  String description;
+  String condition;
+  int combination;
+  double latitude;
+  double longitude;
+  String imageURL;
+  double distanceToUser;
+  PostTile(
+      {required this.name,
+      required this.description,
+      required this.condition,
+      required this.combination,
+      required this.latitude,
+      required this.longitude,
+      required this.imageURL,
+      required this.distanceToUser});
+}
 
 class ListViewBody extends StatefulWidget {
   const ListViewBody({Key? key}) : super(key: key);
@@ -31,6 +53,28 @@ class _ListViewBodyState extends State<ListViewBody> {
     'Totaled'
   ];
   bool filterCondition = false;
+  double userLat = 0.0;
+  double userLon = 0.0;
+
+  Future<LocationData> retrieveLocation() async {
+    var locationService = Location();
+    var locationUser = await locationService.getLocation();
+    userLat = locationUser.latitude!;
+    userLon = locationUser.longitude!;
+    print('User Location: ${locationUser.latitude}, ${locationUser.longitude}');
+    return locationUser;
+  }
+
+  Stream<QuerySnapshot<Object?>> bikeQuery() {
+    if (filterString == 'Filter by: Condition') {
+      return FirebaseFirestore.instance
+          .collection('bikes')
+          .where('Condition', isEqualTo: conditionString)
+          .snapshots();
+    } else {
+      return FirebaseFirestore.instance.collection('bikes').snapshots();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,45 +175,56 @@ class _ListViewBodyState extends State<ListViewBody> {
   }
 
   Widget listViewBikes() {
-    return StreamBuilder(
-        stream: bikeQuery(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasData) {
-            return Flexible(
-                child: ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                //
-                snapshot = sortSnapshot(snapshot);
-                // TO DO: Only show bikes that are within x distance
-                // TO DO: Sort by condition
-                // TO DO: Sort by distance
-                // TO DO: Filter by tags
-                //
-                var post = snapshot.data!.docs[index];
-                return Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(color: Color(s_jungleGreen), width: 1),
-                        borderRadius: BorderRadius.circular(15)),
-                    child: ListTile(
-                        isThreeLine: true,
-                        title: entryName(post['Name']),
-                        subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              entryDescription(post['Description']),
-                              conditionDescription(
-                                  'Distance: XX mi | Condition: ' + // TO DO: Add in actual distance per bike
-                                      post['Condition']),
-                            ]),
-                        trailing: Image(image: NetworkImage(post['imageURL'])),
-                        contentPadding: EdgeInsets.all(10),
-                        onTap: () {}));
-              },
-            ));
+    return FutureBuilder(
+        future: retrieveLocation(),
+        builder: (BuildContext context, snapshotLocation) {
+          if (snapshotLocation.hasData) {
+            return StreamBuilder(
+                stream: bikeQuery(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshotBikes) {
+                  if (snapshotBikes.hasData) {
+                    return Flexible(
+                        child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: snapshotBikes.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        var snapList = snapshotBikes.data!.docs.toList();
+                        var snapMap = postBuilder(
+                            snapList); // Converts to custom List<Map> that's easier to pass around
+                        var posts = sortSnapshot(snapMap);
+                        var post = posts[index];
+                        return Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: Color(s_jungleGreen), width: 1),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: ListTile(
+                                isThreeLine: true,
+                                title: entryName(post.name),
+                                subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      entryDescription(post.description),
+                                      conditionDescription(
+                                          'Distance: ${post.distanceToUser.toStringAsFixed(2)} mi | Condition: ${post.condition}'),
+                                    ]),
+                                trailing:
+                                    Image(image: NetworkImage(post.imageURL)),
+                                contentPadding: EdgeInsets.all(10),
+                                onTap: () {}));
+                      },
+                    ));
+                  } else {
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: Color(s_jungleGreen),
+                    ));
+                  }
+                });
           } else {
             return Center(
                 child: CircularProgressIndicator(
@@ -179,28 +234,66 @@ class _ListViewBodyState extends State<ListViewBody> {
         });
   }
 
-  AsyncSnapshot<QuerySnapshot<Object?>> sortSnapshot(
-      AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-    // Sort first
-    if (sortString == sortItems[0]) {
-      // Sort by distance
-    } else if (sortString == sortItems[1]) {
-      // Sort by condition
-      // snapshot.data!.docs
-      //     .sort((a, b) => a['Name'].length.compareTo(b['Name'].length));
-    }
-    return snapshot;
+  List<PostTile> postBuilder(List<QueryDocumentSnapshot<Object?>> snapList) {
+    List<PostTile> posts = [];
+    snapList.forEach((snapPost) {
+      PostTile post = PostTile(
+          name: snapPost['Name'],
+          description: snapPost['Description'],
+          condition: snapPost['Condition'],
+          latitude: snapPost['Latitude'],
+          longitude: snapPost['Longitude'],
+          imageURL: snapPost['imageURL'],
+          combination: snapPost['Combination'],
+          distanceToUser: 0.0);
+      posts.add(post);
+    });
+    return posts;
   }
 
-  Stream<QuerySnapshot<Object?>> bikeQuery() {
-    if (filterString == filterItems[1]) {
-      return FirebaseFirestore.instance
-          .collection('bikes')
-          .where('Condition', isEqualTo: conditionString)
-          .snapshots();
-    } else {
-      return FirebaseFirestore.instance.collection('bikes').snapshots();
+  List<PostTile> sortSnapshot(List<PostTile> postList) {
+    postList.forEach((bike) {
+      bike.distanceToUser =
+          haversineCalculator(userLat, userLon, bike.latitude, bike.longitude);
+    });
+    if (sortString == 'Sort by: Distance') {
+      postList.sort((a, b) => a.distanceToUser.compareTo(b.distanceToUser));
+    } else if (sortString == 'Sort by: Condition') {
+      postList.sort((a, b) => compareCondition(a.condition, b.condition));
     }
+    return postList;
+  }
+
+  int compareCondition(String? a, String? b) {
+    // Order: Excellent, Great, Good, Fair, Poor, Totaled
+    if (a == b) return 0;
+    switch (a) {
+      case "Excellent":
+        return -1;
+      case "Great":
+        if (b == 'Excellent') return 1;
+        return -1;
+      case "Good":
+        if ((b == 'Excellent') || (b == 'Great')) return 1;
+        return -1;
+      case "Fair":
+        if ((b == 'Excellent') || (b == 'Great') || (b == 'Great')) return 1;
+        return -1;
+      case "Poor":
+        if ((b == 'Excellent') ||
+            (b == 'Great') ||
+            (b == 'Great') ||
+            (b == 'Fair')) return 1;
+        return -1;
+      case "Totaled":
+        if ((b == 'Excellent') ||
+            (b == 'Great') ||
+            (b == 'Great') ||
+            (b == 'Fair') ||
+            (b == 'Poor')) return 1;
+        return -1;
+    }
+    return -1;
   }
 
   Widget dropDownText(String text) {
