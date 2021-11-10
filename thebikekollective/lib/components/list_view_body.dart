@@ -190,48 +190,46 @@ class _ListViewBodyState extends State<ListViewBody> {
                     var snapMap = postBuilder(
                         snapList); // Converts to custom List<Map> that's easier to pass around
                     var posts = sortSnapshot(snapMap);
-                    return Flexible(
-                        child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: posts.length,
-                      itemBuilder: (context, index) {
-                        var post = posts[index];
-                        return Card(
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color: Color(s_jungleGreen), width: 1),
-                                borderRadius: BorderRadius.circular(15)),
-                            child: ListTile(
-                                isThreeLine: true,
-                                title: entryName(post.name),
-                                subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      entryDescription(post.description),
-                                      conditionDescription(
-                                          'Distance: ${post.distanceToUser.toStringAsFixed(2)} mi | Condition: ${post.condition}'),
-                                    ]),
-                                trailing:
-                                    Image(image: NetworkImage(post.imageURL)),
-                                contentPadding: EdgeInsets.all(10),
-                                onTap: () {}));
-                      },
-                    ));
+                    if (posts.length == 0) {
+                      return noBikesFound();
+                    } else {
+                      return Flexible(
+                          child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: posts.length,
+                        itemBuilder: (context, index) {
+                          var post = posts[index];
+                          return Card(
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: Color(s_jungleGreen), width: 1),
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: ListTile(
+                                  isThreeLine: true,
+                                  title: entryName(post.name),
+                                  subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        entryDescription(post.description),
+                                        conditionDescription(
+                                            'Distance: ${post.distanceToUser.toStringAsFixed(2)} mi | Condition: ${post.condition}'),
+                                      ]),
+                                  trailing:
+                                      Image(image: NetworkImage(post.imageURL)),
+                                  contentPadding: EdgeInsets.all(10),
+                                  onTap: () {}));
+                        },
+                      ));
+                    }
                   } else {
-                    return Center(
-                        child: CircularProgressIndicator(
-                      color: Color(s_jungleGreen),
-                    ));
+                    return bikesLoading();
                   }
                 });
           } else {
-            return Center(
-                child: CircularProgressIndicator(
-              color: Color(s_jungleGreen),
-            ));
+            return bikesLoading();
           }
         });
   }
@@ -304,6 +302,33 @@ class _ListViewBodyState extends State<ListViewBody> {
         return -1;
     }
     return -1;
+  }
+
+  Widget bikesLoading() {
+    return Center(
+        child: Column(children: [
+      CircularProgressIndicator(
+        color: Color(s_jungleGreen),
+      ),
+      FormattedText(
+        text: 'Loading Bikes...',
+        size: s_fontSizeMedium,
+        color: Color(s_jungleGreen),
+        font: s_font_AmaticSC,
+        weight: FontWeight.bold,
+      )
+    ]));
+  }
+
+  Widget noBikesFound() {
+    return Center(
+        child: FormattedText(
+      text: 'No Bikes Found In Your Area!',
+      size: s_fontSizeLarge,
+      color: Color(s_declineRed),
+      font: s_font_AmaticSC,
+      weight: FontWeight.bold,
+    ));
   }
 
   Widget dropDownText(String text) {
