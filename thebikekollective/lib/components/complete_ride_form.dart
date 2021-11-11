@@ -141,7 +141,7 @@ class _CompletRideForm extends State <CompleteRideForm> {
   );}
 
   Widget completeRideButton(double buttonWidth, double buttonHeight) {
-    final bikeId = 'testId';  //THIS NEEDS TO COME FROM THE SELECTED BIKE PASSED AS AN ARGUMENT
+    final bikeId = ModalRoute.of(context)!.settings.arguments;  //THIS NEEDS TO COME FROM THE SELECTED BIKE PASSED AS AN ARGUMENT
     return ElevatedButton(
       onPressed: () async {
         if (formKey.currentState!.validate()) {
@@ -159,7 +159,7 @@ class _CompletRideForm extends State <CompleteRideForm> {
             .collection('rides')
             .add({'bike': rideFields.bikeName, 'Condition': rideFields.bikeCondition, 'endLat' : rideFields.endLat, 'endLong': rideFields.endLong, 'rating': rideFields.rideRating, 'rider': rideFields.riderName});
           await FirebaseFirestore.instance
-            .collection('bikes').doc(bikeId)
+            .collection('bikes').doc('bikeId')
             .update({'Condition': rideFields.bikeCondition, 'Latitude' : rideFields.endLat, 'Longitude': rideFields.endLong});
           Navigator.push(
             context,
