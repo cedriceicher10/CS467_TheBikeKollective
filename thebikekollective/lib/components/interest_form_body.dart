@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../screens/splash_screen.dart';
+import '../screens/home_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
@@ -18,7 +18,8 @@ class _InterestFormBodyState extends State<InterestFormBody> {
   String interestFormTextFromFile = "null";
 
   void loadInterestFormText() async {
-    interestFormTextFromFile = await rootBundle.loadString(INTERESTFORM_TEXT_PATH);
+    interestFormTextFromFile =
+        await rootBundle.loadString(INTERESTFORM_TEXT_PATH);
     setState(() {
       isLoading = false;
     });
@@ -39,27 +40,27 @@ class _InterestFormBodyState extends State<InterestFormBody> {
         color: Color(s_jungleGreen),
       ));
     } else {
-        return SingleChildScrollView(
-            child: Column(
-          children: [
-            SizedBox(height: imageHeadSpace),
-            importantText('IMPORTANT'),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
-                child: waiverText(interestFormTextFromFile)),
-            SizedBox(height: buttonSpacing),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                acceptButton(context, 'Accept', buttonWidth, buttonHeight),
-                SizedBox(width: 20),
-                declineButton(context, 'Decline', buttonWidth, buttonHeight),
-              ],
-            ),
-            SizedBox(height: buttonSpacing * 10)
-          ],
-        ));
-      }
+      return SingleChildScrollView(
+          child: Column(
+        children: [
+          SizedBox(height: imageHeadSpace),
+          importantText('IMPORTANT'),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
+              child: waiverText(interestFormTextFromFile)),
+          SizedBox(height: buttonSpacing),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              acceptButton(context, 'Accept', buttonWidth, buttonHeight),
+              SizedBox(width: 20),
+              declineButton(context, 'Decline', buttonWidth, buttonHeight),
+            ],
+          ),
+          SizedBox(height: buttonSpacing * 10)
+        ],
+      ));
+    }
   }
 
   Widget acceptButton(BuildContext context, String text, double buttonWidth,
@@ -81,7 +82,7 @@ class _InterestFormBodyState extends State<InterestFormBody> {
         onPressed: () {
           Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => SplashScreen()),
+              MaterialPageRoute(builder: (context) => HomeScreen(map: true)),
               (Route<dynamic> route) => false);
         },
         child: declineButtonText(text),
@@ -132,4 +133,3 @@ class _InterestFormBodyState extends State<InterestFormBody> {
     );
   }
 }
-

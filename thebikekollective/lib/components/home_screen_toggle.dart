@@ -15,6 +15,7 @@ class _HomeScreenToggle extends State<HomeScreenToggle> {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      heroTag: "Toggle FAB",
       onPressed: () {
         Navigator.pushReplacement(
           context,
@@ -25,7 +26,7 @@ class _HomeScreenToggle extends State<HomeScreenToggle> {
           ),
         );
       },
-      tooltip: 'List View',
+      tooltip: 'Toggle View',
       backgroundColor: toggleColor(),
       child: toggleIcon(),
     );

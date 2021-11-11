@@ -6,6 +6,7 @@ import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'styles.dart';
 import 'formatted_text.dart';
 import 'home_screen_toggle.dart';
+import 'add_bike_fab.dart';
 import 'dart:developer';
 
 const Color MarkerColor = Color(s_jungleGreen);
@@ -180,7 +181,10 @@ class _CreateMapBody extends State<CreateMapBody>
                   ]),
               floatingActionButton:
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                AddBikeFAB(),
+                SizedBox(height: 10),
                 FloatingActionButton(
+                  heroTag: "Zoom FAB",
                   onPressed: _zoom,
                   tooltip: 'Zoom',
                   backgroundColor: Color(s_jungleGreen),

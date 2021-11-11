@@ -4,6 +4,7 @@ import 'package:location/location.dart';
 import 'home_screen_toggle.dart';
 import 'styles.dart';
 import 'formatted_text.dart';
+import 'add_bike_fab.dart';
 import '../utils/haversine_calculator.dart';
 
 const GEOFENCE_DISTANCE = 10.0; // mi
@@ -16,6 +17,8 @@ class PostTile {
   double latitude;
   double longitude;
   String imageURL;
+  //bool checkedOut; // TO DO: Use when checkedOut field is active
+  List<dynamic> tags;
   double distanceToUser;
   PostTile(
       {required this.name,
@@ -25,6 +28,8 @@ class PostTile {
       required this.latitude,
       required this.longitude,
       required this.imageURL,
+      //required this.checkedOut, // TO DO: Use when checkedOut field is active
+      required this.tags,
       required this.distanceToUser});
 }
 
@@ -42,8 +47,7 @@ class _ListViewBodyState extends State<ListViewBody> {
   List<String> filterItems = <String>[
     'No Filter',
     'Filter by: Condition',
-    'Filter by: Tag #1', // TO DO: Dynamically create this list from available tags
-    'Filter by: Tag #2'
+    'Filter by: Tag'
   ];
   String conditionString = 'Excellent';
   List<String> conditionItems = <String>[
@@ -54,7 +58,19 @@ class _ListViewBodyState extends State<ListViewBody> {
     'Poor',
     'Totaled'
   ];
+  String tagString = 'Mountain';
+  List<String> tagItems = <String>[
+    'Mountain',
+    'Road',
+    'Hybrid',
+    'Electric',
+    'Motorized',
+    'Multiple Gear',
+    'Tricycle',
+    'Training Wheels'
+  ];
   bool filterCondition = false;
+  bool filterTag = false;
   double userLat = 0.0;
   double userLon = 0.0;
 
@@ -73,6 +89,11 @@ class _ListViewBodyState extends State<ListViewBody> {
           .collection('bikes')
           .where('Condition', isEqualTo: conditionString)
           .snapshots();
+    } else if (filterString == 'Filter by: Tag') {
+      return FirebaseFirestore.instance
+          .collection('bikes')
+          .where('Tags', arrayContains: tagString)
+          .snapshots();
     } else {
       return FirebaseFirestore.instance.collection('bikes').snapshots();
     }
@@ -81,12 +102,17 @@ class _ListViewBodyState extends State<ListViewBody> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(children: [
-        filterSortButtons(),
-        listViewBikes(),
-      ]),
-      floatingActionButton: HomeScreenToggle(map: true),
-    );
+        body: Column(children: [
+          filterSortButtons(),
+          listViewBikes(),
+        ]),
+        floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              AddBikeFAB(),
+              SizedBox(height: 10),
+              HomeScreenToggle(map: true)
+            ]));
   }
 
   Widget filterSortButtons() {
@@ -131,10 +157,15 @@ class _ListViewBodyState extends State<ListViewBody> {
             ),
             onChanged: (String? newValue) {
               filterString = newValue!;
-              if (filterString == filterItems[1]) {
+              if (filterString == 'Filter by: Condition') {
                 filterCondition = true;
               } else {
                 filterCondition = false;
+              }
+              if (filterString == 'Filter by: Tag') {
+                filterTag = true;
+              } else {
+                filterTag = false;
               }
               setState(() {});
             },
@@ -172,7 +203,33 @@ class _ListViewBodyState extends State<ListViewBody> {
                   );
                 }).toList(),
               ))
-          : Container() // Hides condition drop-down when filter isn't on Filter: Condition
+          : Container(), // Hides condition drop-down when filter isn't on Filter: Condition
+      filterTag
+          ? Container(
+              height: 40,
+              child: DropdownButton<String>(
+                value: tagString,
+                icon: const Icon(Icons.arrow_drop_down,
+                    color: Color(s_cadmiumOrange)),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Color(s_cadmiumOrange)),
+                underline: Container(
+                  height: 2,
+                  color: Color(s_cadmiumOrange),
+                ),
+                onChanged: (String? newValue) {
+                  tagString = newValue!;
+                  setState(() {});
+                },
+                items: tagItems.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: dropDownText(value),
+                  );
+                }).toList(),
+              ))
+          : Container()
     ]);
   }
 
@@ -245,6 +302,8 @@ class _ListViewBodyState extends State<ListViewBody> {
           longitude: snapPost['Longitude'],
           imageURL: snapPost['imageURL'],
           combination: snapPost['Combination'],
+          //checkedOut: snapPost['Stolen'], // TO DO: Use when checkedOut field is active
+          tags: snapPost['Tags'], // TO DO: Use when tags are active
           distanceToUser: 0.0);
       posts.add(post);
     });
@@ -257,8 +316,9 @@ class _ListViewBodyState extends State<ListViewBody> {
     postList.forEach((bike) {
       bike.distanceToUser =
           haversineCalculator(userLat, userLon, bike.latitude, bike.longitude);
-      // Cut off bikes that are more than GEOFENCE_DISTANCE
+      // Cut off bikes that are more than GEOFENCE_DISTANCE or Checked-Out (in a current ride)
       if (bike.distanceToUser < GEOFENCE_DISTANCE) {
+        //if ((bike.distanceToUser < GEOFENCE_DISTANCE) && (bike.checkedOut == false)) { // TO DO: Use when Stolen field is active
         geoFencedPosts.add(bike);
       }
     });

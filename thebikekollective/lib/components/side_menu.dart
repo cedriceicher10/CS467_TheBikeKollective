@@ -39,10 +39,6 @@ class _SideMenuState extends State<SideMenu> {
                         ]),
                       )),
                   ListTile(
-                    title: menuItemsText('Ride History'),
-                    onTap: () {},
-                  ),
-                  ListTile(
                       title: menuItemsText('Email Verification'),
                       onTap: () async {
                         SharedPreferences preferences =
@@ -74,10 +70,6 @@ class _SideMenuState extends State<SideMenu> {
                           });
                         }
                       }),
-                  ListTile(
-                    title: menuItemsText('Change Account Info'),
-                    onTap: () {},
-                  ),
                   ListTile(
                     title: signOutText('Sign Out'),
                     onTap: () async {
