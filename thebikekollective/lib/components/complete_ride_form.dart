@@ -1,4 +1,4 @@
-//TO DO: Need to update bike collection in database to change the condition and location based on results from this form
+//TO DO: Need to get bikeId which is the bike's documentId to update bike collection in database to change the condition and location based on results from this form
 //TO DO: Need to finalize adding to rides collection making sure we pull lat long from the bike and store as startlat startlong also need start and end time for ride
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -141,6 +141,7 @@ class _CompletRideForm extends State <CompleteRideForm> {
   );}
 
   Widget completeRideButton(double buttonWidth, double buttonHeight) {
+    final bikeId = 'testId';  //THIS NEEDS TO COME FROM THE SELECTED BIKE PASSED AS AN ARGUMENT
     return ElevatedButton(
       onPressed: () async {
         if (formKey.currentState!.validate()) {
@@ -157,6 +158,9 @@ class _CompletRideForm extends State <CompleteRideForm> {
           await FirebaseFirestore.instance
             .collection('rides')
             .add({'bike': rideFields.bikeName, 'Condition': rideFields.bikeCondition, 'endLat' : rideFields.endLat, 'endLong': rideFields.endLong, 'rating': rideFields.rideRating, 'rider': rideFields.riderName});
+          await FirebaseFirestore.instance
+            .collection('bikes').doc(bikeId)
+            .update({'Condition': rideFields.bikeCondition, 'Latitude' : rideFields.endLat, 'Longitude': rideFields.endLong});
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SplashScreen()),
