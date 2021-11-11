@@ -1,3 +1,4 @@
+//TO DO: Ride needs to "start" on map screen or list screen when button is clicked. At that time the start time should be stored and the document ID should be passed here so we can update instead of add?
 //TO DO: Need to get bikeId which is the bike's documentId to update bike collection in database to change the condition and location based on results from this form
 //TO DO: Need to finalize adding to rides collection making sure we pull lat long from the bike and store as startlat startlong also need start and end time for ride
 import 'package:flutter/material.dart';

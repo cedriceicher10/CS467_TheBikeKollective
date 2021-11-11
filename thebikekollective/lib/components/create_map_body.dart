@@ -291,7 +291,7 @@ Container portraitLayout(BuildContext context, bike){
                         SizedBox(height: 8),
                         Text('Condition: ${bike.condition}'),
                         SizedBox(height: 8),
-                        rideButton(context, "Details", 100, 25)
+                        rideButton(context, "Details", 100, 25, bike.name)
                       ])
                 ]
             )
@@ -334,7 +334,7 @@ Container landscapeLayout(BuildContext context, bike){
                           SizedBox(height: 8),
                           Text('Condition: ${bike.condition}'),
                           SizedBox(height: 8),
-                          rideButton(context, "Details", 100, 25)
+                          rideButton(context, "Start Ride", 100, 25, bike.name)
                         ])
               ]
             )
@@ -345,6 +345,21 @@ Container landscapeLayout(BuildContext context, bike){
   );
 }
 
+//This will become the Start Ride button
+Widget rideButton(BuildContext context, String text,
+    double buttonWidth, double buttonHeight, String bikeName) {
+  return ElevatedButton(
+      onPressed: () {
+        Navigator.of(context).pushNamed('rideScreen', arguments: bikeName);
+        return;
+      },
+      child: rideButtonText(text),
+      style: ElevatedButton.styleFrom(
+          primary: Color(s_jungleGreen),
+          fixedSize: Size(buttonWidth, buttonHeight)));
+}
+
+/*
 Widget rideButton(BuildContext context, String text,
     double buttonWidth, double buttonHeight) {
   return ElevatedButton(
@@ -356,6 +371,7 @@ Widget rideButton(BuildContext context, String text,
           primary: Color(s_jungleGreen),
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
+*/
 
 Widget rideButtonText(String text) {
   return FormattedText(
