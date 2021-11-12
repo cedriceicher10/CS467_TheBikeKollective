@@ -309,7 +309,6 @@ class _ListViewBodyState extends State<ListViewBody> {
                                               builder: (BuildContext context) {
                                                 // Take note of chosen bike for Ride screen
                                                 bikeId = post.id;
-                                                print('Chose: $bikeId');
                                                 return AlertDialog(
                                                   title:
                                                       alertTitle("Start Ride"),

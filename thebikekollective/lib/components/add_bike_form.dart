@@ -24,6 +24,11 @@ class BikeFields {
       this.imageURL});
 }
 
+// Weird bug fix: For some reason having this not be absolute global scope made
+// it keep reverting (possibly a setState() infinite loop in here somewhere)
+double? userLat = 0.0;
+double? userLon = 0.0;
+
 class AddBikeForm extends StatefulWidget {
   const AddBikeForm({Key? key}) : super(key: key);
 
@@ -47,6 +52,8 @@ class _AddBikeFormState extends State<AddBikeForm> {
     locationData = await locationService.getLocation();
     print(
         'User Location: ${locationData!.latitude}, ${locationData!.longitude}');
+    userLat = locationData!.latitude;
+    userLon = locationData!.longitude;
     setState(() {});
   }
 
@@ -220,8 +227,8 @@ class _AddBikeFormState extends State<AddBikeForm> {
           if (formKey.currentState!.validate()) {
             formKey.currentState!.save();
 
-            bikeFields.latitude = locationData!.latitude; // TO DO: NULL bug!
-            bikeFields.longitude = locationData!.longitude;
+            bikeFields.latitude = userLat;
+            bikeFields.longitude = userLon;
             bikeFields.imageURL = url;
 
             print(Text(bikeFields.toString()));
