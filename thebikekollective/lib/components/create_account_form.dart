@@ -163,8 +163,8 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
                 await SharedPreferences.getInstance();
             preferences.setBool('loggedIn', true);
             preferences.setString('username', emailKey.currentState!.value);
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => HomeScreen(map: true)));
           }
         },
         style: ElevatedButton.styleFrom(

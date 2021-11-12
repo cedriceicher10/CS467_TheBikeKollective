@@ -69,7 +69,8 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
                   // );
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => HomeScreen(map: true)),
                       (Route<dynamic> route) => false);
                 } else {
                   final snackBar = SnackBar(

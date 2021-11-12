@@ -19,7 +19,9 @@ class _AppState extends State<App> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (loggedIn) {
-            return HomeScreen(); // When LIVE, turn this to HomeScreen() for persistent login
+            return HomeScreen(
+                map:
+                    true); // When LIVE, turn this to HomeScreen() for persistent login
           } else {
             return SplashScreen();
           }
