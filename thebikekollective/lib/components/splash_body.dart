@@ -1,7 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
 import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/waiver_screen.dart';
@@ -68,7 +65,6 @@ class _SplashBodyState extends State<SplashBody> {
       googleAuthButton(
           context, 'Sign in with Google', buttonWidth, buttonHeight),
       SizedBox(height: buttonSpacing),
-      addBikeButton(context, 'Add Bike', buttonWidth, buttonHeight),
       testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
       SizedBox(height: buttonSpacing)
     ]));
@@ -123,9 +119,6 @@ class _SplashBodyState extends State<SplashBody> {
                         SizedBox(height: buttonSpacing),
                         googleAuthButton(context, 'Sign in with Google',
                             buttonWidth, buttonHeight),
-                        SizedBox(height: buttonSpacing),
-                        addBikeButton(
-                            context, 'Add Bike', buttonWidth, buttonHeight),
                         SizedBox(height: buttonSpacing),
                         testUserButton(context, 'Test User', buttonWidth / 2,
                             buttonHeight / 2),
@@ -185,41 +178,12 @@ class _SplashBodyState extends State<SplashBody> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => HomeScreen(map: true)),
           );
         },
         child: testUserLogin(text),
         style: ElevatedButton.styleFrom(
             primary: Colors.black, fixedSize: Size(buttonWidth, buttonHeight)));
-  }
-
-  Widget addBikeButton(BuildContext context, String text, double buttonWidth,
-      double buttonHeight) {
-    File? image;
-    final picker = ImagePicker();
-
-    Future getImage() async {
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-      image = File(pickedFile!.path);
-
-      var fileName = DateTime.now().toString() + '.jpg';
-      Reference storageReference =
-          FirebaseStorage.instance.ref().child(fileName);
-      UploadTask uploadTask = storageReference.putFile(image!);
-      await uploadTask;
-      final url = await storageReference.getDownloadURL();
-      return url;
-    }
-
-    return ElevatedButton(
-        onPressed: () async {
-          final url = await getImage();
-          Navigator.of(context).pushNamed('interestForm', arguments: url);
-        },
-        child: addBikeText(text),
-        style: ElevatedButton.styleFrom(
-            primary: Color(s_jungleGreen),
-            fixedSize: Size(buttonWidth, buttonHeight)));
   }
 
   double imageSizeFactor(BuildContext context) {

@@ -179,8 +179,8 @@ class _EmailVerificationBodyState extends State<EmailVerificationBody> {
           .update({'verified': true});
       ScaffoldMessenger.of(context).showSnackBar(otpVerfieidSnackBar(email));
       await Future.delayed(Duration(seconds: 2)); // Lets the snackbar show
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => HomeScreen(map: true)));
     } else {
       print('EMAIL NOT VERIFIED VIA OTP, BAD CODE');
       ScaffoldMessenger.of(context).showSnackBar(otpFailedSnackBar());

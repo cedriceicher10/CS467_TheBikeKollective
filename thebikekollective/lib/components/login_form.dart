@@ -113,7 +113,7 @@ class _LoginFormState extends State<LoginForm> {
             preferences.setString('username', usernameKey.currentState!.value);
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => HomeScreen(map: true)),
                 (Route<dynamic> route) => false);
           }
         },
