@@ -260,28 +260,37 @@ Container portraitLayout(BuildContext context, bike) {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Padding(
-              padding: EdgeInsets.all(8),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Column(children: <Widget>[
-                      Image(
-                          image: NetworkImage(bike.imagePath),
-                          width: 150 * imageSizeFactor(context),
-                          height: 150 * imageSizeFactor(context)),
-                    ]),
-                    Column(children: <Widget>[
-                      Text(bike.name,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end),
-                      SizedBox(height: 8),
-                      Text('${bike.description}'),
-                      SizedBox(height: 8),
-                      Text('Condition: ${bike.condition}'),
-                      SizedBox(height: 8),
-                      rideButton(context, "Details", 100, 25)
-                    ])
-                  ]))
+            padding: EdgeInsets.all(8),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Column(
+                      children: <Widget>[
+                        Image(image: NetworkImage(bike.imagePath),
+                            width:150 * imageSizeFactor(context),
+                            height:150 * imageSizeFactor(context)),
+
+                      ]
+                  ),
+
+                  Column(
+                      children: <Widget>[
+                        Text(
+                            bike.name,
+                            style:
+                            TextStyle(fontWeight:FontWeight.bold),
+                            textAlign: TextAlign.end
+                        ),
+                        SizedBox(height: 8),
+                        Text('${bike.description}'),
+                        SizedBox(height: 8),
+                        Text('Condition: ${bike.condition}'),
+                        SizedBox(height: 8),
+                        rideButton(context, "Details", 100, 25, bike.name)
+                      ])
+                ]
+            )
+          )
         ],
       ),
     ),
@@ -303,32 +312,49 @@ Container landscapeLayout(BuildContext context, bike) {
           Padding(
               padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image(
-                        image: NetworkImage(bike.imagePath),
-                        width: 150 * imageSizeFactor(context),
-                        height: 150 * imageSizeFactor(context)),
-                    Column(children: <Widget>[
-                      Text(bike.name,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end),
-                      SizedBox(height: 8),
-                      Text('${bike.description}'),
-                      SizedBox(height: 8),
-                      Text('Condition: ${bike.condition}'),
-                      SizedBox(height: 8),
-                      rideButton(context, "Details", 100, 25)
-                    ])
-                  ]))
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                    Image(image: NetworkImage(bike.imagePath),
+                      width:150 * imageSizeFactor(context),
+                      height:150 * imageSizeFactor(context)),
+                    Column(
+                        children: <Widget>[
+                          Text(bike.name, style:
+                          TextStyle(fontWeight:FontWeight.bold),
+                              textAlign: TextAlign.end),
+                          SizedBox(height: 8),
+                          Text('${bike.description}'),
+                          SizedBox(height: 8),
+                          Text('Condition: ${bike.condition}'),
+                          SizedBox(height: 8),
+                          rideButton(context, "Start Ride", 100, 25, bike.name)
+                        ])
+              ]
+            )
+          )
         ],
       ),
     ),
   );
 }
 
-Widget rideButton(BuildContext context, String text, double buttonWidth,
-    double buttonHeight) {
+//This will become the Start Ride button
+Widget rideButton(BuildContext context, String text,
+    double buttonWidth, double buttonHeight, String bikeName) {
+  return ElevatedButton(
+      onPressed: () {
+        Navigator.of(context).pushNamed('rideScreen', arguments: bikeName);
+        return;
+      },
+      child: rideButtonText(text),
+      style: ElevatedButton.styleFrom(
+          primary: Color(s_jungleGreen),
+          fixedSize: Size(buttonWidth, buttonHeight)));
+}
+
+/*
+Widget rideButton(BuildContext context, String text,
+    double buttonWidth, double buttonHeight) {
   return ElevatedButton(
       onPressed: () {
         return;
@@ -338,6 +364,7 @@ Widget rideButton(BuildContext context, String text, double buttonWidth,
           primary: Color(s_jungleGreen),
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
+*/
 
 Widget rideButtonText(String text) {
   return FormattedText(
