@@ -21,6 +21,7 @@ class PostTile {
   bool checkedOut; // TO DO: Use when checkedOut field is active
   List<dynamic> tags; // TO DO: Use when tags are active
   double distanceToUser;
+  double rating;
   PostTile(
       {required this.id,
       required this.name,
@@ -32,7 +33,8 @@ class PostTile {
       required this.imageURL,
       required this.checkedOut, // TO DO: Use when checkedOut field is active
       required this.tags, // TO DO: Use when tags are active
-      required this.distanceToUser});
+      required this.distanceToUser,
+      required this.rating});
 }
 
 class ListViewBody extends StatefulWidget {
@@ -44,7 +46,11 @@ class ListViewBody extends StatefulWidget {
 
 class _ListViewBodyState extends State<ListViewBody> {
   String sortString = 'Sort by: Distance';
-  List<String> sortItems = <String>['Sort by: Distance', 'Sort by: Condition'];
+  List<String> sortItems = <String>[
+    'Sort by: Distance',
+    'Sort by: Condition',
+    'Sort by: Rating'
+  ];
   String filterString = 'No Filter';
   List<String> filterItems = <String>[
     'No Filter',
@@ -86,6 +92,10 @@ class _ListViewBodyState extends State<ListViewBody> {
     return locationUser;
   }
 
+  Stream<QuerySnapshot<Object?>> ratingsQuery() {
+    return FirebaseFirestore.instance.collection('rides').snapshots();
+  }
+
   Stream<QuerySnapshot<Object?>> bikeQuery() {
     if (filterString == 'Filter by: Condition') {
       return FirebaseFirestore.instance
@@ -99,7 +109,6 @@ class _ListViewBodyState extends State<ListViewBody> {
           .where('Tags', arrayContains: tagString)
           .snapshots();
     } else {
-      print('here');
       return FirebaseFirestore.instance
           .collection('bikes')
           .where('checkedOut', isEqualTo: false)
@@ -248,65 +257,79 @@ class _ListViewBodyState extends State<ListViewBody> {
         builder: (BuildContext context, snapshotLocation) {
           if (snapshotLocation.hasData) {
             return StreamBuilder(
-                stream: bikeQuery(),
+                stream: ratingsQuery(),
                 builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshotBikes) {
-                  if (snapshotBikes.hasData) {
-                    var snapMap = postBuilder(
-                        snapshotBikes); // Converts to custom List<Map> that's easier to pass around
-                    var posts = sortSnapshot(snapMap);
-                    if (posts.length == 0) {
-                      return noBikesFound();
-                    } else {
-                      return Flexible(
-                          child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: posts.length,
-                        itemBuilder: (context, index) {
-                          var post = posts[index];
-                          return Card(
-                              elevation: 2,
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: Color(s_jungleGreen), width: 1),
-                                  borderRadius: BorderRadius.circular(15)),
-                              child: ListTile(
-                                  isThreeLine: true,
-                                  title: entryName(post.name),
-                                  subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        entryDescription(post.description),
-                                        conditionDescription(
-                                            'Distance: ${post.distanceToUser.toStringAsFixed(2)} mi | Condition: ${post.condition}'),
-                                      ]),
-                                  trailing:
-                                      Image(image: NetworkImage(post.imageURL)),
-                                  contentPadding: EdgeInsets.all(10),
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        // Take note of chosen bike for Ride screen
-                                        bikeId = post.id;
-                                        print('Chose: $bikeId');
-                                        return AlertDialog(
-                                          title: alertTitle("Start Ride"),
-                                          content: alertText(
-                                              "Would you like to start a ride with this bike?"),
-                                          actions: [
-                                            reportStolenButton(),
-                                            startRideButton(),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }));
-                        },
-                      ));
-                    }
+                    AsyncSnapshot<QuerySnapshot> snapshotRatings) {
+                  if (snapshotRatings.hasData) {
+                    return StreamBuilder(
+                        stream: bikeQuery(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshotBikes) {
+                          if (snapshotBikes.hasData) {
+                            var snapMap = postBuilder(snapshotBikes,
+                                snapshotRatings); // Converts to custom List<Map> that's easier to pass around
+                            var posts = sortSnapshot(snapMap);
+                            if (posts.length == 0) {
+                              return noBikesFound();
+                            } else {
+                              return Flexible(
+                                  child: ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: posts.length,
+                                itemBuilder: (context, index) {
+                                  var post = posts[index];
+                                  return Card(
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              color: Color(s_jungleGreen),
+                                              width: 1),
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
+                                      child: ListTile(
+                                          isThreeLine: true,
+                                          title: entryName(post.name),
+                                          subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                entryDescription(
+                                                    post.description),
+                                                conditionDescription(
+                                                    'Distance: ${post.distanceToUser.toStringAsFixed(2)} mi | Condition: ${post.condition} | Rating: ${post.rating.toStringAsFixed(1)}'),
+                                              ]),
+                                          trailing: Image(
+                                              image:
+                                                  NetworkImage(post.imageURL)),
+                                          contentPadding: EdgeInsets.all(10),
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                // Take note of chosen bike for Ride screen
+                                                bikeId = post.id;
+                                                print('Chose: $bikeId');
+                                                return AlertDialog(
+                                                  title:
+                                                      alertTitle("Start Ride"),
+                                                  content: alertText(
+                                                      "Would you like to start a ride with this bike?"),
+                                                  actions: [
+                                                    reportStolenButton(),
+                                                    startRideButton(),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          }));
+                                },
+                              ));
+                            }
+                          } else {
+                            return bikesLoading();
+                          }
+                        });
                   } else {
                     return bikesLoading();
                   }
@@ -318,9 +341,11 @@ class _ListViewBodyState extends State<ListViewBody> {
   }
 
   List<PostTile> postBuilder(
-      AsyncSnapshot<QuerySnapshot<Object?>> snapshotBikes) {
+      AsyncSnapshot<QuerySnapshot<Object?>> snapshotBikes,
+      AsyncSnapshot<QuerySnapshot<Object?>> snapshotRatings) {
     List<PostTile> posts = [];
     for (var index = 0; index < snapshotBikes.data!.size; ++index) {
+      // Convert to lightweight bike post object
       PostTile post = PostTile(
           id: snapshotBikes.data!.docs[index].id,
           name: snapshotBikes.data!.docs[index]['Name'],
@@ -334,7 +359,22 @@ class _ListViewBodyState extends State<ListViewBody> {
               ['checkedOut'], // TO DO: Use when checkedOut field is active
           tags: snapshotBikes.data!.docs[index]
               ['Tags'], // TO DO: Use when tags are active
-          distanceToUser: 0.0);
+          distanceToUser: 0.0,
+          rating: 0.0);
+      // Add ratings (average from rides table)
+      double sum = 0;
+      double count = 0;
+      for (var index = 0; index < snapshotRatings.data!.size; ++index) {
+        if (post.name == snapshotRatings.data!.docs[index]['bike']) {
+          sum += snapshotRatings.data!.docs[index]['rating'];
+          count++;
+        }
+      }
+      if (count > 0) {
+        post.rating = sum / count;
+      }
+
+      // Add to returable List collection
       posts.add(post);
     }
     return posts;
@@ -359,6 +399,8 @@ class _ListViewBodyState extends State<ListViewBody> {
           .sort((a, b) => a.distanceToUser.compareTo(b.distanceToUser));
     } else if (sortString == 'Sort by: Condition') {
       geoFencedPosts.sort((a, b) => compareCondition(a.condition, b.condition));
+    } else if (sortString == 'Sort by: Rating') {
+      geoFencedPosts.sort((a, b) => b.rating.compareTo(a.rating));
     }
     return geoFencedPosts;
   }
