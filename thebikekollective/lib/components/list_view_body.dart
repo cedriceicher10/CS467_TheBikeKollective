@@ -10,6 +10,7 @@ import '../utils/haversine_calculator.dart';
 const GEOFENCE_DISTANCE = 10.0; // mi
 
 class PostTile {
+  String id;
   String name;
   String description;
   String condition;
@@ -17,19 +18,20 @@ class PostTile {
   double latitude;
   double longitude;
   String imageURL;
-  //bool checkedOut; // TO DO: Use when checkedOut field is active
-  List<dynamic> tags;
+  bool checkedOut; // TO DO: Use when checkedOut field is active
+  List<dynamic> tags; // TO DO: Use when tags are active
   double distanceToUser;
   PostTile(
-      {required this.name,
+      {required this.id,
+      required this.name,
       required this.description,
       required this.condition,
       required this.combination,
       required this.latitude,
       required this.longitude,
       required this.imageURL,
-      //required this.checkedOut, // TO DO: Use when checkedOut field is active
-      required this.tags,
+      required this.checkedOut, // TO DO: Use when checkedOut field is active
+      required this.tags, // TO DO: Use when tags are active
       required this.distanceToUser});
 }
 
@@ -58,7 +60,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     'Poor',
     'Totaled'
   ];
-  String tagString = 'Mountain';
+  String tagString = 'Mountain'; // TO DO: Use when tags are active
   List<String> tagItems = <String>[
     'Mountain',
     'Road',
@@ -73,6 +75,7 @@ class _ListViewBodyState extends State<ListViewBody> {
   bool filterTag = false;
   double userLat = 0.0;
   double userLon = 0.0;
+  String bikeId = 'no bike';
 
   Future<LocationData> retrieveLocation() async {
     var locationService = Location();
@@ -90,12 +93,17 @@ class _ListViewBodyState extends State<ListViewBody> {
           .where('Condition', isEqualTo: conditionString)
           .snapshots();
     } else if (filterString == 'Filter by: Tag') {
+      // TO DO: Use when tags are active
       return FirebaseFirestore.instance
           .collection('bikes')
           .where('Tags', arrayContains: tagString)
           .snapshots();
     } else {
-      return FirebaseFirestore.instance.collection('bikes').snapshots();
+      print('here');
+      return FirebaseFirestore.instance
+          .collection('bikes')
+          .where('checkedOut', isEqualTo: false)
+          .snapshots();
     }
   }
 
@@ -104,6 +112,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     return Scaffold(
         body: Column(children: [
           filterSortButtons(),
+          tapBikeText(),
           listViewBikes(),
         ]),
         floatingActionButton: Column(
@@ -204,7 +213,7 @@ class _ListViewBodyState extends State<ListViewBody> {
                 }).toList(),
               ))
           : Container(), // Hides condition drop-down when filter isn't on Filter: Condition
-      filterTag
+      filterTag // TO DO: Use when tags are active
           ? Container(
               height: 40,
               child: DropdownButton<String>(
@@ -229,7 +238,7 @@ class _ListViewBodyState extends State<ListViewBody> {
                   );
                 }).toList(),
               ))
-          : Container()
+          : Container() // Hides filter drop-down when filter isn't on Filter: Tags
     ]);
   }
 
@@ -243,9 +252,8 @@ class _ListViewBodyState extends State<ListViewBody> {
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshotBikes) {
                   if (snapshotBikes.hasData) {
-                    var snapList = snapshotBikes.data!.docs.toList();
                     var snapMap = postBuilder(
-                        snapList); // Converts to custom List<Map> that's easier to pass around
+                        snapshotBikes); // Converts to custom List<Map> that's easier to pass around
                     var posts = sortSnapshot(snapMap);
                     if (posts.length == 0) {
                       return noBikesFound();
@@ -277,7 +285,25 @@ class _ListViewBodyState extends State<ListViewBody> {
                                   trailing:
                                       Image(image: NetworkImage(post.imageURL)),
                                   contentPadding: EdgeInsets.all(10),
-                                  onTap: () {}));
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        // Take note of chosen bike for Ride screen
+                                        bikeId = post.id;
+                                        print('Chose: $bikeId');
+                                        return AlertDialog(
+                                          title: alertTitle("Start Ride"),
+                                          content: alertText(
+                                              "Would you like to start a ride with this bike?"),
+                                          actions: [
+                                            reportStolenButton(),
+                                            startRideButton(),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }));
                         },
                       ));
                     }
@@ -291,22 +317,26 @@ class _ListViewBodyState extends State<ListViewBody> {
         });
   }
 
-  List<PostTile> postBuilder(List<QueryDocumentSnapshot<Object?>> snapList) {
+  List<PostTile> postBuilder(
+      AsyncSnapshot<QuerySnapshot<Object?>> snapshotBikes) {
     List<PostTile> posts = [];
-    snapList.forEach((snapPost) {
+    for (var index = 0; index < snapshotBikes.data!.size; ++index) {
       PostTile post = PostTile(
-          name: snapPost['Name'],
-          description: snapPost['Description'],
-          condition: snapPost['Condition'],
-          latitude: snapPost['Latitude'],
-          longitude: snapPost['Longitude'],
-          imageURL: snapPost['imageURL'],
-          combination: snapPost['Combination'],
-          //checkedOut: snapPost['Stolen'], // TO DO: Use when checkedOut field is active
-          tags: snapPost['Tags'], // TO DO: Use when tags are active
+          id: snapshotBikes.data!.docs[index].id,
+          name: snapshotBikes.data!.docs[index]['Name'],
+          description: snapshotBikes.data!.docs[index]['Description'],
+          condition: snapshotBikes.data!.docs[index]['Condition'],
+          latitude: snapshotBikes.data!.docs[index]['Latitude'],
+          longitude: snapshotBikes.data!.docs[index]['Longitude'],
+          imageURL: snapshotBikes.data!.docs[index]['imageURL'],
+          combination: snapshotBikes.data!.docs[index]['Combination'],
+          checkedOut: snapshotBikes.data!.docs[index]
+              ['checkedOut'], // TO DO: Use when checkedOut field is active
+          tags: snapshotBikes.data!.docs[index]
+              ['Tags'], // TO DO: Use when tags are active
           distanceToUser: 0.0);
       posts.add(post);
-    });
+    }
     return posts;
   }
 
@@ -317,8 +347,9 @@ class _ListViewBodyState extends State<ListViewBody> {
       bike.distanceToUser =
           haversineCalculator(userLat, userLon, bike.latitude, bike.longitude);
       // Cut off bikes that are more than GEOFENCE_DISTANCE or Checked-Out (in a current ride)
-      if (bike.distanceToUser < GEOFENCE_DISTANCE) {
-        //if ((bike.distanceToUser < GEOFENCE_DISTANCE) && (bike.checkedOut == false)) { // TO DO: Use when Stolen field is active
+      if ((bike.distanceToUser < GEOFENCE_DISTANCE) &&
+          (bike.condition != 'Stolen')) {
+        // TO DO: Use when Stolen field is active
         geoFencedPosts.add(bike);
       }
     });
@@ -364,6 +395,67 @@ class _ListViewBodyState extends State<ListViewBody> {
     return -1;
   }
 
+  Widget reportStolenButton() {
+    return ElevatedButton(
+      child: FormattedText(
+        text: 'Report Stolen',
+        size: s_fontSizeSmall,
+        color: Colors.white,
+        font: s_font_BonaNova,
+        weight: FontWeight.bold,
+      ),
+      style: ElevatedButton.styleFrom(primary: Color(s_declineRed)),
+      onPressed: () async {
+        await FirebaseFirestore.instance
+            .collection('bikes')
+            .doc(bikeId)
+            .update({'Condition': 'Stolen'});
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+      },
+    );
+  }
+
+  Widget startRideButton() {
+    return ElevatedButton(
+      child: FormattedText(
+        text: 'Start Ride',
+        size: s_fontSizeSmall,
+        color: Colors.white,
+        font: s_font_BonaNova,
+        weight: FontWeight.bold,
+      ),
+      style: ElevatedButton.styleFrom(primary: Color(s_jungleGreen)),
+      onPressed: () async {
+        await FirebaseFirestore.instance
+            .collection('bikes')
+            .doc(bikeId)
+            .update({'checkedOut': true});
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+        // TO DO: Navigate to 'Ride' screen
+      },
+    );
+  }
+
+  Widget alertTitle(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeMedium,
+      color: Color(s_jungleGreen),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget alertText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Color(s_jungleGreen),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+    );
+  }
+
   Widget bikesLoading() {
     return Center(
         child: Column(children: [
@@ -378,6 +470,17 @@ class _ListViewBodyState extends State<ListViewBody> {
         weight: FontWeight.bold,
       )
     ]));
+  }
+
+  Widget tapBikeText() {
+    return Center(
+        child: FormattedText(
+      text: 'Tap a bike to start your ride!',
+      size: s_fontSizeSmall,
+      color: Color(s_periwinkleBlue),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+    ));
   }
 
   Widget noBikesFound() {
