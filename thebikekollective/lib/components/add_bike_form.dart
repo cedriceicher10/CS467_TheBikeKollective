@@ -14,6 +14,7 @@ class BikeFields {
   double? latitude;
   double? longitude;
   String? imageURL;
+  List<String?>? bikeTags;
   BikeFields(
       {this.bikeName,
       this.bikeDescription,
@@ -21,7 +22,9 @@ class BikeFields {
       this.bikeCombination,
       this.latitude,
       this.longitude,
-      this.imageURL});
+      this.imageURL,
+      this.bikeTags,
+      });
 }
 
 // Weird bug fix: For some reason having this not be absolute global scope made
@@ -38,8 +41,10 @@ class AddBikeForm extends StatefulWidget {
 
 class _AddBikeFormState extends State<AddBikeForm> {
   final formKey = GlobalKey<FormState>();
+  GlobalKey<FormFieldState> bikeNameKey = GlobalKey<FormFieldState>();
   var bikeFields = BikeFields();
   LocationData? locationData;
+  bool bikeNameTaken = false;
 
   @override
   void initState() {
@@ -61,6 +66,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
     final double buttonHeight = 60;
     final double buttonWidth = 260;
     //final url = ModalRoute.of(context)!.settings.arguments as String?;
+    bikeFields.bikeTags = ['', '', ''];
 
     return Form(
         key: formKey,
@@ -73,6 +79,12 @@ class _AddBikeFormState extends State<AddBikeForm> {
           SizedBox(height: 10),
           Container(width: 325, child: bikeDescriptionEntry()),
           SizedBox(height: 10),
+          Container(width: 325, child: bikeTypeEntry()),
+          SizedBox(height: 10),
+          Container(width: 325, child: bikeGearEntry()),
+          SizedBox(height: 10),
+          Container(width: 325, child: bikeColorEntry()),
+          SizedBox(height: 10),
           addBikeButton(buttonWidth, buttonHeight),
         ]));
   }
@@ -80,6 +92,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
   Widget bikeNameEntry() {
     return TextFormField(
         autofocus: true,
+        key: bikeNameKey,
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
             labelText: 'Bike Name',
@@ -97,13 +110,11 @@ class _AddBikeFormState extends State<AddBikeForm> {
           bikeFields.bikeName = value;
         },
         validator: (value) {
-          // TO DO: Query database for value, to check if the bike's name is already taken
-          // bool alreadyTaken = false;
 
           if (value!.isEmpty) {
             return 'Please enter a name for the Bike';
-            // } else if (alreadyTaken) {
-            //   return 'Bike Name is already taken!';
+          } else if (bikeNameTaken) {
+              return 'Bike Name is already taken!';
           } else if (value.length > 20) {
             return 'The name of the Bike may not be greater than 20 characters';
           } else {
@@ -112,9 +123,21 @@ class _AddBikeFormState extends State<AddBikeForm> {
         });
   }
 
+  Future<bool> uniqueCheck(String? value) async {
+    bool alreadyTaken = false;
+    var snapshot = await FirebaseFirestore.instance
+        .collection('bikes')
+        .where('name', isEqualTo: value)
+        .get();
+    snapshot.docs.forEach((result) {
+      alreadyTaken = true;
+    });
+    return alreadyTaken;
+  }
+
   Widget bikeConditionEntry() {
     String? value;
-    List<String> conditionList = [
+    List<String> colorList = [
       'Totaled',
       'Poor',
       'Fair',
@@ -151,7 +174,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
           return 'Please select a Condition for the Bike';
         }
       },
-      items: conditionList.map((String value) {
+      items: colorList.map((String value) {
         return DropdownMenuItem(value: value, child: Text(value));
       }).toList(),
     );
@@ -218,12 +241,152 @@ class _AddBikeFormState extends State<AddBikeForm> {
         });
   }
 
+  Widget bikeTypeEntry() {
+    String? value;
+    List<String> typeList = [
+      'Mountain',
+      'Road',
+      'Hybrid',
+      'Tricycle',
+      'Training Wheels',
+      'Electric',
+      'Motorized',
+    ];
+    return DropdownButtonFormField(
+      value: value,
+      //decoration: InputDecoration(autofocus: true,
+      //style: TextStyle(color: Color(s_jungleGreen)),
+      decoration: InputDecoration(
+          labelText: 'Type of Bike',
+          labelStyle: TextStyle(
+              color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+          hintText: 'Please select the type of the Bike',
+          hintStyle: TextStyle(color: Color(s_jungleGreen)),
+          errorStyle: TextStyle(
+              color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+              borderSide:
+                  const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
+      onChanged: (value) {
+        setState(() {
+          bikeFields.bikeTags![0] = value as String?;
+        });
+      },
+      onSaved: (value) {
+        bikeFields.bikeTags![0] = value as String?;
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select a Type for the Bike';
+        }
+      },
+      items: typeList.map((String value) {
+        return DropdownMenuItem(value: value, child: Text(value));
+      }).toList(),
+    );
+  }
+
+  Widget bikeGearEntry() {
+    String? value;
+    List<String> gearList = [
+      'Fixie',
+      'Multiple Gear',
+    ];
+    return DropdownButtonFormField(
+      value: value,
+      //decoration: InputDecoration(autofocus: true,
+      //style: TextStyle(color: Color(s_jungleGreen)),
+      decoration: InputDecoration(
+          labelText: 'Bike\'s Gears',
+          labelStyle: TextStyle(
+              color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+          hintText: 'Please select the type of gears for the Bike',
+          hintStyle: TextStyle(color: Color(s_jungleGreen)),
+          errorStyle: TextStyle(
+              color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+              borderSide:
+                  const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
+      onChanged: (value) {
+        setState(() {
+          bikeFields.bikeTags![1] = value as String?;
+        });
+      },
+      onSaved: (value) {
+        bikeFields.bikeTags![1] = value as String?;
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select the gears for the Bike';
+        }
+      },
+      items: gearList.map((String value) {
+        return DropdownMenuItem(value: value, child: Text(value));
+      }).toList(),
+    );
+  }
+
+  Widget bikeColorEntry() {
+    String? value;
+    List<String> colorList = [
+      'Red',
+      'Blue',
+      'Yellow',
+      'Green',
+      'Pink',
+      'Purple',
+      'Orange',
+      'Black',
+      'Brown',
+      'White',
+      'Grey',
+      'Multicolor',
+    ];
+    return DropdownButtonFormField(
+      value: value,
+      //decoration: InputDecoration(autofocus: true,
+      //style: TextStyle(color: Color(s_jungleGreen)),
+      decoration: InputDecoration(
+          labelText: 'Bike\'s Color',
+          labelStyle: TextStyle(
+              color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+          hintText: 'Please select the color of the Bike',
+          hintStyle: TextStyle(color: Color(s_jungleGreen)),
+          errorStyle: TextStyle(
+              color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+              borderSide:
+                  const BorderSide(color: Color(s_jungleGreen), width: 2.0))),
+      onChanged: (value) {
+        setState(() {
+          bikeFields.bikeTags![2] = value as String?;
+        });
+      },
+      onSaved: (value) {
+        bikeFields.bikeTags![2] = value as String?;
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select the color of the Bike';
+        }
+      },
+      items: colorList.map((String value) {
+        return DropdownMenuItem(value: value, child: Text(value));
+      }).toList(),
+    );
+  }
+
   Widget addBikeButton(double buttonWidth, double buttonHeight) {
     final url = ModalRoute.of(context)!.settings.arguments as String;
     bikeFields.imageURL = url;
 
     return ElevatedButton(
         onPressed: () async {
+          bikeNameTaken = await uniqueCheck(bikeNameKey.currentState!.value);
+          setState(() {});
           if (formKey.currentState!.validate()) {
             formKey.currentState!.save();
 
@@ -239,7 +402,8 @@ class _AddBikeFormState extends State<AddBikeForm> {
               'Combination': bikeFields.bikeCombination,
               'Latitude': bikeFields.latitude,
               'Longitude': bikeFields.longitude,
-              'imageURL': bikeFields.imageURL
+              'imageURL': bikeFields.imageURL,
+              'Tags' : bikeFields.bikeTags,
             });
             Navigator.push(
               context,
