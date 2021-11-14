@@ -10,15 +10,12 @@ import '../components/styles.dart';
 import '../screens/splash_screen.dart';
 
 class RideFields {
-  String? riderName;
-  String? bikeName;
+  String? rideId;
   String? bikeCondition;
   int? rideRating;
-  double? startLat;
-  double? startLong;
   double? endLat;
   double? endLong;
-  RideFields({this. riderName, this. bikeName, this.bikeCondition, this.rideRating, this.startLat, this.startLong, this.endLat, this.endLong,});
+  RideFields({this.rideId, this.bikeCondition, this.rideRating, this.endLat, this.endLong,});
 }
 
 class CompleteRideForm extends StatefulWidget {
@@ -50,7 +47,7 @@ class _CompletRideForm extends State <CompleteRideForm> {
   Widget build(BuildContext context) {
     final double buttonHeight = 60;
     final double buttonWidth = 260;
-    //final url = ModalRoute.of(context)!.settings.arguments as String?;
+    final rideId = ModalRoute.of(context)!.settings.arguments as String?;
 
     return Form(
       key: formKey,
@@ -142,7 +139,9 @@ class _CompletRideForm extends State <CompleteRideForm> {
   );}
 
   Widget completeRideButton(double buttonWidth, double buttonHeight) {
-    final bikeId = ModalRoute.of(context)!.settings.arguments;  //THIS NEEDS TO COME FROM THE SELECTED BIKE PASSED AS AN ARGUMENT
+    String? rideId = ModalRoute.of(context)!.settings.arguments as String;
+    String? bikeId = ModalRoute.of(context)!.settings.arguments as String;  //QUERY DB FOR BIKE'S DOC ID
+
     return ElevatedButton(
       onPressed: () async {
         if (formKey.currentState!.validate()) {
@@ -156,12 +155,14 @@ class _CompletRideForm extends State <CompleteRideForm> {
           );
 
           //TO DO: timeStart and timeEnd, startLat and startLong
+          final rideDoc = await FirebaseFirestore.instance.collection('rides').doc(rideId).get();
+          bikeId = rideDoc['bike'];
           await FirebaseFirestore.instance
-            .collection('rides')
-            .add({'bike': rideFields.bikeName, 'Condition': rideFields.bikeCondition, 'endLat' : rideFields.endLat, 'endLong': rideFields.endLong, 'rating': rideFields.rideRating, 'rider': rideFields.riderName});
+            .collection('rides').doc(rideId)
+            .update({'endLat' : rideFields.endLat, 'endLong': rideFields.endLong, 'rating': rideFields.rideRating});
           await FirebaseFirestore.instance
-            .collection('bikes').doc('bikeId')
-            .update({'Condition': rideFields.bikeCondition, 'Latitude' : rideFields.endLat, 'Longitude': rideFields.endLong});
+            .collection('bikes').doc(bikeId)
+            .update({'Condition': rideFields.bikeCondition, 'Latitude' : rideFields.endLat, 'Longitude': rideFields.endLong, 'checkedOut': false});
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SplashScreen()),
