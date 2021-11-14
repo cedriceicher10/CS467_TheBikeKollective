@@ -21,6 +21,7 @@ Future<List<BikeMarker>> GetBikes(BuildContext context) async {
   // Convert to Bike object
   querySnapshot.docs.forEach((doc) {
     Bike bike = new Bike(
+        id: doc.id,
         name: doc['Name'],
         imagePath: doc['imageURL'],
         lat: doc['Latitude'],
@@ -204,13 +205,15 @@ class Bike {
   static const double size = 25;
 
   Bike(
-      {required this.name,
+      {required this.id,
+      required this.name,
       required this.imagePath,
       required this.lat,
       required this.long,
       required this.description,
       required this.condition});
 
+  final String id;
   final String name;
   final String imagePath;
   final double lat;
@@ -286,7 +289,7 @@ Container portraitLayout(BuildContext context, bike) {
                         SizedBox(height: 8),
                         Text('Condition: ${bike.condition}'),
                         SizedBox(height: 8),
-                        rideButton(context, "Details", 100, 25, bike.name)
+                        rideButton(context, "Details", 100, 25, bike.id)
                       ])
                 ]
             )
@@ -340,10 +343,10 @@ Container landscapeLayout(BuildContext context, bike) {
 
 //This will become the Start Ride button
 Widget rideButton(BuildContext context, String text,
-    double buttonWidth, double buttonHeight, String bikeName) {
+    double buttonWidth, double buttonHeight, String id) {
   return ElevatedButton(
       onPressed: () {
-        Navigator.of(context).pushNamed('rideScreen', arguments: bikeName);
+        Navigator.of(context).pushNamed('rideScreen', arguments: id);
         return;
       },
       child: rideButtonText(text),
