@@ -15,6 +15,7 @@ class BikeFields {
   double? longitude;
   String? imageURL;
   List<String?>? bikeTags;
+  bool checkedOut;
   BikeFields(
       {this.bikeName,
       this.bikeDescription,
@@ -24,6 +25,7 @@ class BikeFields {
       this.longitude,
       this.imageURL,
       this.bikeTags,
+      this.checkedOut = false,
       });
 }
 
@@ -91,7 +93,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
 
   Widget bikeNameEntry() {
     return TextFormField(
-        autofocus: true,
+        autofocus: false,
         key: bikeNameKey,
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
@@ -183,7 +185,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
   Widget bikeCombinationEntry() {
     return TextFormField(
         keyboardType: TextInputType.number,
-        autofocus: true,
+        autofocus: false,
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
             labelText: 'Bike Lock Combination',
@@ -205,7 +207,10 @@ class _AddBikeFormState extends State<AddBikeForm> {
             return 'Please enter a combination.';
           } else if (value.length > 20) {
             return 'The combination may not be greater than 10 numbers.';
-          } else {
+          } else if (value[0] == '0') {
+            return 'The combination cannot start with 0.';
+          }
+          else {
             return null;
           }
         });
@@ -213,7 +218,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
 
   Widget bikeDescriptionEntry() {
     return TextFormField(
-        autofocus: true,
+        autofocus: false,
         style: TextStyle(color: Color(s_jungleGreen)),
         decoration: InputDecoration(
             labelText: 'Bike Description',
@@ -255,7 +260,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
     return DropdownButtonFormField(
       value: value,
       //decoration: InputDecoration(autofocus: true,
-      //style: TextStyle(color: Color(s_jungleGreen)),
+      style: TextStyle(color: Color(s_jungleGreen)),
       decoration: InputDecoration(
           labelText: 'Type of Bike',
           labelStyle: TextStyle(
@@ -296,7 +301,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
     return DropdownButtonFormField(
       value: value,
       //decoration: InputDecoration(autofocus: true,
-      //style: TextStyle(color: Color(s_jungleGreen)),
+      style: TextStyle(color: Color(s_jungleGreen)),
       decoration: InputDecoration(
           labelText: 'Bike\'s Gears',
           labelStyle: TextStyle(
@@ -347,7 +352,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
     return DropdownButtonFormField(
       value: value,
       //decoration: InputDecoration(autofocus: true,
-      //style: TextStyle(color: Color(s_jungleGreen)),
+      style: TextStyle(color: Color(s_jungleGreen)),
       decoration: InputDecoration(
           labelText: 'Bike\'s Color',
           labelStyle: TextStyle(
@@ -404,6 +409,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
               'Longitude': bikeFields.longitude,
               'imageURL': bikeFields.imageURL,
               'Tags' : bikeFields.bikeTags,
+              'checkedOut': bikeFields.checkedOut,
             });
             Navigator.push(
               context,
