@@ -6,6 +6,18 @@ import 'package:location/location.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
 
+class RideFields {
+  String? riderName;
+  String? bikeId;
+  String? bikeCondition;
+  int? rideRating;
+  double? startLat;
+  double? startLong;
+  double? endLat;
+  double? endLong;
+  RideFields({this.riderName, this.bikeId, this.bikeCondition, this.rideRating, this.startLat, this.startLong, this.endLat, this.endLong,});
+}
+
 class RideScreenBody extends StatefulWidget {
   const RideScreenBody({ Key? key }) : super(key: key);
 
@@ -37,8 +49,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
 
     /*
       NOTE: THIS IS ALL ROUGH DRAFT CODE TO GET YOU STARTED CONNOR - THIS IS ROUGHLY WHAT SHOULD BE HAPPENING DATABASE-WISE
-          final bikeName = ModalRoute.of(context)!.settings.arguments;
-          //need to get bikeId from bikeName or change this so that bikeId is passed here
+          final bikeId = ModalRoute.of(context)!.settings.arguments;
           final startLat = locationData!.latitude;
           final startLong = locationData!.longitude;
           final riderName = //THIS NEEDS TO BE IMPLEMENTED - NEED TO PULL USER'S USERNAME
@@ -47,13 +58,13 @@ class _RideScreenBodyState extends State<RideScreenBody> {
           //TO DO: timeStart and timeEnd
           await FirebaseFirestore.instance
             .collection('rides')
-            .add({'bike': bikeName, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName})
+            .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName})
             .then(function(docRef) {
               rideId = docRef.id;
             });
           await FirebaseFirestore.instance
             .collection('bikes').doc('bikeId')
-            .update({'Condition': rideFields.bikeCondition, 'Latitude' : startLat, 'Longitude': startLong});
+            .update({'checkedOut': true, 'Latitude' : startLat, 'Longitude': startLong});
           Navigator.of(context).pushNamed('completeRideForm', arguments: rideId);
         }
       },
