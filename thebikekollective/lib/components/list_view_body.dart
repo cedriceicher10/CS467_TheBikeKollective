@@ -18,8 +18,8 @@ class PostTile {
   double latitude;
   double longitude;
   String imageURL;
-  bool checkedOut; // TO DO: Use when checkedOut field is active
-  List<dynamic> tags; // TO DO: Use when tags are active
+  bool checkedOut;
+  List<dynamic> tags;
   double distanceToUser;
   double rating;
   PostTile(
@@ -31,8 +31,8 @@ class PostTile {
       required this.latitude,
       required this.longitude,
       required this.imageURL,
-      required this.checkedOut, // TO DO: Use when checkedOut field is active
-      required this.tags, // TO DO: Use when tags are active
+      required this.checkedOut,
+      required this.tags,
       required this.distanceToUser,
       required this.rating});
 }
@@ -55,7 +55,7 @@ class _ListViewBodyState extends State<ListViewBody> {
   List<String> filterItems = <String>[
     'No Filter',
     'Filter by: Condition',
-    'Filter by: Tag'
+    'Filter by: Tags'
   ];
   String conditionString = 'Excellent';
   List<String> conditionItems = <String>[
@@ -66,7 +66,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     'Poor',
     'Totaled'
   ];
-  String tagString = 'Mountain'; // TO DO: Use when tags are active
+  String tagString = 'Mountain';
   List<String> tagItems = <String>[
     'Mountain',
     'Road',
@@ -75,7 +75,21 @@ class _ListViewBodyState extends State<ListViewBody> {
     'Motorized',
     'Multiple Gear',
     'Tricycle',
-    'Training Wheels'
+    'Training Wheels',
+    'Fixie',
+    'Multiple Gear',
+    'Red',
+    'Blue',
+    'Yellow',
+    'Green',
+    'Pink',
+    'Purple',
+    'Orange',
+    'Black',
+    'Brown',
+    'White',
+    'Grey',
+    'Multicolor'
   ];
   bool filterCondition = false;
   bool filterTag = false;
@@ -102,7 +116,7 @@ class _ListViewBodyState extends State<ListViewBody> {
           .collection('bikes')
           .where('Condition', isEqualTo: conditionString)
           .snapshots();
-    } else if (filterString == 'Filter by: Tag') {
+    } else if (filterString == 'Filter by: Tags') {
       // TO DO: Use when tags are active
       return FirebaseFirestore.instance
           .collection('bikes')
@@ -180,7 +194,7 @@ class _ListViewBodyState extends State<ListViewBody> {
               } else {
                 filterCondition = false;
               }
-              if (filterString == 'Filter by: Tag') {
+              if (filterString == 'Filter by: Tags') {
                 filterTag = true;
               } else {
                 filterTag = false;
@@ -195,59 +209,10 @@ class _ListViewBodyState extends State<ListViewBody> {
             }).toList(),
           )),
       SizedBox(width: 20),
-      filterCondition
-          ? Container(
-              height: 40,
-              child: DropdownButton<String>(
-                value: conditionString,
-                icon: const Icon(Icons.arrow_drop_down,
-                    color: Color(s_cadmiumOrange)),
-                iconSize: 24,
-                elevation: 16,
-                style: const TextStyle(color: Color(s_cadmiumOrange)),
-                underline: Container(
-                  height: 2,
-                  color: Color(s_cadmiumOrange),
-                ),
-                onChanged: (String? newValue) {
-                  conditionString = newValue!;
-                  setState(() {});
-                },
-                items: conditionItems
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: dropDownText(value),
-                  );
-                }).toList(),
-              ))
-          : Container(), // Hides condition drop-down when filter isn't on Filter: Condition
-      filterTag // TO DO: Use when tags are active
-          ? Container(
-              height: 40,
-              child: DropdownButton<String>(
-                value: tagString,
-                icon: const Icon(Icons.arrow_drop_down,
-                    color: Color(s_cadmiumOrange)),
-                iconSize: 24,
-                elevation: 16,
-                style: const TextStyle(color: Color(s_cadmiumOrange)),
-                underline: Container(
-                  height: 2,
-                  color: Color(s_cadmiumOrange),
-                ),
-                onChanged: (String? newValue) {
-                  tagString = newValue!;
-                  setState(() {});
-                },
-                items: tagItems.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: dropDownText(value),
-                  );
-                }).toList(),
-              ))
-          : Container() // Hides filter drop-down when filter isn't on Filter: Tags
+      // Filter by condition drop-down (only shows up if filter drop-down is Filter by: Condition)
+      filterByConditionDropDown(),
+      // Filter by tags drop-down (only shows up if filter drop-down is Filter by: Tags)
+      filterByTagDropDown(),
     ]);
   }
 
@@ -354,10 +319,8 @@ class _ListViewBodyState extends State<ListViewBody> {
           longitude: snapshotBikes.data!.docs[index]['Longitude'],
           imageURL: snapshotBikes.data!.docs[index]['imageURL'],
           combination: snapshotBikes.data!.docs[index]['Combination'],
-          checkedOut: snapshotBikes.data!.docs[index]
-              ['checkedOut'], // TO DO: Use when checkedOut field is active
-          tags: snapshotBikes.data!.docs[index]
-              ['Tags'], // TO DO: Use when tags are active
+          checkedOut: snapshotBikes.data!.docs[index]['checkedOut'],
+          tags: snapshotBikes.data!.docs[index]['Tags'],
           distanceToUser: 0.0,
           rating: 0.0);
       // Add ratings (average from rides table)
@@ -372,7 +335,6 @@ class _ListViewBodyState extends State<ListViewBody> {
       if (count > 0) {
         post.rating = sum / count;
       }
-
       // Add to returable List collection
       posts.add(post);
     }
@@ -388,7 +350,6 @@ class _ListViewBodyState extends State<ListViewBody> {
       // Cut off bikes that are more than GEOFENCE_DISTANCE or Checked-Out (in a current ride)
       if ((bike.distanceToUser < GEOFENCE_DISTANCE) &&
           (bike.condition != 'Stolen')) {
-        // TO DO: Use when Stolen field is active
         geoFencedPosts.add(bike);
       }
     });
@@ -434,6 +395,65 @@ class _ListViewBodyState extends State<ListViewBody> {
         return -1;
     }
     return -1;
+  }
+
+  Widget filterByConditionDropDown() {
+    return filterCondition
+        ? Container(
+            height: 40,
+            child: DropdownButton<String>(
+              value: conditionString,
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: Color(s_cadmiumOrange)),
+              iconSize: 24,
+              elevation: 16,
+              style: const TextStyle(color: Color(s_cadmiumOrange)),
+              underline: Container(
+                height: 2,
+                color: Color(s_cadmiumOrange),
+              ),
+              onChanged: (String? newValue) {
+                conditionString = newValue!;
+                setState(() {});
+              },
+              items:
+                  conditionItems.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: dropDownText(value),
+                );
+              }).toList(),
+            ))
+        : Container();
+  }
+
+  Widget filterByTagDropDown() {
+    return filterTag
+        ? Container(
+            height: 40,
+            child: DropdownButton<String>(
+              value: tagString,
+              icon: const Icon(Icons.arrow_drop_down,
+                  color: Color(s_cadmiumOrange)),
+              iconSize: 24,
+              elevation: 16,
+              style: const TextStyle(color: Color(s_cadmiumOrange)),
+              underline: Container(
+                height: 2,
+                color: Color(s_cadmiumOrange),
+              ),
+              onChanged: (String? newValue) {
+                tagString = newValue!;
+                setState(() {});
+              },
+              items: tagItems.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: dropDownText(value),
+                );
+              }).toList(),
+            ))
+        : Container();
   }
 
   Widget reportStolenButton() {
