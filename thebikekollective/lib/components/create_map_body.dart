@@ -289,7 +289,7 @@ Container portraitLayout(BuildContext context, bike) {
                         SizedBox(height: 8),
                         Text('Condition: ${bike.condition}'),
                         SizedBox(height: 8),
-                        rideButton(context, "Details", 100, 25, bike.id)
+                        rideButton(context, "Ride Me!", 100, 25, bike.id)
                       ])
                 ]
             )
@@ -330,7 +330,7 @@ Container landscapeLayout(BuildContext context, bike) {
                           SizedBox(height: 8),
                           Text('Condition: ${bike.condition}'),
                           SizedBox(height: 8),
-                          rideButton(context, "Start Ride", 100, 25, bike.name)
+                          rideButton(context, "Ride Me!", 100, 25, bike.name)
                         ])
               ]
             )
