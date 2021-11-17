@@ -3,7 +3,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
+import 'package:practice1/screens/ride_screen.dart';
 import 'styles.dart';
+import '../screens/map.dart';
 import 'formatted_text.dart';
 import 'home_screen_toggle.dart';
 import 'add_bike_fab.dart';
@@ -180,6 +182,17 @@ class _CreateMapBody extends State<CreateMapBody>
                                   })),
                     )
                   ]),
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+              floatingActionButton: FloatingActionButton(
+                onPressed: _zoom,
+                tooltip: 'Zoom',
+                backgroundColor: Color(s_jungleGreen),
+                child: Icon(Icons.zoom_out_map_outlined),
+              ),
+=======
+>>>>>>> Stashed changes
               floatingActionButton:
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                 AddBikeFAB(),
@@ -194,6 +207,11 @@ class _CreateMapBody extends State<CreateMapBody>
                 SizedBox(height: 10),
                 HomeScreenToggle(map: false)
               ]),
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
             );
           }
           return Center(child: Text('Loading...'));
@@ -289,7 +307,15 @@ Container portraitLayout(BuildContext context, bike) {
                         SizedBox(height: 8),
                         Text('Condition: ${bike.condition}'),
                         SizedBox(height: 8),
+<<<<<<< Updated upstream
                         rideButton(context, "Details", 100, 25, bike.id)
+=======
+<<<<<<< Updated upstream
+                        rideButton(context, "Details", 100, 25)
+=======
+                        rideButton(context, "Ride Me!", 100, 25, bike.id)
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                       ])
                 ]
             )
@@ -330,7 +356,15 @@ Container landscapeLayout(BuildContext context, bike) {
                           SizedBox(height: 8),
                           Text('Condition: ${bike.condition}'),
                           SizedBox(height: 8),
+<<<<<<< Updated upstream
                           rideButton(context, "Start Ride", 100, 25, bike.name)
+=======
+<<<<<<< Updated upstream
+                          rideButton(context, "Details", 100, 25)
+=======
+                          rideButton(context, "Ride Me!", 100, 25, bike.name)
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                         ])
               ]
             )

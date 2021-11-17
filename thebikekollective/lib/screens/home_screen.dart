@@ -2,9 +2,19 @@ import 'package:flutter/material.dart';
 import '../components/formatted_text.dart';
 import '../components/styles.dart';
 import '../components/home_body.dart';
+<<<<<<< Updated upstream
 import '../components/side_menu.dart';
 import 'interest_form_screen.dart';
 import 'add_bike_screen.dart';
+=======
+<<<<<<< Updated upstream
+=======
+import '../components/side_menu.dart';
+import 'interest_form_screen.dart';
+import 'add_bike_screen.dart';
+import 'ride_screen.dart';
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 class HomeScreen extends StatefulWidget {
   final bool map;
@@ -25,6 +35,19 @@ class _HomeScreenState extends State<HomeScreen> {
             title: mainTitle(),
             backgroundColor: Color(s_jungleGreen),
             centerTitle: true,
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.settings, color: Color(s_lightPurple)),
+                  onPressed: () {})
+            ]),
+        body: HomeBody(),
+      ),
+    );
+=======
+>>>>>>> Stashed changes
           ),
           drawer: SideMenu(),
           body: HomeBody(map: widget.map),
@@ -32,7 +55,13 @@ class _HomeScreenState extends State<HomeScreen> {
         routes: {
           'addBike': (context) => AddBikeScreen(),
           'interestForm': (context) => InterestFormScreen(),
+<<<<<<< Updated upstream
         });
+=======
+          'rideScreen': (context) => RideScreen(),
+        });
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   }
 }
 
