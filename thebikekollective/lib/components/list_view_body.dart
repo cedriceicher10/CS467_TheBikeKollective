@@ -6,6 +6,7 @@ import 'styles.dart';
 import 'formatted_text.dart';
 import 'add_bike_fab.dart';
 import '../utils/haversine_calculator.dart';
+import '../utils/multi_select_alert_dialog.dart';
 
 const GEOFENCE_DISTANCE = 10.0; // mi
 
@@ -96,6 +97,10 @@ class _ListViewBodyState extends State<ListViewBody> {
   double userLat = 0.0;
   double userLon = 0.0;
   String bikeId = 'no bike';
+  bool filterTagsOn = false;
+  Set<int>? tagSelectedValues;
+  bool filterConditionOn = false;
+  Set<int>? conditionSelectedValues;
 
   Future<LocationData> retrieveLocation() async {
     var locationService = Location();
@@ -111,16 +116,10 @@ class _ListViewBodyState extends State<ListViewBody> {
   }
 
   Stream<QuerySnapshot<Object?>> bikeQuery() {
-    if (filterString == 'Filter by: Condition') {
+    if ((filterTagsOn) && (tagSelectedValues!.isNotEmpty)) {
       return FirebaseFirestore.instance
           .collection('bikes')
-          .where('Condition', isEqualTo: conditionString)
-          .snapshots();
-    } else if (filterString == 'Filter by: Tags') {
-      // TO DO: Use when tags are active
-      return FirebaseFirestore.instance
-          .collection('bikes')
-          .where('Tags', arrayContains: tagString)
+          .where('Tags', arrayContains: tagItems[tagSelectedValues!.first - 1])
           .snapshots();
     } else {
       return FirebaseFirestore.instance
@@ -174,45 +173,9 @@ class _ListViewBodyState extends State<ListViewBody> {
             }).toList(),
           )),
       SizedBox(width: 20),
-      Container(
-          height: 40,
-          child: DropdownButton<String>(
-            value: filterString,
-            icon: const Icon(Icons.arrow_drop_down,
-                color: Color(s_cadmiumOrange)),
-            iconSize: 24,
-            elevation: 16,
-            style: const TextStyle(color: Color(s_cadmiumOrange)),
-            underline: Container(
-              height: 2,
-              color: Color(s_cadmiumOrange),
-            ),
-            onChanged: (String? newValue) {
-              filterString = newValue!;
-              if (filterString == 'Filter by: Condition') {
-                filterCondition = true;
-              } else {
-                filterCondition = false;
-              }
-              if (filterString == 'Filter by: Tags') {
-                filterTag = true;
-              } else {
-                filterTag = false;
-              }
-              setState(() {});
-            },
-            items: filterItems.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: dropDownText(value),
-              );
-            }).toList(),
-          )),
+      filterConditionButton(),
       SizedBox(width: 20),
-      // Filter by condition drop-down (only shows up if filter drop-down is Filter by: Condition)
-      filterByConditionDropDown(),
-      // Filter by tags drop-down (only shows up if filter drop-down is Filter by: Tags)
-      filterByTagDropDown(),
+      filterTagsButton(),
     ]);
   }
 
@@ -233,6 +196,17 @@ class _ListViewBodyState extends State<ListViewBody> {
                           if (snapshotBikes.hasData) {
                             var snapMap = postBuilder(snapshotBikes,
                                 snapshotRatings); // Converts to custom List<Map> that's easier to pass around
+                            // Condition filtering
+                            if ((filterConditionOn) &&
+                                (conditionSelectedValues!.isNotEmpty)) {
+                              snapMap = conditionBuilder(snapMap);
+                            }
+                            // Tag filtering
+                            if ((filterTagsOn) &&
+                                (tagSelectedValues!.isNotEmpty) &&
+                                (tagSelectedValues!.length > 1)) {
+                              snapMap = multiTagBuilder(snapMap);
+                            }
                             var posts = sortSnapshot(snapMap);
                             if (posts.length == 0) {
                               return noBikesFound();
@@ -341,6 +315,62 @@ class _ListViewBodyState extends State<ListViewBody> {
     return posts;
   }
 
+  List<PostTile> conditionBuilder(List<PostTile> posts) {
+    // Generate condition list
+    List<String> conditionFilters = [];
+    for (var conditionIndex in conditionSelectedValues!) {
+      conditionFilters.add(conditionItems[conditionIndex - 1]);
+    }
+
+    List<PostTile> conditionPosts = [];
+    for (var index = 0; index < posts.length; ++index) {
+      String postCondition = posts[index].condition;
+      if (conditionFilters.contains(postCondition)) {
+        conditionPosts.add(posts[index]);
+      }
+    }
+    return conditionPosts;
+  }
+
+  List<PostTile> multiTagBuilder(List<PostTile> posts) {
+    // Generate tag list
+    List<String> tagFilters = [];
+    for (var tagIndex in tagSelectedValues!) {
+      tagFilters.add(tagItems[tagIndex - 1]);
+    }
+
+    // Compare to posts' tags
+    List<PostTile> tagPosts = [];
+    for (var index = 0; index < posts.length; ++index) {
+      List<dynamic> postTags = posts[index].tags;
+      if (postHasTagsInFilterList(tagFilters, postTags)) {
+        tagPosts.add(posts[index]);
+      }
+    }
+    return tagPosts;
+  }
+
+  bool postHasTagsInFilterList(
+      List<String> tagsDesired, List<dynamic> postInQuestion) {
+    // Post has less tags than desired
+    if (postInQuestion.length < tagsDesired.length) {
+      return false;
+    }
+
+    int foundNum = 0;
+    for (var tagIndex = 0; tagIndex < tagsDesired.length; ++tagIndex) {
+      for (var postIndex = 0; postIndex < postInQuestion.length; ++postIndex) {
+        if (tagsDesired[tagIndex] == postInQuestion[postIndex]) {
+          foundNum++;
+          if (foundNum == tagsDesired.length) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   List<PostTile> sortSnapshot(List<PostTile> postList) {
     List<PostTile> geoFencedPosts = [];
     // Add distance to user for each bike
@@ -397,63 +427,104 @@ class _ListViewBodyState extends State<ListViewBody> {
     return -1;
   }
 
-  Widget filterByConditionDropDown() {
-    return filterCondition
-        ? Container(
-            height: 40,
-            child: DropdownButton<String>(
-              value: conditionString,
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(s_cadmiumOrange)),
-              iconSize: 24,
-              elevation: 16,
-              style: const TextStyle(color: Color(s_cadmiumOrange)),
-              underline: Container(
-                height: 2,
-                color: Color(s_cadmiumOrange),
-              ),
-              onChanged: (String? newValue) {
-                conditionString = newValue!;
-                setState(() {});
-              },
-              items:
-                  conditionItems.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: dropDownText(value),
-                );
-              }).toList(),
-            ))
-        : Container();
+  Widget filterConditionButton() {
+    return ElevatedButton(
+        child: filterAlertText('Filter by Condition', filterConditionOn),
+        onPressed: (() async {
+          _showConditionsDialog();
+        }),
+        style: ElevatedButton.styleFrom(
+          primary: filterConditionColor(),
+          side: BorderSide(width: 1.0, color: Color(s_cadmiumOrange)),
+        ));
   }
 
-  Widget filterByTagDropDown() {
-    return filterTag
-        ? Container(
-            height: 40,
-            child: DropdownButton<String>(
-              value: tagString,
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color(s_cadmiumOrange)),
-              iconSize: 24,
-              elevation: 16,
-              style: const TextStyle(color: Color(s_cadmiumOrange)),
-              underline: Container(
-                height: 2,
-                color: Color(s_cadmiumOrange),
-              ),
-              onChanged: (String? newValue) {
-                tagString = newValue!;
-                setState(() {});
-              },
-              items: tagItems.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: dropDownText(value),
-                );
-              }).toList(),
-            ))
-        : Container();
+  Color filterConditionColor() {
+    if (filterConditionOn) {
+      return Color(s_lightOrange);
+    } else {
+      return Colors.white;
+    }
+  }
+
+  void _showConditionsDialog() async {
+    List<MultiSelectDialogItem> conditionAlertItems = [];
+    for (var index = 0; index < conditionItems.length; ++index) {
+      MultiSelectDialogItem conditionAlertItem = MultiSelectDialogItem(
+          value: index + 1, filter: conditionItems[index]);
+      conditionAlertItems.add(conditionAlertItem);
+    }
+    conditionSelectedValues = await showDialog<Set<int>>(
+      context: context,
+      builder: (BuildContext context) {
+        return MultiSelectAlertDialog(
+          items: conditionAlertItems,
+          initiallyChecked: conditionSelectedValues,
+        );
+      },
+    );
+
+    // Protects tapping outside of filter dialog
+    if (conditionSelectedValues == null) {
+      conditionSelectedValues = {};
+    }
+
+    if (conditionSelectedValues!.isNotEmpty) {
+      filterConditionOn = true;
+    } else {
+      filterConditionOn = false;
+    }
+    setState(() {});
+  }
+
+  Widget filterTagsButton() {
+    return ElevatedButton(
+        child: filterAlertText('Filter by Tags', filterTagsOn),
+        onPressed: (() async {
+          _showTagsDialog();
+        }),
+        style: ElevatedButton.styleFrom(
+          primary: filterTagsColor(),
+          side: BorderSide(width: 1.0, color: Color(s_cadmiumOrange)),
+        ));
+  }
+
+  Color filterTagsColor() {
+    if (filterTagsOn) {
+      return Color(s_lightOrange);
+    } else {
+      return Colors.white;
+    }
+  }
+
+  void _showTagsDialog() async {
+    List<MultiSelectDialogItem> tagAlertItems = [];
+    for (var index = 0; index < tagItems.length; ++index) {
+      MultiSelectDialogItem tagAlertItem =
+          MultiSelectDialogItem(value: index + 1, filter: tagItems[index]);
+      tagAlertItems.add(tagAlertItem);
+    }
+    tagSelectedValues = await showDialog<Set<int>>(
+      context: context,
+      builder: (BuildContext context) {
+        return MultiSelectAlertDialog(
+          items: tagAlertItems,
+          initiallyChecked: tagSelectedValues,
+        );
+      },
+    );
+
+    // Protects tapping outside of filter dialog
+    if (tagSelectedValues == null) {
+      tagSelectedValues = {};
+    }
+
+    if (tagSelectedValues!.isNotEmpty) {
+      filterTagsOn = true;
+    } else {
+      filterTagsOn = false;
+    }
+    setState(() {});
   }
 
   Widget reportStolenButton() {
@@ -473,6 +544,20 @@ class _ListViewBodyState extends State<ListViewBody> {
             .update({'Condition': 'Stolen'});
         Navigator.of(context, rootNavigator: true).pop('dialog');
       },
+    );
+  }
+
+  Widget filterAlertText(String text, bool filterOn) {
+    Color textColor = Color(s_cadmiumOrange);
+    if (filterOn) {
+      textColor = Colors.white;
+    }
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: textColor,
+      font: s_font_AmaticSC,
+      weight: FontWeight.bold,
     );
   }
 
