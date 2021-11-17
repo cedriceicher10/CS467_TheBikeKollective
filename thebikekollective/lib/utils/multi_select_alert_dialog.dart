@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../components/formatted_text.dart';
+import '../components/styles.dart';
 
 // Sourced and heavily adapted (Flutter 2.0 -> 3.0) from:
 // https://stackoverflow.com/questions/51975690/is-there-an-equivalent-widget-in-flutter-to-the-select-multiple-element-in-htm
@@ -36,6 +38,23 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: titleText(),
+      contentPadding: EdgeInsets.only(top: 12.0),
+      content: SingleChildScrollView(
+        child: ListTileTheme(
+          contentPadding: EdgeInsets.fromLTRB(14.0, 0.0, 24.0, 0.0),
+          child: ListBody(
+            children: widget.items.map(_buildItem).toList(),
+          ),
+        ),
+      ),
+      actions: <Widget>[resetButton(), filterButton()],
+    );
+  }
+
   void _onItemCheckedChange(int filterValue, bool checked) {
     setState(() {
       if (checked) {
@@ -55,39 +74,62 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
     Navigator.pop(context, _selectedFilters);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Select Tags to Filter'),
-      contentPadding: EdgeInsets.only(top: 12.0),
-      content: SingleChildScrollView(
-        child: ListTileTheme(
-          contentPadding: EdgeInsets.fromLTRB(14.0, 0.0, 24.0, 0.0),
-          child: ListBody(
-            children: widget.items.map(_buildItem).toList(),
-          ),
-        ),
-      ),
-      actions: <Widget>[
-        ElevatedButton(
-          child: Text('Reset'),
-          onPressed: _onCancelTap,
-        ),
-        ElevatedButton(
-          child: Text('Filter'),
-          onPressed: _onSubmitTap,
-        )
-      ],
-    );
-  }
-
   Widget _buildItem(MultiSelectDialogItem item) {
     final checked = _selectedFilters.contains(item.value);
     return CheckboxListTile(
       value: checked,
-      title: Text(item.filter),
+      checkColor: Colors.white,
+      title: itemText(item.filter),
       controlAffinity: ListTileControlAffinity.leading,
       onChanged: (checked) => _onItemCheckedChange(item.value, checked!),
+    );
+  }
+
+  Widget resetButton() {
+    return ElevatedButton(
+      child: FormattedText(
+        text: 'Reset',
+        size: s_fontSizeSmall,
+        color: Colors.white,
+        font: s_font_BonaNova,
+        weight: FontWeight.bold,
+      ),
+      style: ElevatedButton.styleFrom(primary: Color(s_declineRed)),
+      onPressed: _onCancelTap,
+    );
+  }
+
+  Widget filterButton() {
+    return ElevatedButton(
+      child: FormattedText(
+        text: 'Filter',
+        size: s_fontSizeSmall,
+        color: Colors.white,
+        font: s_font_BonaNova,
+        weight: FontWeight.bold,
+      ),
+      style: ElevatedButton.styleFrom(primary: Color(s_cadmiumOrange)),
+      onPressed: _onSubmitTap,
+    );
+  }
+
+  Widget titleText() {
+    return FormattedText(
+      text: 'Select Filters',
+      size: s_fontSizeMedium,
+      color: Color(s_cadmiumOrange),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget itemText(String item) {
+    return FormattedText(
+      text: item,
+      size: s_fontSizeSmall,
+      color: Color(s_cadmiumOrange),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
     );
   }
 }
