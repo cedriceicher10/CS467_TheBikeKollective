@@ -16,7 +16,16 @@ class RideFields {
   double? startLong;
   double? endLat;
   double? endLong;
-  RideFields({this.riderName, this.bikeId, this.bikeCondition, this.rideRating, this.startLat, this.startLong, this.endLat, this.endLong,});
+  RideFields({
+    this.riderName,
+    this.bikeId,
+    this.bikeCondition,
+    this.rideRating,
+    this.startLat,
+    this.startLong,
+    this.endLat,
+    this.endLong,
+  });
 }
 
 class RideScreenBody extends StatefulWidget {
@@ -50,15 +59,30 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     setState(() {});
   }
 
+Future<int> retrieveCombo(bikeId) async{
+    var req = await FirebaseFirestore.instance
+        .collection('bikes')
+        .doc(bikeId).get();
+    if(req.exists){
+      Map<String, dynamic>? data = req.data();
+      var c = data?['Combination'];
+      return c;
+    } else {
+      return -1;
+    }
+  }
+
   Future<String> startRide(bikeId, startLat, startLong, riderName) async{
     var rideId = await FirebaseFirestore.instance
         .collection('rides')
         .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now()})
         .then((docRef) {
-      return docRef.id;
+          return docRef.id;
     });
     return rideId;
   }
+
+
 
   Widget build(BuildContext context) {
     final bikeId = ModalRoute
@@ -68,29 +92,57 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     final startLat = locationData!.latitude;
     final startLong = locationData!.longitude;
     final riderName = username;
+    var comboNum;
     var rideId;
 
 
-    return FutureBuilder<String>(
-        future: startRide(bikeId, startLat, startLong, riderName),
-        builder: (context, snapshot) {
-          String? returnData;
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              returnData = snapshot.data;
-              rideId = returnData;
-            };
-            return Container(
-                child: FormattedText(
-                  text: riderName + ' ' + rideId,
-                  size: s_fontSizeExtraLarge,
-                  color: Colors.black,
-                  font: s_font_AmaticSC,
-                  weight: FontWeight.bold,
-                )
-            );};
-          return Center(child: Text('Loading...'));
-        });
+    return Scaffold(
+      body: Column(children: [
+        Row(
+          children: [FutureBuilder<String>(
+              future: startRide(bikeId, startLat, startLong, riderName),
+              builder: (context, snapshot) {
+                String? returnData;
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    returnData = snapshot.data;
+                    rideId = returnData;
+                  };
+                  return Container(
+                      child: FormattedText(
+                        text: 'Username: ' + riderName + '\n' + 'Ride ID: ' + rideId,
+                        size: s_fontSizeMedLarge,
+                        color: Colors.black,
+                        font: s_font_AmaticSC,
+                        weight: FontWeight.bold,
+                      )
+                  );};
+                return Center(child: Text('Loading...'));
+              }),
+        ]),
+        Row(
+          children: [FutureBuilder<int>(
+              future: retrieveCombo(bikeId),
+              builder: (context, snapshot) {
+                int? returnData;
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    returnData = snapshot.data;
+                    comboNum = returnData;
+                  };
+                  return Container(
+                      child: FormattedText(
+                        text: 'Bike combination: ' + comboNum.toString(),
+                        size: s_fontSizeMedLarge,
+                        color: Colors.black,
+                        font: s_font_AmaticSC,
+                        weight: FontWeight.bold,
+                      )
+                  );};
+                return Center(child: Text('Loading...'));
+              })
+      ])]
+    ));
 
   }
 
