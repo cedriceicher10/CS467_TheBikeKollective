@@ -17,8 +17,8 @@ class _AddBikeFab extends State<AddBikeFAB> {
     return FloatingActionButton(
       heroTag: "Add Bike FAB",
       onPressed: () async {
-        final url = await getImage();
-        Navigator.of(context).pushNamed('interestForm', arguments: url);
+        //final url = await getImage();
+        Navigator.of(context).pushNamed('interestForm');
       },
       tooltip: 'Toggle View',
       backgroundColor: Color(s_lightPurple),
@@ -26,6 +26,7 @@ class _AddBikeFab extends State<AddBikeFAB> {
     );
   }
 
+  /*
   Future getImage() async {
     File? image;
     final picker = ImagePicker();
@@ -39,4 +40,5 @@ class _AddBikeFab extends State<AddBikeFAB> {
     final url = await storageReference.getDownloadURL();
     return url;
   }
+  */
 }
