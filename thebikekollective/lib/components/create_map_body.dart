@@ -3,37 +3,22 @@ import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'dart:core';
 import 'styles.dart';
 import 'formatted_text.dart';
 import 'home_screen_toggle.dart';
+import 'package:location/location.dart';
 import 'add_bike_fab.dart';
+import '../utils/haversine_calculator.dart';
 import 'dart:developer';
 
-const Color MarkerColor = Color(s_jungleGreen);
+const HAVERSINE_CUTOFF_RANGE = 0.5;
 
-Future<List<BikeMarker>> GetBikes(BuildContext context) async {
-  List<BikeMarker> bikeMarkers = <BikeMarker>[];
-  var bikes = [];
+const Color ActiveMarkerColor = Color(s_jungleGreen);
+const Color DisabledMarkerColor = Color(s_disabledGray);
 
-  QuerySnapshot querySnapshot =
-      await FirebaseFirestore.instance.collection('bikes').get();
 
-  // Convert to Bike object
-  querySnapshot.docs.forEach((doc) {
-    Bike bike = new Bike(
-        id: doc.id,
-        name: doc['Name'],
-        imagePath: doc['imageURL'],
-        lat: doc['Latitude'],
-        long: doc['Longitude'],
-        description: doc['Description'],
-        condition: doc['Condition']);
-    bikes.add(bike);
-    bikeMarkers.add(new BikeMarker(bike: bike));
-  });
-
-  return bikeMarkers;
-}
 
 List<BikeMarker> ConvertMarkers(
     BuildContext context, List<BikeMarker> bmFuture) {
@@ -53,8 +38,110 @@ class CreateMapBody extends StatefulWidget {
 
 class _CreateMapBody extends State<CreateMapBody>
     with TickerProviderStateMixin {
+  LocationData? locationData;
   List<BikeMarker> bikes = <BikeMarker>[];
   final PopupController _popupLayerController = PopupController();
+  List<BikeMarker> bikeMarkers = <BikeMarker>[];
+  List<BikeMarker> markerList = <BikeMarker>[];
+
+
+  var locationService = Location();
+  var bikesFromDB;
+
+  void initState() {
+
+    super.initState();
+    locationService.changeSettings(interval: 1000, distanceFilter: 5);
+    initLocation();
+    getBikeSnapshot();
+
+    locationService.onLocationChanged.distinct().listen((l) async {
+/*      print('zoz');
+      markerList = await GetBikes(context);
+      setState(() {
+        markerList = bikeMarkers;
+        locationData = locationData;
+      });*/
+      retrieveLocation();
+    });
+
+  }
+
+void getBikeSnapshot() async{
+    QuerySnapshot querySnapshot =
+    await FirebaseFirestore.instance.collection('bikes').get();
+
+    print('DATABASE QUERIED');
+
+    bikesFromDB = querySnapshot;
+  }
+
+
+
+  Future<List<BikeMarker>> GetBikes(BuildContext context, q) async {
+
+    var bikes = [];
+    bikeMarkers = [];
+
+    print('bikezzz');
+    print(locationData!.latitude);
+    print(locationData!.longitude);
+
+
+
+    // Convert to Bike object
+    q.docs.forEach((doc) {
+      Bike bike = new Bike(
+          id: doc.id,
+          name: doc['Name'],
+          imagePath: doc['imageURL'],
+          lat: doc['Latitude'],
+          long: doc['Longitude'],
+          description: doc['Description'],
+          condition: doc['Condition']);
+      bikes.add(bike);
+      var lat = locationData!.latitude;
+      var long = locationData!.longitude;
+
+      if(haversineCalculator(
+          lat!,
+          long!,
+          doc['Latitude'],
+          doc['Longitude'])
+          < HAVERSINE_CUTOFF_RANGE){
+        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_jungleGreen)));
+      } else {
+        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_lightPurple)));
+      }
+
+
+    });
+
+    return bikeMarkers;
+  }
+
+  void retrieveLocation() async{
+    var oldLocationData = locationData;
+    locationData = await locationService.getLocation();
+
+    if( (locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.001){
+      setState(() {});
+    }
+    print(locationData!.longitude);
+    print(locationData!.latitude);
+
+
+  }
+
+  void initLocation() async{
+    locationData = await locationService.getLocation();
+
+
+    print(locationData!.longitude);
+    print(locationData!.latitude);
+
+    setState(() {});
+  }
 
   // Zoom functions from chunhunghan's answer here:
   // https://stackoverflow.com/questions/64034365/flutter-map-zoom-not-updating
@@ -112,17 +199,23 @@ class _CreateMapBody extends State<CreateMapBody>
 
   @override
   Widget build(BuildContext context) {
-    List<BikeMarker> markerList = <BikeMarker>[];
+
+    final userLat = locationData!.latitude;
+    final userLong = locationData!.longitude;
+
+
     return FutureBuilder<List<BikeMarker>>(
-        future: GetBikes(context),
+        future: GetBikes(context, bikesFromDB),
         builder: (context, snapshot) {
           List<BikeMarker>? returnData;
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
+              markerList = [];
               returnData = snapshot.data;
               returnData!.forEach((el) {
                 markerList.add(el);
               });
+
             }
 
             return Scaffold(
@@ -154,6 +247,7 @@ class _CreateMapBody extends State<CreateMapBody>
                       },
                       additionalOptions: {},
                     )),
+                    LocationMarkerLayerWidget(),
                     PopupMarkerLayerWidget(
                       options: PopupMarkerLayerOptions(
 
@@ -167,8 +261,17 @@ class _CreateMapBody extends State<CreateMapBody>
                               duration: Duration(milliseconds: 300)),
                           popupController: _popupLayerController,
                           popupBuilder: (_, Marker marker) {
-                            if (marker is BikeMarker) {
-                              return BikeMarkerPopup(bike: marker.bike);
+                            if (marker is BikeMarker &&
+                              haversineCalculator(
+                                  userLat!,
+                                  userLong!,
+                                  marker.point.latitude,
+                                  marker.point.longitude)
+                              < HAVERSINE_CUTOFF_RANGE){
+                              return BikeMarkerPopup(bike: marker.bike, inRange: true);
+                            }
+                            else if (marker is BikeMarker) {
+                              return BikeMarkerPopup(bike: marker.bike, inRange: false);
                             }
                             return Card(child: const Text('Not a bike'));
                           },
@@ -223,7 +326,7 @@ class Bike {
 }
 
 class BikeMarker extends Marker {
-  BikeMarker({required this.bike})
+  BikeMarker({required this.bike, required this.markerColor})
       : super(
             anchorPos: AnchorPos.align(AnchorAlign.top),
             height: Bike.size,
@@ -231,27 +334,52 @@ class BikeMarker extends Marker {
             point: LatLng(bike.lat, bike.long),
             builder: (BuildContext ctx) => new Container(
                   child: new Icon(Icons.location_pin,
-                      color: MarkerColor, size: 30.0),
+                      color: markerColor, size: 30.0),
                 ));
+
+  void setMarkerColor(color){
+    this.markerColor = color;
+  }
+
+  Color getMarkerColor(){
+    return this.markerColor;
+  }
+
+  final Bike bike;
+  var markerColor;
+}
+
+class DisabledBikeMarker extends Marker {
+  DisabledBikeMarker({required this.bike})
+      : super(
+      anchorPos: AnchorPos.align(AnchorAlign.top),
+      height: Bike.size,
+      width: Bike.size,
+      point: LatLng(bike.lat, bike.long),
+      builder: (BuildContext ctx) => new Container(
+        child: new Icon(Icons.location_pin,
+            color: DisabledMarkerColor, size: 30.0),
+      ));
 
   final Bike bike;
 }
 
 class BikeMarkerPopup extends StatelessWidget {
-  const BikeMarkerPopup({Key? key, required this.bike}) : super(key: key);
+  const BikeMarkerPopup({Key? key, required this.bike, required this.inRange}) : super(key: key);
   final Bike bike;
+  final bool inRange;
 
   @override
   Widget build(BuildContext context) {
     if (!isLandscape(context)) {
-      return portraitLayout(context, bike);
+      return portraitLayout(context, bike, inRange);
     } else {
-      return landscapeLayout(context, bike);
+      return landscapeLayout(context, bike, inRange);
     }
   }
 }
 
-Container portraitLayout(BuildContext context, bike) {
+Container portraitLayout(BuildContext context, bike, inRange) {
   return Container(
     width: double.infinity,
     child: Card(
@@ -289,7 +417,7 @@ Container portraitLayout(BuildContext context, bike) {
                         SizedBox(height: 8),
                         Text('Condition: ${bike.condition}'),
                         SizedBox(height: 8),
-                        rideButton(context, "Ride Me!", 100, 25, bike.id)
+                        rideButton(context, inRange, 100, 25, bike.id)
                       ])
                 ]
             )
@@ -300,7 +428,7 @@ Container portraitLayout(BuildContext context, bike) {
   );
 }
 
-Container landscapeLayout(BuildContext context, bike) {
+Container landscapeLayout(BuildContext context, bike, inRange) {
   return Container(
     alignment: Alignment.topLeft,
     height: double.infinity,
@@ -330,7 +458,7 @@ Container landscapeLayout(BuildContext context, bike) {
                           SizedBox(height: 8),
                           Text('Condition: ${bike.condition}'),
                           SizedBox(height: 8),
-                          rideButton(context, "Ride Me!", 100, 25, bike.name)
+                          rideButton(context, inRange, 100, 25, bike.name)
                         ])
               ]
             )
@@ -342,16 +470,30 @@ Container landscapeLayout(BuildContext context, bike) {
 }
 
 //This will become the Start Ride button
-Widget rideButton(BuildContext context, String text,
+Widget rideButton(BuildContext context, bool inRange,
     double buttonWidth, double buttonHeight, String id) {
+
+  var text = '';
+  var color;
+
+  if( inRange ){
+    text = 'Ride Me!';
+    color = Color(s_jungleGreen);
+  } else {
+    text = 'Too Far';
+    color = Color(s_disabledGray);
+  }
   return ElevatedButton(
       onPressed: () {
-        Navigator.of(context).pushNamed('rideScreen', arguments: id);
+        if( inRange ){
+          Navigator.of(context).pushNamed('rideScreen', arguments: id);
+
+        }
         return;
       },
       child: rideButtonText(text),
       style: ElevatedButton.styleFrom(
-          primary: Color(s_jungleGreen),
+          primary: color,
           fixedSize: Size(buttonWidth, buttonHeight)));
 }
 
