@@ -51,8 +51,9 @@ class _CreateMapBody extends State<CreateMapBody>
   void initState() {
 
     super.initState();
-    locationService.changeSettings(interval: 1000, distanceFilter: 5);
+
     initLocation();
+    locationService.changeSettings(interval: 1000, distanceFilter: 5);
     getBikeSnapshot();
 
     locationService.onLocationChanged.distinct().listen((l) async {
@@ -74,6 +75,9 @@ void getBikeSnapshot() async{
     print('DATABASE QUERIED');
 
     bikesFromDB = querySnapshot;
+    setState(() {
+
+    });
   }
 
 
@@ -82,12 +86,6 @@ void getBikeSnapshot() async{
 
     var bikes = [];
     bikeMarkers = [];
-
-    print('bikezzz');
-    print(locationData!.latitude);
-    print(locationData!.longitude);
-
-
 
     // Convert to Bike object
     q.docs.forEach((doc) {
@@ -124,11 +122,12 @@ void getBikeSnapshot() async{
     var oldLocationData = locationData;
     locationData = await locationService.getLocation();
 
-    if( (locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.001){
+    if( (locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001){
+      print(locationData!.longitude);
+      print(locationData!.latitude);
       setState(() {});
     }
-    print(locationData!.longitude);
-    print(locationData!.latitude);
+
 
 
   }
@@ -225,7 +224,7 @@ void getBikeSnapshot() async{
                       onMapCreated: (c) {
                         mapController = c;
                       },
-                      center: currentCenter,
+                      center: LatLng(userLat!, userLong!),
                       zoom: currentZoom,
                       // Conzar! You can disable rotation using this,
                       // but try not to take the easy way out:
@@ -299,7 +298,7 @@ void getBikeSnapshot() async{
               ]),
             );
           }
-          return Center(child: Text('Loading...'));
+          return Center();
         });
   }
 }
