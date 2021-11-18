@@ -108,7 +108,7 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
         font: s_font_BonaNova,
         weight: FontWeight.bold,
       ),
-      style: ElevatedButton.styleFrom(primary: Color(s_cadmiumOrange)),
+      style: ElevatedButton.styleFrom(primary: Color(s_grayGreen)),
       onPressed: _onSubmitTap,
     );
   }
@@ -117,7 +117,7 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
     return FormattedText(
       text: 'Select Filters',
       size: s_fontSizeMedium,
-      color: Color(s_cadmiumOrange),
+      color: Color(s_grayGreen),
       font: s_font_BonaNova,
       weight: FontWeight.bold,
     );
@@ -127,7 +127,7 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
     return FormattedText(
       text: item,
       size: s_fontSizeSmall,
-      color: Color(s_cadmiumOrange),
+      color: Color(s_raisinBlack),
       font: s_font_BonaNova,
       weight: FontWeight.bold,
     );

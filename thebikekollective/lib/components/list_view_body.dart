@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
+import 'package:geocoding/geocoding.dart' as GeoCode;
 import 'home_screen_toggle.dart';
 import 'styles.dart';
 import 'formatted_text.dart';
@@ -18,6 +19,7 @@ class PostTile {
   int combination;
   double latitude;
   double longitude;
+  String street;
   String imageURL;
   bool checkedOut;
   List<dynamic> tags;
@@ -31,6 +33,7 @@ class PostTile {
       required this.combination,
       required this.latitude,
       required this.longitude,
+      required this.street,
       required this.imageURL,
       required this.checkedOut,
       required this.tags,
@@ -96,11 +99,14 @@ class _ListViewBodyState extends State<ListViewBody> {
   bool filterTag = false;
   double userLat = 0.0;
   double userLon = 0.0;
+  String address = 'no address';
   String bikeId = 'no bike';
   bool filterTagsOn = false;
   Set<int>? tagSelectedValues;
   bool filterConditionOn = false;
   Set<int>? conditionSelectedValues;
+  List<PostTile> postsListForStreets = [];
+  List<String> streets = [];
 
   Future<LocationData> retrieveLocation() async {
     var locationService = Location();
@@ -134,7 +140,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     return Scaffold(
         body: Column(children: [
           filterSortButtons(),
-          tapBikeText(),
+          showBikeText(),
           listViewBikes(),
         ]),
         floatingActionButton: Column(
@@ -152,14 +158,13 @@ class _ListViewBodyState extends State<ListViewBody> {
           height: 40,
           child: DropdownButton<String>(
             value: sortString,
-            icon: const Icon(Icons.arrow_drop_down,
-                color: Color(s_cadmiumOrange)),
+            icon: const Icon(Icons.arrow_drop_down, color: Color(s_grayGreen)),
             iconSize: 24,
             elevation: 16,
-            style: const TextStyle(color: Color(s_cadmiumOrange)),
+            style: const TextStyle(color: Color(s_grayGreen)),
             underline: Container(
               height: 2,
-              color: Color(s_cadmiumOrange),
+              color: Color(s_raisinBlack),
             ),
             onChanged: (String? newValue) {
               sortString = newValue!;
@@ -194,8 +199,9 @@ class _ListViewBodyState extends State<ListViewBody> {
                         builder: (BuildContext context,
                             AsyncSnapshot<QuerySnapshot> snapshotBikes) {
                           if (snapshotBikes.hasData) {
-                            var snapMap = postBuilder(snapshotBikes,
-                                snapshotRatings); // Converts to custom List<Map> that's easier to pass around
+                            // Converts to custom List<Map> that's easier to pass around
+                            var snapMap =
+                                postBuilder(snapshotBikes, snapshotRatings);
                             // Condition filtering
                             if ((filterConditionOn) &&
                                 (conditionSelectedValues!.isNotEmpty)) {
@@ -207,73 +213,91 @@ class _ListViewBodyState extends State<ListViewBody> {
                                 (tagSelectedValues!.length > 1)) {
                               snapMap = multiTagBuilder(snapMap);
                             }
-                            var posts = sortSnapshot(snapMap);
-                            if (posts.length == 0) {
-                              return noBikesFound();
-                            } else {
-                              return Flexible(
-                                  child: ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: posts.length,
-                                itemBuilder: (context, index) {
-                                  var post = posts[index];
-                                  return Card(
-                                      elevation: 2,
-                                      shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                              color: Color(s_jungleGreen),
-                                              width: 1),
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: ListTile(
-                                          isThreeLine: true,
-                                          title: entryName(post.name),
-                                          subtitle: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                entryDescription(
-                                                    post.description),
-                                                conditionDescription(
-                                                    'Distance: ${post.distanceToUser.toStringAsFixed(2)} mi | Condition: ${post.condition} | Rating: ${post.rating.toStringAsFixed(1)}'),
-                                              ]),
-                                          trailing: Image(
-                                              image:
-                                                  NetworkImage(post.imageURL)),
-                                          contentPadding: EdgeInsets.all(10),
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                // Take note of chosen bike for Ride screen
-                                                bikeId = post.id;
-                                                return AlertDialog(
-                                                  title:
-                                                      alertTitle("Start Ride"),
-                                                  content: alertText(
-                                                      "Would you like to start a ride with this bike?"),
-                                                  actions: [
-                                                    reportStolenButton(),
-                                                    startRideButton(),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          }));
-                                },
-                              ));
-                            }
+                            postsListForStreets = snapMap;
+                            return FutureBuilder(
+                                future: getStreets(),
+                                builder: (BuildContext context,
+                                    snapshotPlacemarksUselessDontUse) {
+                                  if (snapshotPlacemarksUselessDontUse
+                                      .hasData) {
+                                    // Sorting
+                                    var posts = sortSnapshot(snapMap);
+                                    if (posts.length == 0) {
+                                      return noBikesFound();
+                                    } else {
+                                      return Flexible(
+                                          child: ListView.builder(
+                                        scrollDirection: Axis.vertical,
+                                        shrinkWrap: true,
+                                        itemCount: posts.length,
+                                        itemBuilder: (context, index) {
+                                          var post = posts[index];
+                                          return Card(
+                                              elevation: 2,
+                                              shape: RoundedRectangleBorder(
+                                                  side: BorderSide(
+                                                      color: Color(s_grayGreen),
+                                                      width: 1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
+                                              child: ListTile(
+                                                  isThreeLine: true,
+                                                  title: entryName(
+                                                      '${post.name} (${post.distanceToUser.toStringAsFixed(2)} mi)'),
+                                                  subtitle: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        entryDescription(
+                                                            post.description),
+                                                        postSecondLineText(
+                                                            'Condition: ${post.condition} | Rating: ${post.rating.toStringAsFixed(1)}'),
+                                                        postThirdLineText(
+                                                            '${post.street}'),
+                                                      ]),
+                                                  trailing: Image(
+                                                      image: NetworkImage(
+                                                          post.imageURL)),
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        // Take note of chosen bike for Ride screen
+                                                        bikeId = post.id;
+                                                        return AlertDialog(
+                                                          title: alertTitle(
+                                                              "Start Ride"),
+                                                          content: alertText(
+                                                              "Would you like to start a ride with this bike?"),
+                                                          actions: [
+                                                            reportStolenButton(),
+                                                            startRideButton(),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  }));
+                                        },
+                                      ));
+                                    }
+                                  } else {
+                                    return bikesLoading(
+                                        'Finding bike\'s locations...');
+                                  }
+                                });
                           } else {
-                            return bikesLoading();
+                            return bikesLoading('Loading bike ratings...');
                           }
                         });
                   } else {
-                    return bikesLoading();
+                    return bikesLoading('Loading bikes...');
                   }
                 });
           } else {
-            return bikesLoading();
+            return bikesLoading('Getting user\'s location...');
           }
         });
   }
@@ -291,6 +315,7 @@ class _ListViewBodyState extends State<ListViewBody> {
           condition: snapshotBikes.data!.docs[index]['Condition'],
           latitude: snapshotBikes.data!.docs[index]['Latitude'],
           longitude: snapshotBikes.data!.docs[index]['Longitude'],
+          street: 'no street yet',
           imageURL: snapshotBikes.data!.docs[index]['imageURL'],
           combination: snapshotBikes.data!.docs[index]['Combination'],
           checkedOut: snapshotBikes.data!.docs[index]['checkedOut'],
@@ -383,6 +408,12 @@ class _ListViewBodyState extends State<ListViewBody> {
         geoFencedPosts.add(bike);
       }
     });
+    // Add streets to bikes
+    int index = 0;
+    postList.forEach((bike) {
+      bike.street = streets[index];
+      index++;
+    });
     // Sort
     if (sortString == 'Sort by: Distance') {
       geoFencedPosts
@@ -393,6 +424,18 @@ class _ListViewBodyState extends State<ListViewBody> {
       geoFencedPosts.sort((a, b) => b.rating.compareTo(a.rating));
     }
     return geoFencedPosts;
+  }
+
+  Future<dynamic> getStreets() async {
+    var placemarks;
+    // Add street address for each bike
+    for (var index = 0; index < postsListForStreets.length; ++index) {
+      placemarks = await GeoCode.placemarkFromCoordinates(
+          postsListForStreets[index].latitude,
+          postsListForStreets[index].longitude);
+      streets.add(placemarks[0].street!);
+    }
+    return placemarks;
   }
 
   int compareCondition(String? a, String? b) {
@@ -435,13 +478,13 @@ class _ListViewBodyState extends State<ListViewBody> {
         }),
         style: ElevatedButton.styleFrom(
           primary: filterConditionColor(),
-          side: BorderSide(width: 1.0, color: Color(s_cadmiumOrange)),
+          side: BorderSide(width: 1.0, color: Color(s_raisinBlack)),
         ));
   }
 
   Color filterConditionColor() {
     if (filterConditionOn) {
-      return Color(s_lightOrange);
+      return Color(s_grayGreen);
     } else {
       return Colors.white;
     }
@@ -485,13 +528,13 @@ class _ListViewBodyState extends State<ListViewBody> {
         }),
         style: ElevatedButton.styleFrom(
           primary: filterTagsColor(),
-          side: BorderSide(width: 1.0, color: Color(s_cadmiumOrange)),
+          side: BorderSide(width: 1.0, color: Color(s_raisinBlack)),
         ));
   }
 
   Color filterTagsColor() {
     if (filterTagsOn) {
-      return Color(s_lightOrange);
+      return Color(s_grayGreen);
     } else {
       return Colors.white;
     }
@@ -548,7 +591,7 @@ class _ListViewBodyState extends State<ListViewBody> {
   }
 
   Widget filterAlertText(String text, bool filterOn) {
-    Color textColor = Color(s_cadmiumOrange);
+    Color textColor = Color(s_grayGreen);
     if (filterOn) {
       textColor = Colors.white;
     }
@@ -606,14 +649,14 @@ class _ListViewBodyState extends State<ListViewBody> {
     );
   }
 
-  Widget bikesLoading() {
+  Widget bikesLoading(String text) {
     return Center(
         child: Column(children: [
       CircularProgressIndicator(
         color: Color(s_jungleGreen),
       ),
       FormattedText(
-        text: 'Loading Bikes...',
+        text: text,
         size: s_fontSizeMedium,
         color: Color(s_jungleGreen),
         font: s_font_AmaticSC,
@@ -622,15 +665,15 @@ class _ListViewBodyState extends State<ListViewBody> {
     ]));
   }
 
-  Widget tapBikeText() {
+  Widget showBikeText() {
     return Center(
         child: FormattedText(
-      text: 'Tap a bike to start your ride!',
-      size: s_fontSizeSmall,
-      color: Color(s_periwinkleBlue),
-      font: s_font_BonaNova,
-      weight: FontWeight.bold,
-    ));
+            text: 'Showing eligible bikes within $GEOFENCE_DISTANCE mi',
+            size: s_fontSizeSmall,
+            color: Color(s_grayGreen),
+            font: s_font_BonaNova,
+            weight: FontWeight.bold,
+            align: TextAlign.center));
   }
 
   Widget noBikesFound() {
@@ -639,7 +682,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: 'No Bikes Found In Your Area!',
       size: s_fontSizeLarge,
       color: Color(s_declineRed),
-      font: s_font_AmaticSC,
+      font: s_font_BonaNova,
       weight: FontWeight.bold,
     ));
   }
@@ -648,7 +691,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     return FormattedText(
       text: text,
       size: s_fontSizeSmall,
-      color: Color(s_cadmiumOrange),
+      color: Color(s_grayGreen),
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
     );
@@ -673,7 +716,16 @@ class _ListViewBodyState extends State<ListViewBody> {
         style: FontStyle.italic);
   }
 
-  Widget conditionDescription(String text) {
+  Widget postSecondLineText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeExtraSmall,
+      color: Color(s_jungleGreen),
+      font: s_font_BonaNova,
+    );
+  }
+
+  Widget postThirdLineText(String text) {
     return FormattedText(
       text: text,
       size: s_fontSizeExtraSmall,
