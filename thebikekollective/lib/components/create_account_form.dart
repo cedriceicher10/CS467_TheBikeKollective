@@ -158,6 +158,7 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
               'username': collectInfo.email,
               'password': collectInfo.password,
               'verified': false,
+              'lockedOut': false,
             });
             SharedPreferences preferences =
                 await SharedPreferences.getInstance();
