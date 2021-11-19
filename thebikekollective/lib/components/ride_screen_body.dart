@@ -8,6 +8,7 @@ import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
 import '../screens/splash_screen.dart';
 import '../screens/home_screen.dart';
+import 'complete_ride_form.dart';
 
 class RideFields {
   String? riderName;
@@ -268,10 +269,7 @@ Future<int> retrieveCombo(bikeId) async{
                 'Longitude': locationData!.longitude,
                 'checkedOut': false
               });
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => HomeScreen(map: true)),
-          );
+          Navigator.of(context).pushNamed('completeRideScreen', arguments: rideId);
         },
         child: endRideText(text),
         style: ElevatedButton.styleFrom(

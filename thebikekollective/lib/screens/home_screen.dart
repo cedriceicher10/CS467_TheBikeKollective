@@ -7,6 +7,7 @@ import 'interest_form_screen.dart';
 import 'add_bike_screen.dart';
 import 'ride_screen.dart';
 import 'image_select_screen.dart';
+import 'complete_ride_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool map;
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'interestForm': (context) => InterestFormScreen(),
           'rideScreen': (context) => RideScreen(),
           'imageSelect': (context) => ImageSelectScreen(),
+          'completeRideScreen': (context) => CompleteRideScreen()
         });
   }
 }
