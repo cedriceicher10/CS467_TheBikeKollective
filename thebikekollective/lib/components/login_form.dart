@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/home_screen.dart';
+import '../screens/splash_screen.dart';
 import 'formatted_text.dart';
 import 'styles.dart';
 
@@ -137,9 +138,67 @@ class _LoginFormState extends State<LoginForm> {
         .get();
     snapshotUsername.docs.forEach((result) {
       if (result.data()['password'] == password) {
-        successfulLogin = true;
+        if (result.data()['lockedOut'] == true) {
+          print('Account is locked!');
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: lockedAccountTitleText('Account Has Been Locked'),
+                content: lockedAccountDescriptionText(
+                    "Your account is currently locked after keeping a bike our for greater than 24 hours. You have been removed from the Kollective."),
+                actions: [
+                  acceptButton(),
+                ],
+              );
+            },
+          );
+        } else {
+          successfulLogin = true;
+        }
       }
     });
     return successfulLogin;
+  }
+
+  Widget acceptButton() {
+    return ElevatedButton(
+      child: FormattedText(
+        text: 'Accept',
+        size: s_fontSizeSmall,
+        color: Colors.white,
+        font: s_font_BonaNova,
+        weight: FontWeight.bold,
+      ),
+      style: ElevatedButton.styleFrom(primary: Color(s_declineRed)),
+      onPressed: () {
+        // Get rid of alert
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+        // Go back to splash screen
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => SplashScreen()),
+            (Route<dynamic> route) => false);
+      },
+    );
+  }
+
+  Widget lockedAccountTitleText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeMedium,
+      color: Color(s_declineRed),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget lockedAccountDescriptionText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Colors.black,
+      font: s_font_BonaNova,
+    );
   }
 }
