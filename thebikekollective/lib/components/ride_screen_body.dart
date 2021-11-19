@@ -47,20 +47,12 @@ class _RideScreenBodyState extends State<RideScreenBody> {
 
   void initState() {
     super.initState();
-    retrieveLocation();
-    retrieveUsername();
   }
 
-  void retrieveLocation() async{
-
-    locationData = await locationService.getLocation();
-    setState(() {});
-  }
-
-  void retrieveUsername() async {
+  Future<String> retrieveUsername() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     username = preferences.getString('username')!;
-    setState(() {});
+    return username;
   }
 
 Future<int> retrieveCombo(bikeId) async{
@@ -76,20 +68,39 @@ Future<int> retrieveCombo(bikeId) async{
     }
   }
 
-  Future<String> startRide(bikeId, startLat, startLong, riderName) async{
-    var rideId = await FirebaseFirestore.instance
-        .collection('rides')
-        .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now()})
-        .then((docRef) {
-          return docRef.id;
-    });
-    await FirebaseFirestore.instance
+  Future<String> retrieveImageUrl(bikeId) async{
+    var req = await FirebaseFirestore.instance
         .collection('bikes')
-        .doc(bikeId)
-        .update({
-          'checkedOut': true
-        });
-    return rideId;
+        .doc(bikeId).get();
+    if(req.exists){
+      Map<String, dynamic>? data = req.data();
+      var c = data?['imageURL'];
+      return c;
+    } else {
+      return '';
+    }
+  }
+
+  Future<String> startRide(bikeId) async{
+    var r = locationService.getLocation().then((locationData) async {
+      final startLat = locationData.latitude;
+      final startLong = locationData.longitude;
+      var riderName = await retrieveUsername();
+      var rideId = await FirebaseFirestore.instance
+          .collection('rides')
+          .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now()})
+          .then((docRef) {
+        return docRef.id;
+      });
+      await FirebaseFirestore.instance
+          .collection('bikes')
+          .doc(bikeId)
+          .update({
+        'checkedOut': true
+      });
+      return rideId;
+    });
+    return r;
   }
 
   Widget build(BuildContext context) {
@@ -103,23 +114,20 @@ Future<int> retrieveCombo(bikeId) async{
         .of(context)!
         .settings
         .arguments;
-    final startLat = locationData!.latitude;
-    final startLong = locationData!.longitude;
-/*    if( startLat == null || startLong == null){
-      return new Container();
-    }*/
+
     final riderName = username;
     var comboNum;
+    var imageURL;
 
 
 
-    return Scaffold(
-      body: Column(children: [
-        Column(
-          children: [
-
+    return Center(
+      child: Column(
+        children: [
         Row(
-          children: [FutureBuilder<int>(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FutureBuilder<int>(
               future: retrieveCombo(bikeId),
               builder: (context, snapshot) {
                 int? returnData;
@@ -132,63 +140,91 @@ Future<int> retrieveCombo(bikeId) async{
                       child: Column(
                         children: [
                           SizedBox(height: imageHeadSpace),
-                          Padding(
-                              padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
-                              child: rideScreenText('Combination: ' + comboNum.toString())),
-                          SizedBox(height: buttonSpacing * 5)
+                          rideScreenText('Combination: ' + comboNum.toString()),
+                          SizedBox(height: buttonSpacing)
                         ],
                       ));
-                  return Container(
-                      child: FormattedText(
-                        text: 'Bike combination: ' + comboNum.toString(),
-                        size: s_fontSizeMedLarge,
-                        color: Colors.black,
-                        font: s_font_AmaticSC,
-                        weight: FontWeight.bold,
-                      )
-                  );};
+                };
                 return Center(child: Text('Loading...'));
               })
-      ]),
-            FutureBuilder<String>(
-                future: startRide(bikeId, startLat, startLong, riderName),
-                builder: (context, snapshot) {
-                  String? returnData;
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasData) {
-                      returnData = snapshot.data;
-                      rideId = returnData;
-                    };
-                    return Container(
-                        child: Column(
-                          children: [
-                            SizedBox(height: imageHeadSpace * 3),
-                            Padding(
-                                padding: EdgeInsets.symmetric(horizontal: textHorizPadding),
-                                child: rideScreenTextSmaller('Username: ' + riderName + '\n' + 'Ride ID: ' + rideId + '\n')),
-                            SizedBox(height: buttonSpacing),
-                            endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
-                          ],
-                        ));
-                    return Container(
-                        child: FormattedText(
-                          text: 'Username: ' + riderName + '\n' + 'Ride ID: ' + rideId,
-                          size: s_fontSizeMedLarge,
-                          color: Colors.black,
-                          font: s_font_AmaticSC,
-                          weight: FontWeight.bold,
-                        )
-                    );};
-                  return Center(child: Text('Loading...'));
-                }),
-          ]),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+        ]),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FutureBuilder<String>(
+                    future: retrieveImageUrl(bikeId),
+                    builder: (context, snapshot) {
+                      String? returnData;
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData) {
+                          returnData = snapshot.data;
+                          imageURL = returnData;
+                        };
+                        return Expanded(
+                            child: FractionallySizedBox(
+                                widthFactor: imageSizeFactor(context),
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(width: 3, color: Color(s_jungleGreen)),
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: Image(
+                                      image: NetworkImage(imageURL),
+                                      loadingBuilder: (BuildContext context, Widget child,
+                                          ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                              AlwaysStoppedAnimation<Color>(Color(s_jungleGreen)),
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded /
+                                                  loadingProgress.expectedTotalBytes!
+                                                  : null,
+                                            ));
+                                      },
+                                    ))));
+                      };
+                      return Center();
+                    })
+              ]),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [FutureBuilder<String>(
+                    future: startRide(bikeId),
+                    builder: (context, snapshot) {
+                      String? returnData;
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData) {
+                          returnData = snapshot.data;
+                          rideId = returnData;
+                        };
+                        return Container(
+                            child: Column(
+                              children: [
+                                SizedBox(height: imageHeadSpace * 3),
+                                rideScreenTextSmaller('Ride ID: ' + rideId + '\n'),
+                                SizedBox(height: buttonSpacing),
+                                endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
+                              ],
+                            ));
+                        return Container(
+                            child: FormattedText(
+                              text: 'Username: ' + riderName + '\n' + 'Ride ID: ' + rideId,
+                              size: s_fontSizeMedLarge,
+                              color: Colors.black,
+                              font: s_font_AmaticSC,
+                              weight: FontWeight.bold,
+                            )
+                        );};
+                      return Center(child: Text('Loading...'));
+                    }),]
+            )
 
-          ],
-        ),]
-    ));
+
+          ],)
+    );
 
   }
 
@@ -251,6 +287,14 @@ Future<int> retrieveCombo(bikeId) async{
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
     );
+  }
+
+  double imageSizeFactor(BuildContext context) {
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      return 0.8;
+    } else {
+      return 0.85;
+    }
   }
 
 
