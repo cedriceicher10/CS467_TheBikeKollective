@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
         routes: {
           'addBike': (context) => AddBikeScreen(),
           'interestForm': (context) => InterestFormScreen(),
-          'rideScreen': (context) => RideScreen()
+          'rideScreen': (context) => RideScreen(),
         });
   }
 }

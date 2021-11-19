@@ -13,7 +13,7 @@ import 'add_bike_fab.dart';
 import '../utils/haversine_calculator.dart';
 import 'dart:developer';
 
-const HAVERSINE_CUTOFF_RANGE = 0.5;
+const HAVERSINE_CUTOFF_RANGE = 0.1;
 
 const Color ActiveMarkerColor = Color(s_jungleGreen);
 const Color DisabledMarkerColor = Color(s_disabledGray);
@@ -107,9 +107,9 @@ void getBikeSnapshot() async{
           doc['Latitude'],
           doc['Longitude'])
           < HAVERSINE_CUTOFF_RANGE){
-        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_jungleGreen)));
+        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_declineRed)));
       } else {
-        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_lightPurple)));
+        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_jungleGreen)));
       }
 
 
@@ -196,11 +196,13 @@ void getBikeSnapshot() async{
     controller.forward();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
 
-    final userLat = locationData!.latitude;
-    final userLong = locationData!.longitude;
+    final userLat = locationData?.latitude;
+    final userLong = locationData?.longitude;
 
 
     return FutureBuilder<List<BikeMarker>>(
@@ -262,8 +264,8 @@ void getBikeSnapshot() async{
                           popupBuilder: (_, Marker marker) {
                             if (marker is BikeMarker &&
                               haversineCalculator(
-                                  userLat!,
-                                  userLong!,
+                                  userLat,
+                                  userLong,
                                   marker.point.latitude,
                                   marker.point.longitude)
                               < HAVERSINE_CUTOFF_RANGE){
@@ -457,7 +459,7 @@ Container landscapeLayout(BuildContext context, bike, inRange) {
                           SizedBox(height: 8),
                           Text('Condition: ${bike.condition}'),
                           SizedBox(height: 8),
-                          rideButton(context, inRange, 100, 25, bike.name)
+                          rideButton(context, inRange, 100, 25, bike.id)
                         ])
               ]
             )
