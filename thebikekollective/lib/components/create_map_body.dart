@@ -16,7 +16,7 @@ import 'dart:developer';
 const HAVERSINE_CUTOFF_RANGE = 0.1;
 
 const Color ActiveMarkerColor = Color(s_jungleGreen);
-const Color DisabledMarkerColor = Color(s_disabledGray);
+const Color DisabledMarkerColor = Color(s_fadedDeclineRed);
 
 List<BikeMarker> ConvertMarkers(
     BuildContext context, List<BikeMarker> bmFuture) {
@@ -99,10 +99,10 @@ class _CreateMapBody extends State<CreateMapBody>
         if (haversineCalculator(lat, long, doc['Latitude'], doc['Longitude']) <
             HAVERSINE_CUTOFF_RANGE) {
           bikeMarkers.add(
-              new BikeMarker(bike: bike, markerColor: Color(s_declineRed)));
+              new BikeMarker(bike: bike, markerColor: ActiveMarkerColor));
         } else {
           bikeMarkers.add(
-              new BikeMarker(bike: bike, markerColor: Color(s_jungleGreen)));
+              new BikeMarker(bike: bike, markerColor: DisabledMarkerColor));
         }
       });
     }
@@ -133,7 +133,7 @@ class _CreateMapBody extends State<CreateMapBody>
   // Zoom functions from chunhunghan's answer here:
   // https://stackoverflow.com/questions/64034365/flutter-map-zoom-not-updating
 
-  double currentZoom = 14.5;
+  double currentZoom = 15;
   MapController? mapController = new MapController();
   LatLng currentCenter = LatLng(39.276, -74.576);
 
@@ -463,7 +463,7 @@ Widget rideButton(BuildContext context, bool inRange, double buttonWidth,
   return ElevatedButton(
       onPressed: () {
         if (inRange) {
-          Navigator.of(context).pushNamed('rideScreen', arguments: id);
+          Navigator.of(context).pushNamedAndRemoveUntil('rideScreen', (_) => false, arguments: id);
         }
         return;
       },

@@ -205,7 +205,6 @@ Future<int> retrieveCombo(bikeId) async{
                             child: Column(
                               children: [
                                 SizedBox(height: imageHeadSpace * 3),
-                                rideScreenTextSmaller('Ride ID: ' + rideId + '\n'),
                                 SizedBox(height: buttonSpacing),
                                 endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
                               ],
@@ -269,7 +268,7 @@ Future<int> retrieveCombo(bikeId) async{
                 'Longitude': locationData!.longitude,
                 'checkedOut': false
               });
-          Navigator.of(context).pushNamed('completeRideScreen', arguments: rideId);
+          Navigator.of(context).pushNamedAndRemoveUntil('completeRideScreen', (_) => false, arguments: rideId);
         },
         child: endRideText(text),
         style: ElevatedButton.styleFrom(
