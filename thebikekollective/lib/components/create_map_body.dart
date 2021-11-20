@@ -18,8 +18,6 @@ const HAVERSINE_CUTOFF_RANGE = 0.1;
 const Color ActiveMarkerColor = Color(s_jungleGreen);
 const Color DisabledMarkerColor = Color(s_disabledGray);
 
-
-
 List<BikeMarker> ConvertMarkers(
     BuildContext context, List<BikeMarker> bmFuture) {
   var list = <BikeMarker>[];
@@ -44,12 +42,10 @@ class _CreateMapBody extends State<CreateMapBody>
   List<BikeMarker> bikeMarkers = <BikeMarker>[];
   List<BikeMarker> markerList = <BikeMarker>[];
 
-
   var locationService = Location();
   var bikesFromDB;
 
   void initState() {
-
     super.initState();
 
     initLocation();
@@ -65,76 +61,68 @@ class _CreateMapBody extends State<CreateMapBody>
       });*/
       retrieveLocation();
     });
-
   }
 
-void getBikeSnapshot() async{
+  void getBikeSnapshot() async {
     QuerySnapshot querySnapshot =
-    await FirebaseFirestore.instance.collection('bikes').get();
+        await FirebaseFirestore.instance.collection('bikes').get();
 
     print('DATABASE QUERIED');
 
     bikesFromDB = querySnapshot;
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-
-
   Future<List<BikeMarker>> GetBikes(BuildContext context, q) async {
-
     var bikes = [];
     bikeMarkers = [];
 
     // Convert to Bike object
-    q.docs.forEach((doc) {
-      Bike bike = new Bike(
-          id: doc.id,
-          name: doc['Name'],
-          imagePath: doc['imageURL'],
-          lat: doc['Latitude'],
-          long: doc['Longitude'],
-          description: doc['Description'],
-          condition: doc['Condition']);
-      bikes.add(bike);
-      var lat = locationData!.latitude;
-      var long = locationData!.longitude;
+    if (q != null) {
+      // added: orig caused null error
+      q.docs.forEach((doc) {
+        Bike bike = new Bike(
+            id: doc.id,
+            name: doc['Name'],
+            imagePath: doc['imageURL'],
+            lat: doc['Latitude'],
+            long: doc['Longitude'],
+            description: doc['Description'],
+            condition: doc['Condition']);
+        bikes.add(bike);
+        //var lat = locationData!.latitude; // orig: caused null error
+        //var long = locationData!.longitude; // orig: caused null error
 
-      if(haversineCalculator(
-          lat!,
-          long!,
-          doc['Latitude'],
-          doc['Longitude'])
-          < HAVERSINE_CUTOFF_RANGE){
-        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_declineRed)));
-      } else {
-        bikeMarkers.add(new BikeMarker(bike: bike, markerColor: Color(s_jungleGreen)));
-      }
+        final lat = locationData?.latitude ?? 0.0;
+        final long = locationData?.longitude ?? 0.0;
 
-
-    });
+        if (haversineCalculator(lat, long, doc['Latitude'], doc['Longitude']) <
+            HAVERSINE_CUTOFF_RANGE) {
+          bikeMarkers.add(
+              new BikeMarker(bike: bike, markerColor: Color(s_declineRed)));
+        } else {
+          bikeMarkers.add(
+              new BikeMarker(bike: bike, markerColor: Color(s_jungleGreen)));
+        }
+      });
+    }
 
     return bikeMarkers;
   }
 
-  void retrieveLocation() async{
+  void retrieveLocation() async {
     var oldLocationData = locationData;
     locationData = await locationService.getLocation();
 
-    if( (locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001){
+    if ((locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001) {
       print(locationData!.longitude);
       print(locationData!.latitude);
       setState(() {});
     }
-
-
-
   }
 
-  void initLocation() async{
+  void initLocation() async {
     locationData = await locationService.getLocation();
-
 
     print(locationData!.longitude);
     print(locationData!.latitude);
@@ -196,14 +184,13 @@ void getBikeSnapshot() async{
     controller.forward();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
+    //final userLat = locationData?.latitude; // orig: caused null error
+    //final userLong = locationData?.longitude; // orig: caused null error
 
-    final userLat = locationData?.latitude;
-    final userLong = locationData?.longitude;
-
+    final userLat = locationData?.latitude ?? 0.0;
+    final userLong = locationData?.longitude ?? 0.0;
 
     return FutureBuilder<List<BikeMarker>>(
         future: GetBikes(context, bikesFromDB),
@@ -216,7 +203,6 @@ void getBikeSnapshot() async{
               returnData!.forEach((el) {
                 markerList.add(el);
               });
-
             }
 
             return Scaffold(
@@ -226,7 +212,7 @@ void getBikeSnapshot() async{
                       onMapCreated: (c) {
                         mapController = c;
                       },
-                      center: LatLng(userLat!, userLong!),
+                      center: LatLng(userLat, userLong),
                       zoom: currentZoom,
                       // Conzar! You can disable rotation using this,
                       // but try not to take the easy way out:
@@ -263,16 +249,17 @@ void getBikeSnapshot() async{
                           popupController: _popupLayerController,
                           popupBuilder: (_, Marker marker) {
                             if (marker is BikeMarker &&
-                              haversineCalculator(
-                                  userLat,
-                                  userLong,
-                                  marker.point.latitude,
-                                  marker.point.longitude)
-                              < HAVERSINE_CUTOFF_RANGE){
-                              return BikeMarkerPopup(bike: marker.bike, inRange: true);
-                            }
-                            else if (marker is BikeMarker) {
-                              return BikeMarkerPopup(bike: marker.bike, inRange: false);
+                                haversineCalculator(
+                                        userLat,
+                                        userLong,
+                                        marker.point.latitude,
+                                        marker.point.longitude) <
+                                    HAVERSINE_CUTOFF_RANGE) {
+                              return BikeMarkerPopup(
+                                  bike: marker.bike, inRange: true);
+                            } else if (marker is BikeMarker) {
+                              return BikeMarkerPopup(
+                                  bike: marker.bike, inRange: false);
                             }
                             return Card(child: const Text('Not a bike'));
                           },
@@ -338,11 +325,11 @@ class BikeMarker extends Marker {
                       color: markerColor, size: 30.0),
                 ));
 
-  void setMarkerColor(color){
+  void setMarkerColor(color) {
     this.markerColor = color;
   }
 
-  Color getMarkerColor(){
+  Color getMarkerColor() {
     return this.markerColor;
   }
 
@@ -353,20 +340,21 @@ class BikeMarker extends Marker {
 class DisabledBikeMarker extends Marker {
   DisabledBikeMarker({required this.bike})
       : super(
-      anchorPos: AnchorPos.align(AnchorAlign.top),
-      height: Bike.size,
-      width: Bike.size,
-      point: LatLng(bike.lat, bike.long),
-      builder: (BuildContext ctx) => new Container(
-        child: new Icon(Icons.location_pin,
-            color: DisabledMarkerColor, size: 30.0),
-      ));
+            anchorPos: AnchorPos.align(AnchorAlign.top),
+            height: Bike.size,
+            width: Bike.size,
+            point: LatLng(bike.lat, bike.long),
+            builder: (BuildContext ctx) => new Container(
+                  child: new Icon(Icons.location_pin,
+                      color: DisabledMarkerColor, size: 30.0),
+                ));
 
   final Bike bike;
 }
 
 class BikeMarkerPopup extends StatelessWidget {
-  const BikeMarkerPopup({Key? key, required this.bike, required this.inRange}) : super(key: key);
+  const BikeMarkerPopup({Key? key, required this.bike, required this.inRange})
+      : super(key: key);
   final Bike bike;
   final bool inRange;
 
@@ -392,37 +380,28 @@ Container portraitLayout(BuildContext context, bike, inRange) {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(8),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Column(
-                      children: <Widget>[
-                        Image(image: NetworkImage(bike.imagePath),
-                            width:150 * imageSizeFactor(context),
-                            height:150 * imageSizeFactor(context)),
-
-                      ]
-                  ),
-
-                  Column(
-                      children: <Widget>[
-                        Text(
-                            bike.name,
-                            style:
-                            TextStyle(fontWeight:FontWeight.bold),
-                            textAlign: TextAlign.end
-                        ),
-                        SizedBox(height: 8),
-                        Text('${bike.description}'),
-                        SizedBox(height: 8),
-                        Text('Condition: ${bike.condition}'),
-                        SizedBox(height: 8),
-                        rideButton(context, inRange, 100, 25, bike.id)
-                      ])
-                ]
-            )
-          )
+              padding: EdgeInsets.all(8),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Column(children: <Widget>[
+                      Image(
+                          image: NetworkImage(bike.imagePath),
+                          width: 150 * imageSizeFactor(context),
+                          height: 150 * imageSizeFactor(context)),
+                    ]),
+                    Column(children: <Widget>[
+                      Text(bike.name,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.end),
+                      SizedBox(height: 8),
+                      Text('${bike.description}'),
+                      SizedBox(height: 8),
+                      Text('Condition: ${bike.condition}'),
+                      SizedBox(height: 8),
+                      rideButton(context, inRange, 100, 25, bike.id)
+                    ])
+                  ]))
         ],
       ),
     ),
@@ -444,26 +423,24 @@ Container landscapeLayout(BuildContext context, bike, inRange) {
           Padding(
               padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                    Image(image: NetworkImage(bike.imagePath),
-                      width:150 * imageSizeFactor(context),
-                      height:150 * imageSizeFactor(context)),
-                    Column(
-                        children: <Widget>[
-                          Text(bike.name, style:
-                          TextStyle(fontWeight:FontWeight.bold),
-                              textAlign: TextAlign.end),
-                          SizedBox(height: 8),
-                          Text('${bike.description}'),
-                          SizedBox(height: 8),
-                          Text('Condition: ${bike.condition}'),
-                          SizedBox(height: 8),
-                          rideButton(context, inRange, 100, 25, bike.id)
-                        ])
-              ]
-            )
-          )
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Image(
+                        image: NetworkImage(bike.imagePath),
+                        width: 150 * imageSizeFactor(context),
+                        height: 150 * imageSizeFactor(context)),
+                    Column(children: <Widget>[
+                      Text(bike.name,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.end),
+                      SizedBox(height: 8),
+                      Text('${bike.description}'),
+                      SizedBox(height: 8),
+                      Text('Condition: ${bike.condition}'),
+                      SizedBox(height: 8),
+                      rideButton(context, inRange, 100, 25, bike.id)
+                    ])
+                  ]))
         ],
       ),
     ),
@@ -471,13 +448,12 @@ Container landscapeLayout(BuildContext context, bike, inRange) {
 }
 
 //This will become the Start Ride button
-Widget rideButton(BuildContext context, bool inRange,
-    double buttonWidth, double buttonHeight, String id) {
-
+Widget rideButton(BuildContext context, bool inRange, double buttonWidth,
+    double buttonHeight, String id) {
   var text = '';
   var color;
 
-  if( inRange ){
+  if (inRange) {
     text = 'Ride Me!';
     color = Color(s_jungleGreen);
   } else {
@@ -486,16 +462,14 @@ Widget rideButton(BuildContext context, bool inRange,
   }
   return ElevatedButton(
       onPressed: () {
-        if( inRange ){
+        if (inRange) {
           Navigator.of(context).pushNamed('rideScreen', arguments: id);
-
         }
         return;
       },
       child: rideButtonText(text),
       style: ElevatedButton.styleFrom(
-          primary: color,
-          fixedSize: Size(buttonWidth, buttonHeight)));
+          primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
 }
 
 /*
