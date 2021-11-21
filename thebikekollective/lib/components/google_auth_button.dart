@@ -57,6 +57,7 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
                     'username': email,
                     'password': answer,
                     'verified': true,
+                    'lockedOut': false,
                   });
                   SharedPreferences preferences =
                       await SharedPreferences.getInstance();
