@@ -327,7 +327,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       double sum = 0;
       double count = 0;
       for (var index = 0; index < snapshotRatings.data!.size; ++index) {
-        if (post.name == snapshotRatings.data!.docs[index]['bike']) {
+        if (post.id == snapshotRatings.data!.docs[index]['bike']) {
           sum += snapshotRatings.data!.docs[index]['rating'];
           count++;
         }
@@ -620,8 +620,9 @@ class _ListViewBodyState extends State<ListViewBody> {
             .collection('bikes')
             .doc(bikeId)
             .update({'checkedOut': true});
-        // TO DO: Navigate to 'Ride' screen
-        Navigator.of(context, rootNavigator: true).pop('dialog'); // Temp
+        // Remove alert
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+        // Navigate to the Ride screen
         Navigator.of(context).pushNamedAndRemoveUntil(
             'rideScreen', (_) => false,
             arguments: bikeId);
@@ -679,12 +680,12 @@ class _ListViewBodyState extends State<ListViewBody> {
   Widget noBikesFound() {
     return Center(
         child: FormattedText(
-      text: 'No Bikes Found In Your Area!',
-      size: s_fontSizeLarge,
-      color: Color(s_declineRed),
-      font: s_font_BonaNova,
-      weight: FontWeight.bold,
-    ));
+            text: 'No Bikes Found In Your Area!',
+            size: s_fontSizeLarge,
+            color: Color(s_declineRed),
+            font: s_font_AmaticSC,
+            weight: FontWeight.bold,
+            align: TextAlign.center));
   }
 
   Widget dropDownText(String text) {
@@ -711,17 +712,19 @@ class _ListViewBodyState extends State<ListViewBody> {
     return FormattedText(
         text: text,
         size: s_fontSizeExtraSmall,
-        color: Color(s_jungleGreen),
+        color: Color(s_raisinBlack),
         font: s_font_BonaNova,
-        style: FontStyle.italic);
+        style: FontStyle.italic,
+        weight: FontWeight.bold);
   }
 
   Widget postSecondLineText(String text) {
     return FormattedText(
       text: text,
       size: s_fontSizeExtraSmall,
-      color: Color(s_jungleGreen),
+      color: Color(s_raisinBlack),
       font: s_font_BonaNova,
+      weight: FontWeight.bold,
     );
   }
 
@@ -729,8 +732,9 @@ class _ListViewBodyState extends State<ListViewBody> {
     return FormattedText(
       text: text,
       size: s_fontSizeExtraSmall,
-      color: Color(s_jungleGreen),
+      color: Color(s_raisinBlack),
       font: s_font_BonaNova,
+      weight: FontWeight.bold,
     );
   }
 }

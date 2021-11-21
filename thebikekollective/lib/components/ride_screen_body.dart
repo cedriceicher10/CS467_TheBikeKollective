@@ -89,7 +89,7 @@ Future<int> retrieveCombo(bikeId) async{
       var riderName = await retrieveUsername();
       var rideId = await FirebaseFirestore.instance
           .collection('rides')
-          .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now()})
+          .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now(), 'rating': 1.0})
           .then((docRef) {
         return docRef.id;
       });
