@@ -65,10 +65,10 @@ class _InterestFormBodyState extends State<InterestFormBody> {
 
   Widget acceptButton(BuildContext context, String text, double buttonWidth,
       double buttonHeight) {
-    final url = ModalRoute.of(context)!.settings.arguments as String;
+    //final url = ModalRoute.of(context)!.settings.arguments as String;
     return ElevatedButton(
         onPressed: () {
-          Navigator.of(context).pushNamed('addBike', arguments: url);
+          Navigator.of(context).pushNamed('imageSelect');
         },
         child: acceptButtonText(text),
         style: ElevatedButton.styleFrom(
