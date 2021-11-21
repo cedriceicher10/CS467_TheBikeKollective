@@ -9,7 +9,7 @@ import 'add_bike_fab.dart';
 import '../utils/haversine_calculator.dart';
 import '../utils/multi_select_alert_dialog.dart';
 
-const GEOFENCE_DISTANCE = 10.0; // mi
+const GEOFENCE_DISTANCE = 0.1; // mi
 
 class PostTile {
   String id;
@@ -158,10 +158,11 @@ class _ListViewBodyState extends State<ListViewBody> {
           height: 40,
           child: DropdownButton<String>(
             value: sortString,
-            icon: const Icon(Icons.arrow_drop_down, color: Color(s_grayGreen)),
+            icon:
+                const Icon(Icons.arrow_drop_down, color: Color(s_raisinBlack)),
             iconSize: 24,
             elevation: 16,
-            style: const TextStyle(color: Color(s_grayGreen)),
+            style: const TextStyle(color: Color(s_raisinBlack)),
             underline: Container(
               height: 2,
               color: Color(s_raisinBlack),
@@ -591,7 +592,7 @@ class _ListViewBodyState extends State<ListViewBody> {
   }
 
   Widget filterAlertText(String text, bool filterOn) {
-    Color textColor = Color(s_grayGreen);
+    Color textColor = Color(s_raisinBlack);
     if (filterOn) {
       textColor = Colors.white;
     }
@@ -621,10 +622,9 @@ class _ListViewBodyState extends State<ListViewBody> {
             .update({'checkedOut': true});
         // TO DO: Navigate to 'Ride' screen
         Navigator.of(context, rootNavigator: true).pop('dialog'); // Temp
-        // Navigator.pushAndRemoveUntil(
-        //         context,
-        //         MaterialPageRoute(builder: (context) => InRideScreen(bikeDocId: bikeId)),
-        //         (Route<dynamic> route) => false);
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            'rideScreen', (_) => false,
+            arguments: bikeId);
       },
     );
   }
@@ -691,7 +691,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     return FormattedText(
       text: text,
       size: s_fontSizeSmall,
-      color: Color(s_grayGreen),
+      color: Color(s_raisinBlack),
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
     );
