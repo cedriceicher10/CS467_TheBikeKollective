@@ -105,7 +105,7 @@ class _CompletRideForm extends State <CompleteRideForm> {
   Widget rideRatingEntry() {
     return TextFormField(
       keyboardType: TextInputType.number,
-      autofocus: true,
+      autofocus: false,
       style: TextStyle(color: Color(s_jungleGreen)),
       decoration: InputDecoration(
         labelText: 'Ride Rating',
@@ -140,7 +140,7 @@ class _CompletRideForm extends State <CompleteRideForm> {
 
   Widget completeRideButton(double buttonWidth, double buttonHeight) {
     String? rideId = ModalRoute.of(context)!.settings.arguments as String;
-    String? bikeId = ModalRoute.of(context)!.settings.arguments as String;  //QUERY DB FOR BIKE'S DOC ID
+    String? bikeId;
 
     return ElevatedButton(
       onPressed: () async {
@@ -159,7 +159,7 @@ class _CompletRideForm extends State <CompleteRideForm> {
           bikeId = rideDoc['bike'];
           await FirebaseFirestore.instance
             .collection('rides').doc(rideId)
-            .update({'endLat' : rideFields.endLat, 'endLong': rideFields.endLong, 'rating': rideFields.rideRating});
+            .update({'endLat' : rideFields.endLat, 'endLong': rideFields.endLong, 'rating': rideFields.rideRating, 'endTime': DateTime.now()});
           await FirebaseFirestore.instance
             .collection('bikes').doc(bikeId)
             .update({'Condition': rideFields.bikeCondition, 'Latitude' : rideFields.endLat, 'Longitude': rideFields.endLong, 'checkedOut': false});
