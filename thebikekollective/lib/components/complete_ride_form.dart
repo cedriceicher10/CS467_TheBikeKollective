@@ -124,13 +124,13 @@ class _CompletRideForm extends State <CompleteRideForm> {
     },
     validator: (value) {
       if (value!.isEmpty) {
-        return 'Please enter a rating.';
+        return 'Please enter a rating from 1-5.';
       } 
-      else if (int.parse(value) > 10) {
-        return 'The rating may not be greater than 10.';
+      else if (int.parse(value) > 5) {
+        return 'The rating may not be greater than 5.';
       }
-      else if (int.parse(value) < 0) {
-        return 'The rating may not be lower than 0.';
+      else if (int.parse(value) < 1) {
+        return 'The rating may not be lower than 1.';
       } 
       else {
         return null;
