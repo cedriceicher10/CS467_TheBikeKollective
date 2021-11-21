@@ -620,8 +620,9 @@ class _ListViewBodyState extends State<ListViewBody> {
             .collection('bikes')
             .doc(bikeId)
             .update({'checkedOut': true});
-        // TO DO: Navigate to 'Ride' screen
-        Navigator.of(context, rootNavigator: true).pop('dialog'); // Temp
+        // Remove alert
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+        // Navigate to the Ride screen
         Navigator.of(context).pushNamedAndRemoveUntil(
             'rideScreen', (_) => false,
             arguments: bikeId);

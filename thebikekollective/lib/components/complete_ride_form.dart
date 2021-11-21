@@ -56,12 +56,28 @@ class _CompletRideForm extends State<CompleteRideForm> {
     return Form(
         key: formKey,
         child: Column(children: [
+          Container(
+              width: 325,
+              child: anythingWrongText(
+                  'Anything wrong? Please note it in the Bike\'s Condition for other users!')),
+          SizedBox(height: 10),
           Container(width: 325, child: bikeConditionEntry()),
           SizedBox(height: 10),
           Container(width: 325, child: rideRatingEntry()),
           SizedBox(height: 10),
           completeRideButton(buttonWidth, buttonHeight),
         ]));
+  }
+
+  Widget anythingWrongText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Color(s_jungleGreen),
+      font: s_font_BonaNova,
+      weight: FontWeight.bold,
+      align: TextAlign.center,
+    );
   }
 
   Widget bikeConditionEntry() {
@@ -77,7 +93,7 @@ class _CompletRideForm extends State<CompleteRideForm> {
     return DropdownButtonFormField(
       value: value,
       //decoration: InputDecoration(autofocus: true,
-      //style: TextStyle(color: Color(s_jungleGreen)),
+      style: TextStyle(color: Color(s_jungleGreen)),
       decoration: InputDecoration(
           labelText: 'Bike\'s Condition',
           labelStyle: TextStyle(
@@ -118,7 +134,7 @@ class _CompletRideForm extends State<CompleteRideForm> {
             labelText: 'Ride Rating',
             labelStyle: TextStyle(
                 color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
-            hintText: 'Rate your ride from 1 - 10!',
+            hintText: 'Rate your ride from 1 - 5!',
             hintStyle: TextStyle(color: Color(s_jungleGreen)),
             errorStyle: TextStyle(
                 color: Color(s_jungleGreen), fontWeight: FontWeight.bold),
