@@ -49,15 +49,19 @@ class _CompletRideForm extends State <CompleteRideForm> {
     final double buttonWidth = 260;
     final rideId = ModalRoute.of(context)!.settings.arguments as String?;
 
-    return Form(
-      key: formKey,
-      child: Column(children: [
-        Container(width: 325, child: bikeConditionEntry()),
-        SizedBox(height: 10),
-        Container(width: 325, child: rideRatingEntry()),
-        SizedBox(height: 10),
-        completeRideButton(buttonWidth, buttonHeight),
-      ])
+    return Center(
+      child: Form(
+          key: formKey,
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+            Container(width: 325, child: bikeConditionEntry()),
+            SizedBox(height: 10),
+            Container(width: 325, child: rideRatingEntry()),
+            SizedBox(height: 10),
+            completeRideButton(buttonWidth, buttonHeight),
+          ])
+      )
     );
   }
 

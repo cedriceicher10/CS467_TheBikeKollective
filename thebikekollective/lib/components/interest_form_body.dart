@@ -40,8 +40,7 @@ class _InterestFormBodyState extends State<InterestFormBody> {
         color: Color(s_jungleGreen),
       ));
     } else {
-      return Center(
-          child: SingleChildScrollView(
+      return SingleChildScrollView(
           child: Column(
         children: [
           SizedBox(height: imageHeadSpace),
@@ -60,7 +59,7 @@ class _InterestFormBodyState extends State<InterestFormBody> {
           ),
           SizedBox(height: buttonSpacing * 10)
         ],
-      )));
+      ));
     }
   }
 
