@@ -11,8 +11,9 @@ import 'complete_ride_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool map;
+  final showWarning;
 
-  const HomeScreen({Key? key, required this.map}) : super(key: key);
+  const HomeScreen({Key? key, required this.map, this.showWarning}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -30,12 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
             centerTitle: true,
           ),
           drawer: SideMenu(),
-          body: HomeBody(map: widget.map),
+          body: HomeBody(map: widget.map, showWarning: widget.showWarning),
         ),
         routes: {
           'addBike': (context) => AddBikeScreen(),
           'interestForm': (context) => InterestFormScreen(),
           'rideScreen': (context) => RideScreen(),
+          'rideScreenNotNew': (context) => RideScreen(newRide: false),
           'imageSelect': (context) => ImageSelectScreen(),
           'completeRideScreen': (context) => CompleteRideScreen()
         });

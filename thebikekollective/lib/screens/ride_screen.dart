@@ -4,7 +4,9 @@ import '../components/styles.dart';
 import '../components/ride_screen_body.dart';
 
 class RideScreen extends StatelessWidget {
-  const RideScreen({ Key? key }) : super(key: key);
+  final newRide;
+
+  const RideScreen({ Key? key, this.newRide }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,7 @@ class RideScreen extends StatelessWidget {
         backgroundColor: Color(s_jungleGreen),
           centerTitle: true,
       ),
-      body: RideScreenBody(),
+      body: RideScreenBody(newRide: this.newRide),
     );
   }
 

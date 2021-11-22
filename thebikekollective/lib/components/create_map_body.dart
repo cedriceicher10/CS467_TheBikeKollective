@@ -53,19 +53,13 @@ class _CreateMapBody extends State<CreateMapBody>
     getBikeSnapshot();
 
     locationService.onLocationChanged.distinct().listen((l) async {
-/*      print('zoz');
-      markerList = await GetBikes(context);
-      setState(() {
-        markerList = bikeMarkers;
-        locationData = locationData;
-      });*/
       retrieveLocation();
     });
   }
 
   void getBikeSnapshot() async {
     QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('bikes').get();
+        await FirebaseFirestore.instance.collection('bikes').where('checkedOut', isEqualTo: false).get();
 
     print('DATABASE QUERIED');
 
@@ -95,15 +89,17 @@ class _CreateMapBody extends State<CreateMapBody>
 
         final lat = locationData?.latitude ?? 0.0;
         final long = locationData?.longitude ?? 0.0;
-
-        if (haversineCalculator(lat, long, doc['Latitude'], doc['Longitude']) <
-            HAVERSINE_CUTOFF_RANGE) {
-          bikeMarkers.add(
-              new BikeMarker(bike: bike, markerColor: ActiveMarkerColor));
-        } else {
-          bikeMarkers.add(
-              new BikeMarker(bike: bike, markerColor: DisabledMarkerColor));
+        if ( doc['Condition'] != 'Stolen'){
+          if (haversineCalculator(lat, long, doc['Latitude'], doc['Longitude']) <
+              HAVERSINE_CUTOFF_RANGE) {
+            bikeMarkers.add(
+                new BikeMarker(bike: bike, markerColor: ActiveMarkerColor));
+          } else {
+            bikeMarkers.add(
+                new BikeMarker(bike: bike, markerColor: DisabledMarkerColor));
+          }
         }
+
       });
     }
 
@@ -115,18 +111,12 @@ class _CreateMapBody extends State<CreateMapBody>
     locationData = await locationService.getLocation();
 
     if ((locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001) {
-      print(locationData!.longitude);
-      print(locationData!.latitude);
       setState(() {});
     }
   }
 
   void initLocation() async {
     locationData = await locationService.getLocation();
-
-    print(locationData!.longitude);
-    print(locationData!.latitude);
-
     setState(() {});
   }
 

@@ -32,7 +32,9 @@ class RideFields {
 }
 
 class RideScreenBody extends StatefulWidget {
-  const RideScreenBody({ Key? key }) : super(key: key);
+  final newRide;
+
+  const RideScreenBody({ Key? key, this.newRide }) : super(key: key);
 
   @override
   _RideScreenBodyState createState() => _RideScreenBodyState();
@@ -56,7 +58,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     return username;
   }
 
-Future<int> retrieveCombo(bikeId) async{
+  Future<int> retrieveCombo(bikeId) async{
     var req = await FirebaseFirestore.instance
         .collection('bikes')
         .doc(bikeId).get();
@@ -82,23 +84,33 @@ Future<int> retrieveCombo(bikeId) async{
     }
   }
 
-  Future<String> startRide(bikeId) async{
+  Future<String> startRide(bikeId, newRide) async{
     var r = locationService.getLocation().then((locationData) async {
       final startLat = locationData.latitude;
       final startLong = locationData.longitude;
+      String rideId;
       var riderName = await retrieveUsername();
-      var rideId = await FirebaseFirestore.instance
-          .collection('rides')
-          .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now(), 'rating': 1.0})
-          .then((docRef) {
-        return docRef.id;
-      });
-      await FirebaseFirestore.instance
-          .collection('bikes')
-          .doc(bikeId)
-          .update({
-        'checkedOut': true
-      });
+      if( newRide != false ){
+        rideId = await FirebaseFirestore.instance
+            .collection('rides')
+            .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now(), 'ended': false, 'rating': 1.0})
+            .then((docRef) {
+          return docRef.id;
+        });
+        await FirebaseFirestore.instance
+            .collection('bikes')
+            .doc(bikeId)
+            .update({
+          'checkedOut': true
+        });
+      } else {
+        var q = await FirebaseFirestore.instance
+            .collection('rides')
+            .where('rider', isEqualTo: riderName)
+            .get();
+        rideId = q.docs[0].id;
+      }
+
       return rideId;
     });
     return r;
@@ -193,7 +205,7 @@ Future<int> retrieveCombo(bikeId) async{
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [FutureBuilder<String>(
-                    future: startRide(bikeId),
+                    future: startRide(bikeId, widget.newRide),
                     builder: (context, snapshot) {
                       String? returnData;
                       if (snapshot.connectionState == ConnectionState.done) {
