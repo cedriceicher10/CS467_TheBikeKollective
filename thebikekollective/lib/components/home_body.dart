@@ -22,6 +22,7 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> {
   bool? isLate;
+  String? lateType;
   String? userRiding;
 
   final double imageHeadSpace = 20;
@@ -33,17 +34,23 @@ class _HomeBodyState extends State<HomeBody> {
   @override
 
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
+    return FutureBuilder<String>(
         future: LateBikeCheck(),
         builder: (context, snapshot) {
-          bool? returnData;
+          String? returnData;
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               returnData = snapshot.data;
-              isLate = returnData;
-              print(isLate);
+              lateType = returnData;
+              print(lateType);
             }
-            if (isLate == true && widget.showWarning != false){
+            if (lateType == 'banned'){
+              return Center(
+                child: bannedText("You are banned from the Kollective for keeping a "
+                    "bike over 24 hours! Get lost!")
+              );
+            }
+            else if (lateType == 'warning' && widget.showWarning != false){
               return LateNotice();
             }
             else return FutureBuilder<String>(
@@ -97,6 +104,15 @@ class _HomeBodyState extends State<HomeBody> {
       color: Colors.white,
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
+    );
+  }
+
+  Widget bannedText(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      size: s_fontSizeLarge,
+      color: Colors.black,
     );
   }
   }

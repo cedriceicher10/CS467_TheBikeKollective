@@ -38,7 +38,9 @@ class LateNotice extends StatelessWidget {
         ));*/
     return AlertDialog(
       title: const Text("You're Late!"),
-      content: const Text("One of your bikes is late. Return it now!"),
+      content: const Text("Your current bike has been checked out for "
+          "8 hours. If you do not return it within 24 hours, you will be "
+          "banned from the platform. Hurry up!"),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.push(

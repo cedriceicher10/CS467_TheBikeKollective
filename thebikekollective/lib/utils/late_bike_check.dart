@@ -16,9 +16,10 @@ Future<void> addToStolenBikes(bike) async{
   return q;
 }
 
-Future<bool> LateBikeCheck() async{
+Future<String> LateBikeCheck() async{
   var username = await retrieveUsername();
   var isLate = false;
+  String lateType = 'none';
   var isToBeLockedOut = false;
 
   final eightHours = 60 * 60 * 8;
@@ -36,8 +37,10 @@ Future<bool> LateBikeCheck() async{
       if((time - ride['startTime'].seconds) > eightHours){
         print(ride['startTime']);
         isLate = true;
+        lateType = 'warning';
         if((time - ride['startTime'].seconds) > twentyFourHours){
           isToBeLockedOut = true;
+          lateType = 'banned';
           addToStolenBikes(ride['bike']);
         }
       }
@@ -56,6 +59,5 @@ Future<bool> LateBikeCheck() async{
         .doc(userId)
         .update({'lockedOut': true});
   }
-  print(isLate);
-  return isLate;
+  return lateType;
 }
