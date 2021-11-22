@@ -247,7 +247,38 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                           timeLeft = ((startTime + (60 * 60 * 8)) - currentTime).toInt();
                           _notifier.value = timeLeft;
                           print(currentTime);
-                          timer = Timer(Duration(seconds: ((startTime + (60 * 60 * 8)) - currentTime).toInt()), ()=>{});
+                          if (timeLeft > 0){
+                            timer = Timer(Duration(seconds: ((startTime + (60 * 60 * 8)) - currentTime).toInt()), ()=>{
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context){
+                                    return AlertDialog(
+                                        title: Text("You're late!"),
+                                        content: SingleChildScrollView(
+                                            child: ListBody(
+                                                children: <Widget>[
+                                                  Text("You've kept the bike for more than "
+                                                      "8 hours and are now late to return it. "
+                                                      "If you keep the bike longer than 24 "
+                                                      "hours, you will be banned from the Kollective.")
+                                                ]
+                                            )
+                                        ),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            child: Text('Got it'),
+                                            onPressed: (){
+                                              Navigator.of(context).pop();
+                                            },
+                                          )
+                                        ]
+                                    );
+                                  }
+                              )
+                            });
+                          }
+
                           timeLeftTimer = Timer.periodic(Duration(seconds: 1), (t) {
                             timeLeft--;
                             _notifier.value = timeLeft;
@@ -268,21 +299,23 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                   // on StackOverflow
                                   // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
                                   format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+                                  if( tL >= 0 ){
+                                    return rideScreenText(format(Duration(seconds: tL)));
+                                  } else {
+                                    return Column(
+                                      children: [
+                                        rideScreenTextRed(format(Duration(seconds: tL))),
+                                        SizedBox(height: buttonSpacing),
+                                        rideScreenTextRedSmall("LATE")
+                                      ],
+                                    );
+                                  }
 
-                                  return rideScreenText(format(Duration(seconds: tL)));
                                 })
 
                               ],
                             ));
-                        return Container(
-                            child: FormattedText(
-                              text: 'Username: ' + riderName + '\n' + 'Ride ID: ' + rideId,
-                              size: s_fontSizeMedLarge,
-                              color: Colors.black,
-                              font: s_font_AmaticSC,
-                              weight: FontWeight.bold,
-                            )
-                        );};
+                      };
                       return Center(child: Text('Loading...'));
                     }),]
             )
@@ -298,6 +331,26 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       text: text,
       align: TextAlign.center,
       size: s_fontSizeMedLarge,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget rideScreenTextRed(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Color(s_declineRed),
+      size: s_fontSizeMedLarge,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget rideScreenTextRedSmall(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Color(s_declineRed),
+      size: s_fontSizeSmall,
       weight: FontWeight.bold,
     );
   }
