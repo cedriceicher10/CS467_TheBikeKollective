@@ -25,7 +25,6 @@ Future<String> LateBikeCheck() async{
   final eightHours = 60 * 60 * 8;
   final twentyFourHours = 60 * 60 * 24;
   final time = (DateTime.now().millisecondsSinceEpoch / 1000).floor();
-  print(time);
 
   final rideDoc = await FirebaseFirestore.instance
       .collection('rides')
@@ -35,7 +34,6 @@ Future<String> LateBikeCheck() async{
     var ride = rideDoc.docs[i];
     if(ride['ended'] == false){
       if((time - ride['startTime'].seconds) > eightHours){
-        print(ride['startTime']);
         isLate = true;
         lateType = 'warning';
         if((time - ride['startTime'].seconds) > twentyFourHours){

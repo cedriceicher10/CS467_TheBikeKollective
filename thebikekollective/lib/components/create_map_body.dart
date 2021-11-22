@@ -109,18 +109,12 @@ class _CreateMapBody extends State<CreateMapBody>
     locationData = await locationService.getLocation();
 
     if ((locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001) {
-      print(locationData!.longitude);
-      print(locationData!.latitude);
       setState(() {});
     }
   }
 
   void initLocation() async {
     locationData = await locationService.getLocation();
-
-    print(locationData!.longitude);
-    print(locationData!.latitude);
-
     setState(() {});
   }
 

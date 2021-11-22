@@ -42,7 +42,6 @@ class _HomeBodyState extends State<HomeBody> {
             if (snapshot.hasData) {
               returnData = snapshot.data;
               lateType = returnData;
-              print(lateType);
             }
             if (lateType == 'banned'){
               return Center(
@@ -62,7 +61,6 @@ class _HomeBodyState extends State<HomeBody> {
                     if (snapshot.hasData) {
                       isRidingData = snapshot.data;
                       userRiding = isRidingData;
-                      print(userRiding);
                     }
                     if (userRiding != 'none') {
                       return Center(
