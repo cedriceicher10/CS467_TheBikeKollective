@@ -53,19 +53,13 @@ class _CreateMapBody extends State<CreateMapBody>
     getBikeSnapshot();
 
     locationService.onLocationChanged.distinct().listen((l) async {
-/*      print('zoz');
-      markerList = await GetBikes(context);
-      setState(() {
-        markerList = bikeMarkers;
-        locationData = locationData;
-      });*/
       retrieveLocation();
     });
   }
 
   void getBikeSnapshot() async {
     QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('bikes').get();
+        await FirebaseFirestore.instance.collection('bikes').where('checkedOut', isEqualTo: false).get();
 
     print('DATABASE QUERIED');
 

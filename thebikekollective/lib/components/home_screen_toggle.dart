@@ -21,7 +21,7 @@ class _HomeScreenToggle extends State<HomeScreenToggle> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation1, animation2) =>
-                HomeScreen(map: widget.map),
+                HomeScreen(map: widget.map, showWarning: false),
             transitionDuration: Duration.zero,
           ),
         );
