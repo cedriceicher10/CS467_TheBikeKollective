@@ -1,4 +1,5 @@
 import 'styles.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,11 +46,24 @@ class _RideScreenBodyState extends State<RideScreenBody> {
   LocationData? locationData;
   String username = '';
   var rideId;
+  var startTime;
+  Timer? timer;
+  Timer? timeLeftTimer;
+  var timeLeft;
+
+  ValueNotifier<int> _notifier = ValueNotifier(9999999999);
 
   @override
-
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    timeLeftTimer?.cancel();
+
+    super.dispose();
   }
 
   Future<String> retrieveUsername() async {
@@ -88,12 +102,22 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     var r = locationService.getLocation().then((locationData) async {
       final startLat = locationData.latitude;
       final startLong = locationData.longitude;
-      String rideId;
+      String? rideId;
       var riderName = await retrieveUsername();
       if( newRide != false ){
+        var time = DateTime.now();
+        startTime = (time.millisecondsSinceEpoch / 1000).floor();
         rideId = await FirebaseFirestore.instance
             .collection('rides')
-            .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now(), 'ended': false, 'rating': 1.0})
+            .add({
+          'bike': bikeId,
+          'startLat' : startLat,
+          'startLong': startLong,
+          'rider': riderName,
+          'startTime': time,
+          'ended': false,
+          'rating': 1.0
+            })
             .then((docRef) {
           return docRef.id;
         });
@@ -108,10 +132,17 @@ class _RideScreenBodyState extends State<RideScreenBody> {
             .collection('rides')
             .where('rider', isEqualTo: riderName)
             .get();
-        rideId = q.docs[0].id;
+        for( var i=0; i<q.docs.length; i++ ){
+          if( q.docs[i]['ended'] == false ){
+            rideId = q.docs[i].id;
+            print(q.docs[i]['startTime'].seconds);
+            startTime = q.docs[i]['startTime'].seconds;
+          }
+        }
+
       }
 
-      return rideId;
+      return rideId!;
     });
     return r;
   }
@@ -212,6 +243,16 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                         if (snapshot.hasData) {
                           returnData = snapshot.data;
                           rideId = returnData;
+                          var currentTime = (DateTime.now().millisecondsSinceEpoch / 1000).floor();
+                          timeLeft = ((startTime + (60 * 60 * 8)) - currentTime).toInt();
+                          _notifier.value = timeLeft;
+                          print(currentTime);
+                          timer = Timer(Duration(seconds: ((startTime + (60 * 60 * 8)) - currentTime).toInt()), ()=>{});
+                          timeLeftTimer = Timer.periodic(Duration(seconds: 1), (t) {
+                            timeLeft--;
+                            _notifier.value = timeLeft;
+                          });
+                          print(((startTime + (60 * 60 * 8)) - currentTime).toString());
                         };
                         return Container(
                             child: Column(
@@ -219,6 +260,18 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                 SizedBox(height: imageHeadSpace * 3),
                                 SizedBox(height: buttonSpacing),
                                 endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
+                                SizedBox(height: buttonSpacing * 2),
+                                rideScreenTextSmaller("Time Left to Ride:"),
+                                SizedBox(height: buttonSpacing),
+                                ValueListenableBuilder(valueListenable: _notifier, builder: (BuildContext context, int tL, child){
+                                  // Format function from Frank Treacy's answer to 'Formatting a Duration like HH:mm:ss'
+                                  // on StackOverflow
+                                  // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
+                                  format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+
+                                  return rideScreenText(format(Duration(seconds: tL)));
+                                })
+
                               ],
                             ));
                         return Container(
