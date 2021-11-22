@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:practice1/components/complete_ride_form.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
-import '../components/complete_ride_form.dart';
+import '../components/complete_ride_body.dart';
 
 class CompleteRideScreen extends StatelessWidget {
   const CompleteRideScreen({ Key? key }) : super(key: key);
@@ -15,7 +15,7 @@ class CompleteRideScreen extends StatelessWidget {
         backgroundColor: Color(s_jungleGreen),
         centerTitle: true,
       ),
-      body: CompleteRideForm(),
+      body: CompleteRideBody(),
     );
   }
 

@@ -93,7 +93,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       if( newRide != false ){
         rideId = await FirebaseFirestore.instance
             .collection('rides')
-            .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now(), 'ended': false})
+            .add({'bike': bikeId, 'startLat' : startLat, 'startLong': startLong, 'rider': riderName, 'startTime': DateTime.now(), 'ended': false, 'rating': 1.0})
             .then((docRef) {
           return docRef.id;
         });
