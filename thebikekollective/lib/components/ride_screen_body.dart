@@ -1,15 +1,13 @@
+import '../utils/authentication.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'styles.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
 import '../screens/splash_screen.dart';
-import '../screens/home_screen.dart';
-import 'complete_ride_form.dart';
 
 class RideFields {
   String? riderName;
@@ -47,7 +45,8 @@ class _RideScreenBodyState extends State<RideScreenBody> {
   String username = '';
   var rideId;
   var startTime;
-  Timer? timer;
+  Timer? eightHourTimer;
+  Timer? twentyFourHourTimer;
   Timer? timeLeftTimer;
   var timeLeft;
 
@@ -60,7 +59,8 @@ class _RideScreenBodyState extends State<RideScreenBody> {
 
   @override
   void dispose() {
-    timer?.cancel();
+    eightHourTimer?.cancel();
+    twentyFourHourTimer?.cancel();
     timeLeftTimer?.cancel();
 
     super.dispose();
@@ -247,28 +247,32 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                           timeLeft = ((startTime + (60 * 60 * 8)) - currentTime).toInt();
                           _notifier.value = timeLeft;
                           print(currentTime);
-                          if (timeLeft > 0){
-                            timer = Timer(Duration(seconds: ((startTime + (60 * 60 * 8)) - currentTime).toInt()), ()=>{
+                          if (timeLeft > -(60 * 60 * 24)) {
+                            eightHourTimer = Timer(Duration(
+                                seconds: ((startTime + (60 * 60 * 8)) -
+                                    currentTime).toInt()), () =>
+                            {
                               showDialog(
                                   context: context,
                                   barrierDismissible: false,
-                                  builder: (BuildContext context){
+                                  builder: (BuildContext context) {
                                     return AlertDialog(
                                         title: Text("You're late!"),
                                         content: SingleChildScrollView(
                                             child: ListBody(
                                                 children: <Widget>[
-                                                  Text("You've kept the bike for more than "
-                                                      "8 hours and are now late to return it. "
-                                                      "If you keep the bike longer than 24 "
-                                                      "hours, you will be banned from the Kollective.")
+                                                  Text(
+                                                      "You've kept the bike for more than "
+                                                          "8 hours and are now late to return it. "
+                                                          "If you keep the bike longer than 24 "
+                                                          "hours, you will be banned from the Kollective.")
                                                 ]
                                             )
                                         ),
                                         actions: <Widget>[
-                                          FlatButton(
+                                          TextButton(
                                             child: Text('Got it'),
-                                            onPressed: (){
+                                            onPressed: () {
                                               Navigator.of(context).pop();
                                             },
                                           )
@@ -278,7 +282,55 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                               )
                             });
                           }
-
+                            else{
+                            twentyFourHourTimer = Timer(Duration(seconds: ((startTime + (60 * 60 * 24)) - currentTime).toInt()), ()=>{
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context){
+                                    return AlertDialog(
+                                        title: Text("You're banned!"),
+                                        content: SingleChildScrollView(
+                                            child: ListBody(
+                                                children: <Widget>[
+                                                  Text("You've kept the bike for more than "
+                                                      "24 hours and are now banned from The Kollective. "
+                                                      "Get lost!")
+                                                ]
+                                            )
+                                        ),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: Text('Well, that sucks'),
+                                            onPressed: () async {
+                                              final q1 = await FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .where('username', isEqualTo: username)
+                                                  .get();
+                                              final userId = q1.docs[0].id;
+                                              final q2 = await FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .doc(userId)
+                                                  .update({'lockedOut': true});
+                                              await Authentication.signOut(context: context);
+                                              SharedPreferences preferences =
+                                              await SharedPreferences.getInstance();
+                                              preferences.setBool('loggedIn', false);
+                                              preferences.setString('username', 'no username');
+                                              print('SIGNED OUT');
+                                              Navigator.of(context).pop();
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => SplashScreen()),
+                                              );
+                                            },
+                                          )
+                                        ]
+                                    );
+                                  }
+                              )
+                            });
+                          }
                           timeLeftTimer = Timer.periodic(Duration(seconds: 1), (t) {
                             timeLeft--;
                             _notifier.value = timeLeft;
@@ -304,7 +356,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                   } else {
                                     return Column(
                                       children: [
-                                        rideScreenTextRed(format(Duration(seconds: tL))),
+                                        rideScreenTextRed(format(Duration(seconds: 0))),
                                         SizedBox(height: buttonSpacing),
                                         rideScreenTextRedSmall("LATE")
                                       ],

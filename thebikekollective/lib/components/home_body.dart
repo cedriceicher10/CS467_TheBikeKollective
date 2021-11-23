@@ -34,54 +34,33 @@ class _HomeBodyState extends State<HomeBody> {
   @override
 
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: LateBikeCheck(),
-        builder: (context, snapshot) {
-          String? returnData;
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              returnData = snapshot.data;
-              lateType = returnData;
-            }
-            if (lateType == 'banned'){
-              return Center(
-                child: bannedText("You are banned from the Kollective for keeping a "
-                    "bike over 24 hours! Get lost!")
-              );
-            }
-            else if (lateType == 'warning' && widget.showWarning != false){
-              return LateNotice();
-            }
-            else return FutureBuilder<String>(
-                future: UserIsRiding(),
+      return FutureBuilder<String>(
+            future: UserIsRiding(),
 
-                builder: (context, snapshot) {
-                  String? isRidingData;
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasData) {
-                      isRidingData = snapshot.data;
-                      userRiding = isRidingData;
-                    }
-                    if (userRiding != 'none') {
-                      return Center(
-                        child: goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
-                      );
-
-                    }
-                    else if (widget.map) {
-                      return CreateMapBody();
-                    } else {
-                      return ListViewBody();
-                    }
-                  }
-                  return Center();
+            builder: (context, snapshot) {
+              String? isRidingData;
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  isRidingData = snapshot.data;
+                  userRiding = isRidingData;
                 }
+                if (userRiding != 'none') {
+                  return Center(
+                    child: goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
+                  );
 
-            );
-          }
-          return Center();
-        });
-    }
+                }
+                else if (widget.map) {
+                  return CreateMapBody();
+                } else {
+                  return ListViewBody();
+                }
+              }
+              return Center();
+            }
+
+        );
+      }
 
   Widget goToRideButton(BuildContext context, rideId, String text, double buttonWidth,
       double buttonHeight) {
