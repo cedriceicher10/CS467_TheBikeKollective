@@ -214,7 +214,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Color(s_periwinkleBlue),
+                                            color: Color(s_periwinkleBlueTransparent),
                                             spreadRadius: 2,
                                             blurRadius: 7,
                                             offset: Offset(0, 3),
@@ -226,6 +226,8 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                           image: NetworkImage(imageURL),
 
                                         )
+
+                                      // Don't delete; may come back to this.
 /*                                    child: Image(
                                       height: 200,
                                       image: NetworkImage(imageURL),
