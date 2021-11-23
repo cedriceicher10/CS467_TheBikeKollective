@@ -212,6 +212,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                         border: Border.all(width: 3, color: Color(s_jungleGreen)),
                                         borderRadius: BorderRadius.circular(5)),
                                     child: Image(
+                                      height: 200,
                                       image: NetworkImage(imageURL),
                                       loadingBuilder: (BuildContext context, Widget child,
                                           ImageChunkEvent? loadingProgress) {
@@ -340,8 +341,8 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                         return Container(
                             child: Column(
                               children: [
-                                SizedBox(height: imageHeadSpace * 3),
-                                SizedBox(height: buttonSpacing),
+                                SizedBox(height: imageHeadSpace),
+                                SizedBox(height: buttonSpacing * 2),
                                 endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
                                 SizedBox(height: buttonSpacing * 2),
                                 rideScreenTextSmaller("Time Left to Ride:"),
@@ -351,14 +352,17 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                   // on StackOverflow
                                   // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
                                   format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
-                                  if( tL >= 0 ){
+                                  if( tL >= 0 && tL > (60 * 60 * 2)){
                                     return rideScreenText(format(Duration(seconds: tL)));
-                                  } else {
+                                  } else if ( tL >= 0 ){
+                                    return rideScreenTextOrange(format(Duration(seconds: tL)));
+                                  }
+                                  else {
                                     return Column(
                                       children: [
                                         rideScreenTextRed(format(Duration(seconds: 0))),
                                         SizedBox(height: buttonSpacing),
-                                        rideScreenTextRedSmall("LATE")
+                                        rideScreenTextRedSmall("LATE"),
                                       ],
                                     );
                                   }
@@ -397,11 +401,30 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     );
   }
 
+  Widget rideScreenTextOrange(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Color(s_cadmiumOrange),
+      size: s_fontSizeMedLarge,
+      weight: FontWeight.bold,
+    );
+  }
+
   Widget rideScreenTextRedSmall(String text) {
     return FormattedText(
       text: text,
       align: TextAlign.center,
       color: Color(s_declineRed),
+      size: s_fontSizeSmall,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget rideScreenTextSmall(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
       size: s_fontSizeSmall,
       weight: FontWeight.bold,
     );

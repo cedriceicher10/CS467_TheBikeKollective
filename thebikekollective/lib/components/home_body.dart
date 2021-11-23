@@ -46,7 +46,19 @@ class _HomeBodyState extends State<HomeBody> {
                 }
                 if (userRiding != 'none') {
                   return Center(
-                    child: goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
+                    child:
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(20),
+                          child: rideAlertText("You currently have a ride in progress."),
+                        ),
+
+                        SizedBox(height: buttonSpacing*3),
+                        goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
+                      ]
+                    )
                   );
 
                 }
@@ -81,6 +93,15 @@ class _HomeBodyState extends State<HomeBody> {
       color: Colors.white,
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
+    );
+  }
+
+  Widget rideAlertText(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      size: s_fontSizeLarge,
+      color: Colors.black,
     );
   }
 
