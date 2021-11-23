@@ -219,8 +219,8 @@ class _SplashBodyState extends State<SplashBody> {
       text: text,
       size: s_fontSizeSmall,
       color: Colors.white,
-      font: s_font_AmaticSC,
-      weight: FontWeight.bold,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.w500,
     );
   }
 }

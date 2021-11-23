@@ -101,6 +101,7 @@ class _HomeBodyState extends State<HomeBody> {
       text: text,
       align: TextAlign.center,
       size: s_fontSizeLarge,
+      font: s_font_IBMPlexSans,
       color: Colors.black,
     );
   }

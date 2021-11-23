@@ -387,7 +387,8 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       text: text,
       align: TextAlign.center,
       size: s_fontSizeMedLarge,
-      weight: FontWeight.bold,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.w500,
     );
   }
 
@@ -397,6 +398,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       align: TextAlign.center,
       color: Color(s_declineRed),
       size: s_fontSizeMedLarge,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -407,6 +409,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       align: TextAlign.center,
       color: Color(s_cadmiumOrange),
       size: s_fontSizeMedLarge,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -417,6 +420,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       align: TextAlign.center,
       color: Color(s_declineRed),
       size: s_fontSizeSmall,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -426,6 +430,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       text: text,
       align: TextAlign.center,
       size: s_fontSizeSmall,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -435,6 +440,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       text: text,
       align: TextAlign.center,
       size: s_fontSizeMedium,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
