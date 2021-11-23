@@ -383,7 +383,12 @@ class BikeMarkerPopup extends StatelessWidget {
                         SizedBox(height: 8),
                         descriptionText('${bike.description}'),
                         SizedBox(height: 8),
-                        descriptionText('Condition: ${bike.condition}'),
+                        Row(
+                            children:[
+                              descriptionTextItalic('Condition: '),
+                              descriptionText('${bike.condition}')
+                            ]
+                        ),
                         SizedBox(height: 8),
                         rideButton(context, inRange, 100, 25, bike.id)
                       ])
@@ -420,7 +425,13 @@ class BikeMarkerPopup extends StatelessWidget {
                         SizedBox(height: 8),
                         descriptionText('${bike.description}'),
                         SizedBox(height: 8),
-                        descriptionText('Condition: ${bike.condition}'),
+                        Row(
+                          children:[
+                            descriptionTextItalic('Condition: '),
+                            descriptionText('${bike.condition}')
+                          ]
+                        ),
+
                         SizedBox(height: 8),
                         rideButton(context, inRange, 100, 25, bike.id)
                       ])
@@ -473,6 +484,16 @@ class BikeMarkerPopup extends StatelessWidget {
       color: Colors.black,
       font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
+    );
+  }
+
+  Widget descriptionTextItalic(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Colors.black,
+      font: s_font_IBMPlexSans,
+      style: FontStyle.italic,
     );
   }
 

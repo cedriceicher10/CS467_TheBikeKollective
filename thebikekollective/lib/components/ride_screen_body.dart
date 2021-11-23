@@ -189,7 +189,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                         ],
                       ));
                 };
-                return Center(child: Text('Loading...'));
+                return Center();
               })
         ]),
           Row(
@@ -207,11 +207,26 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                         return Expanded(
                             child: FractionallySizedBox(
                                 widthFactor: imageSizeFactor(context),
-                                child: Container(
+                                child:
+                                  Container(
+                                    height: 200,
                                     decoration: BoxDecoration(
-                                        border: Border.all(width: 3, color: Color(s_jungleGreen)),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: Image(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(s_periwinkleBlue),
+                                            spreadRadius: 2,
+                                            blurRadius: 7,
+                                            offset: Offset(0, 3),
+                                          )
+                                        ],
+                                        border: Border.all(width: 5, color: Color(s_jungleGreen)),
+                                        image: new DecorationImage(
+                                          fit: BoxFit.fitWidth,
+                                          image: NetworkImage(imageURL),
+
+                                        )
+/*                                    child: Image(
                                       height: 200,
                                       image: NetworkImage(imageURL),
                                       loadingBuilder: (BuildContext context, Widget child,
@@ -229,7 +244,10 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                   : null,
                                             ));
                                       },
-                                    ))));
+                                    )*/
+                                )
+                            )
+                        ));
                       };
                       return Center();
                     })
@@ -342,37 +360,59 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                             child: Column(
                               children: [
                                 SizedBox(height: imageHeadSpace),
-                                SizedBox(height: buttonSpacing * 2),
-                                endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
-                                SizedBox(height: buttonSpacing * 2),
                                 rideScreenTextSmaller("Time Left to Ride:"),
                                 SizedBox(height: buttonSpacing),
-                                ValueListenableBuilder(valueListenable: _notifier, builder: (BuildContext context, int tL, child){
-                                  // Format function from Frank Treacy's answer to 'Formatting a Duration like HH:mm:ss'
-                                  // on StackOverflow
-                                  // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
-                                  format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
-                                  if( tL >= 0 && tL > (60 * 60 * 2)){
-                                    return rideScreenText(format(Duration(seconds: tL)));
-                                  } else if ( tL >= 0 ){
-                                    return rideScreenTextOrange(format(Duration(seconds: tL)));
-                                  }
-                                  else {
-                                    return Column(
-                                      children: [
-                                        rideScreenTextRed(format(Duration(seconds: 0))),
-                                        SizedBox(height: buttonSpacing),
-                                        rideScreenTextRedSmall("LATE"),
-                                      ],
-                                    );
-                                  }
 
-                                })
+                                Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 3, color: Color(s_jungleGreen)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(s_disabledGray),
+                                          spreadRadius: 2,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ],
+                                    ),
+                                    child:
+                                    Container(
+                                      color: Colors.white,
+                                      child: Padding(
+                                          padding: EdgeInsets.all(8),
+                                          child: ValueListenableBuilder(valueListenable: _notifier, builder: (BuildContext context, int tL, child){
+                                            // Format function from Frank Treacy's answer to 'Formatting a Duration like HH:mm:ss'
+                                            // on StackOverflow
+                                            // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
+                                            format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+                                            if( tL >= 0 && tL > (60 * 60 * 2)){
+                                              return rideScreenText(format(Duration(seconds: tL)));
+                                            } else if ( tL >= 0 ){
+                                              return rideScreenTextOrange(format(Duration(seconds: tL)));
+                                            }
+                                            else {
+                                              return Column(
+                                                children: [
+                                                  rideScreenTextRed(format(Duration(seconds: 0))),
+                                                  SizedBox(height: buttonSpacing),
+                                                  rideScreenTextRedSmall("LATE"),
+                                                ],
+                                              );
+                                            }
+
+                                          })
+
+                                      ),
+                                    )
+                                ),
+                                SizedBox(height: buttonSpacing * 3),
+                                endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
+                                SizedBox(height: buttonSpacing * 2),
 
                               ],
                             ));
                       };
-                      return Center(child: Text('Loading...'));
+                      return Center();
                     }),]
             )
 
