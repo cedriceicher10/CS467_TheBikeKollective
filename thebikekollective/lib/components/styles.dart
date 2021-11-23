@@ -8,6 +8,7 @@ const String s_font_AmaticSC = 'AmaticSC';
 const String s_font_RedOctober = "RedOctober";
 const String s_font_SpecialElite = "SpecialElite";
 const String s_font_IBMPlexSans = "IBMPlexSans";
+const String s_font_NovaMono = "NovaMono";
 
 // Font Sizes
 const double s_fontSizeExtraLarge = 44;
@@ -20,6 +21,7 @@ const double s_fontSizeExtraSmall = 12;
 // Colors
 const int s_jungleGreen = 0xFF2EAD65;
 const int s_grayGreen = 0xFF89A894;
+const int s_darkGray = 0xFF333333;
 const int s_raisinBlack = 0xFF2A2D34;
 const int s_jungleGreen_faded = 0xEEbac261;
 const int s_declineRed = 0xFFf2301b;

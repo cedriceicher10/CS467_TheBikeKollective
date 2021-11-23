@@ -50,13 +50,40 @@ class _HomeBodyState extends State<HomeBody> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.all(20),
-                          child: rideAlertText("You currently have a ride in progress."),
+
+                          Padding(
+                            padding: EdgeInsets.all(20),
+                            child:  Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 3, color: Color(s_jungleGreen)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(s_disabledGray),
+                                    spreadRadius: 2,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 3),
+                                  )
+                                ],
+                              ),
+                            child: Container(
+                              color: Colors.white,
+                              child:
+                              Padding(
+                                padding: EdgeInsets.all(24),
+                                child: Column(
+                                  children: [
+                                    rideAlertText("You currently have a ride in progress."),
+                                    SizedBox(height: buttonSpacing*3),
+                                    goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
+                                  ],
+                                )
+                              )
+                            )
+                          ),
                         ),
 
-                        SizedBox(height: buttonSpacing*3),
-                        goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
+
+
                       ]
                     )
                   );

@@ -43,6 +43,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
   var locationService = Location();
   LocationData? locationData;
   String username = '';
+  String bikeName = '';
   var rideId;
   var startTime;
   Timer? eightHourTimer;
@@ -79,6 +80,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     if(req.exists){
       Map<String, dynamic>? data = req.data();
       var c = data?['Combination'];
+      bikeName = data?['Name'];
       return c;
     } else {
       return -1;
@@ -167,31 +169,48 @@ class _RideScreenBodyState extends State<RideScreenBody> {
 
     return Center(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FutureBuilder<int>(
-              future: retrieveCombo(bikeId),
-              builder: (context, snapshot) {
-                int? returnData;
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasData) {
-                    returnData = snapshot.data;
-                    comboNum = returnData;
-                  };
-                  return Container(
-                      child: Column(
-                        children: [
-                          SizedBox(height: imageHeadSpace),
-                          rideScreenText('Combination: ' + comboNum.toString()),
-                          SizedBox(height: buttonSpacing)
-                        ],
-                      ));
-                };
-                return Center();
-              })
-        ]),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FutureBuilder<int>(
+                    future: retrieveCombo(bikeId),
+                    builder: (context, snapshot) {
+                      int? returnData;
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData) {
+                          returnData = snapshot.data;
+                          comboNum = returnData;
+                        };
+                        return Container(
+                            child: Column(
+                              children: [
+                                rideScreenText(bikeName),
+                                Container(
+                                    decoration: BoxDecoration(
+
+                                    ),
+                                    child:
+                                    Container(
+                                      color: Colors.white,
+                                      child: Padding(
+                                          padding: EdgeInsets.all(8),
+                                          child: Row(
+                                            children: [
+                                              rideScreenTextSmall('Combination: '),
+                                              rideScreenTextSmall('${comboNum}')
+                                            ],
+                                          )
+                                      ),
+                                    )),
+                                SizedBox(height: imageHeadSpace),
+                              ],
+                            ));
+                      };
+                      return Center();
+                    })
+              ]),
           Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -207,27 +226,13 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                         return Expanded(
                             child: FractionallySizedBox(
                                 widthFactor: imageSizeFactor(context),
-                                child:
-                                  Container(
-                                    height: 200,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color(s_periwinkleBlueTransparent),
-                                            spreadRadius: 2,
-                                            blurRadius: 7,
-                                            offset: Offset(0, 3),
-                                          )
-                                        ],
-                                        border: Border.all(width: 5, color: Color(s_jungleGreen)),
-                                        image: new DecorationImage(
-                                          fit: BoxFit.fitWidth,
-                                          image: NetworkImage(imageURL),
+                                child: Column(
+                                  children: [
+                                    Container(
 
-                                        )
 
-                                      // Don't delete; may come back to this.
+
+                                          // Don't delete; may come back to this.
 /*                                    child: Image(
                                       height: 200,
                                       image: NetworkImage(imageURL),
@@ -247,176 +252,228 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                             ));
                                       },
                                     )*/
+                                        child:         Column(
+
+                                            children:[
+                                              Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [FutureBuilder<String>(
+                                                      future: startRide(bikeId, widget.newRide),
+                                                      builder: (context, snapshot) {
+                                                        String? returnData;
+                                                        if (snapshot.connectionState == ConnectionState.done) {
+                                                          if (snapshot.hasData) {
+                                                            returnData = snapshot.data;
+                                                            rideId = returnData;
+                                                            print(rideId);
+
+                                                            var currentTime = (DateTime.now().millisecondsSinceEpoch / 1000).floor();
+                                                            timeLeft = ((startTime + (60 * 60 * 8)) - currentTime).toInt();
+                                                            _notifier.value = timeLeft;
+                                                            print(currentTime);
+                                                            if (timeLeft > -(60 * 60 * 24)) {
+                                                              eightHourTimer = Timer(Duration(
+                                                                  seconds: ((startTime + (60 * 60 * 8)) -
+                                                                      currentTime).toInt()), () =>
+                                                              {
+                                                                showDialog(
+                                                                    context: context,
+                                                                    barrierDismissible: false,
+                                                                    builder: (BuildContext context) {
+                                                                      return AlertDialog(
+                                                                          title: Text("You're late!"),
+                                                                          content: SingleChildScrollView(
+                                                                              child: ListBody(
+                                                                                  children: <Widget>[
+                                                                                    Text(
+                                                                                        "You've kept the bike for more than "
+                                                                                            "8 hours and are now late to return it. "
+                                                                                            "If you keep the bike longer than 24 "
+                                                                                            "hours, you will be banned from the Kollective.")
+                                                                                  ]
+                                                                              )
+                                                                          ),
+                                                                          actions: <Widget>[
+                                                                            TextButton(
+                                                                              child: Text('Got it'),
+                                                                              onPressed: () {
+                                                                                Navigator.of(context).pop();
+                                                                              },
+                                                                            )
+                                                                          ]
+                                                                      );
+                                                                    }
+                                                                )
+                                                              });
+                                                            }
+                                                            else{
+                                                              twentyFourHourTimer = Timer(Duration(seconds: ((startTime + (60 * 60 * 24)) - currentTime).toInt()), ()=>{
+                                                                showDialog(
+                                                                    context: context,
+                                                                    barrierDismissible: false,
+                                                                    builder: (BuildContext context){
+                                                                      return AlertDialog(
+                                                                          title: Text("You're banned!"),
+                                                                          content: SingleChildScrollView(
+                                                                              child: ListBody(
+                                                                                  children: <Widget>[
+                                                                                    Text("You've kept the bike for more than "
+                                                                                        "24 hours and are now banned from The Kollective. "
+                                                                                        "Get lost!")
+                                                                                  ]
+                                                                              )
+                                                                          ),
+                                                                          actions: <Widget>[
+                                                                            TextButton(
+                                                                              child: Text('Well, that sucks'),
+                                                                              onPressed: () async {
+                                                                                final q1 = await FirebaseFirestore.instance
+                                                                                    .collection('users')
+                                                                                    .where('username', isEqualTo: username)
+                                                                                    .get();
+                                                                                final userId = q1.docs[0].id;
+                                                                                final q2 = await FirebaseFirestore.instance
+                                                                                    .collection('users')
+                                                                                    .doc(userId)
+                                                                                    .update({'lockedOut': true});
+                                                                                await Authentication.signOut(context: context);
+                                                                                SharedPreferences preferences =
+                                                                                await SharedPreferences.getInstance();
+                                                                                preferences.setBool('loggedIn', false);
+                                                                                preferences.setString('username', 'no username');
+                                                                                print('SIGNED OUT');
+                                                                                Navigator.of(context).pop();
+                                                                                Navigator.push(
+                                                                                  context,
+                                                                                  MaterialPageRoute(builder: (context) => SplashScreen()),
+                                                                                );
+                                                                              },
+                                                                            )
+                                                                          ]
+                                                                      );
+                                                                    }
+                                                                )
+                                                              });
+                                                            }
+                                                            timeLeftTimer = Timer.periodic(Duration(seconds: 1), (t) {
+                                                              timeLeft--;
+                                                              _notifier.value = timeLeft;
+                                                            });
+                                                            print(((startTime + (60 * 60 * 8)) - currentTime).toString());
+                                                          };
+                                                          return Column(
+                                                            children: [
+                                                              Container(
+                                                              height: 300,
+                                                              width: 300,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    color: Color(s_disabledGray),
+                                                                    spreadRadius: 2,
+                                                                    blurRadius: 7,
+                                                                    offset: Offset(0, 3),
+                                                                  )
+                                                                ],
+                                                                border: Border.all(width: 5, color: Color(s_jungleGreen)),
+                                                                image: new DecorationImage(
+                                                                  fit: BoxFit.fitHeight,
+                                                                  image: NetworkImage(imageURL),
+
+                                                                ),
+                                                              ),
+                                                                child:
+                                                                  Row(
+                                                                    mainAxisSize: MainAxisSize.max,
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
+
+                                                                    children: [
+                                                                      Column(
+
+                                                                        mainAxisAlignment: MainAxisAlignment.end,
+                                                                        children: [
+                                                                          Container(
+
+
+                                                                              decoration: BoxDecoration(
+                                                                                shape: BoxShape.rectangle,
+                                                                                border: Border.all(width: 1, color: Color(s_jungleGreen)),
+                                                                                boxShadow: [
+                                                                                  BoxShadow(
+                                                                                    color: Color(s_disabledGray),
+                                                                                    spreadRadius: 2,
+                                                                                    blurRadius: 7,
+                                                                                    offset: Offset(0, 3),
+                                                                                  )
+                                                                                ],
+                                                                              ),
+                                                                              child:
+                                                                              Container(
+                                                                                color: Colors.black87,
+
+                                                                                child: Padding(
+                                                                                    padding: EdgeInsets.all(8),
+                                                                                    child: Column(
+                                                                                      children: [
+                                                                                        countdownTextSmall("TIME LEFT"),
+                                                                                        ValueListenableBuilder(valueListenable: _notifier, builder: (BuildContext context, int tL, child){
+                                                                                          // Format function from Frank Treacy's answer to 'Formatting a Duration like HH:mm:ss'
+                                                                                          // on StackOverflow
+                                                                                          // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
+                                                                                          format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+                                                                                          if( tL >= 0 && tL > (60 * 60 * 2)){
+                                                                                            return countdownText(format(Duration(seconds: tL)));
+                                                                                          } else if ( tL >= 0 ){
+                                                                                            return countdownTextOrange(format(Duration(seconds: tL)));
+                                                                                          }
+                                                                                          else {
+                                                                                            return Column(
+                                                                                              children: [
+                                                                                                countdownTextRed(format(Duration(seconds: 0))),
+                                                                                                SizedBox(height: buttonSpacing),
+                                                                                                rideScreenTextRedSmall("LATE"),
+                                                                                              ],
+                                                                                            );
+                                                                                          }
+
+                                                                                        }),
+
+                                                                                      ],
+                                                                                    )
+
+                                                                                ),
+                                                                              )
+                                                                          ),
+
+
+                                                                        ],
+                                                                      )
+                                                                    ] ),
+
+                                                          ),
+
+                                                        SizedBox(height: buttonSpacing * 3),
+                                                        endRideButton(context, rideId, bikeId, "End Ride", buttonWidth, buttonHeight),
+                                                            ],
+                                                          );
+
+                                                        };
+                                                        return Center();
+                                                      }),]
+                                              )]),
+
+                                    ),
+]
                                 )
-                            )
+
                         ));
                       };
                       return Center();
                     })
               ]),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [FutureBuilder<String>(
-                    future: startRide(bikeId, widget.newRide),
-                    builder: (context, snapshot) {
-                      String? returnData;
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasData) {
-                          returnData = snapshot.data;
-                          rideId = returnData;
-                          var currentTime = (DateTime.now().millisecondsSinceEpoch / 1000).floor();
-                          timeLeft = ((startTime + (60 * 60 * 8)) - currentTime).toInt();
-                          _notifier.value = timeLeft;
-                          print(currentTime);
-                          if (timeLeft > -(60 * 60 * 24)) {
-                            eightHourTimer = Timer(Duration(
-                                seconds: ((startTime + (60 * 60 * 8)) -
-                                    currentTime).toInt()), () =>
-                            {
-                              showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                        title: Text("You're late!"),
-                                        content: SingleChildScrollView(
-                                            child: ListBody(
-                                                children: <Widget>[
-                                                  Text(
-                                                      "You've kept the bike for more than "
-                                                          "8 hours and are now late to return it. "
-                                                          "If you keep the bike longer than 24 "
-                                                          "hours, you will be banned from the Kollective.")
-                                                ]
-                                            )
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: Text('Got it'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          )
-                                        ]
-                                    );
-                                  }
-                              )
-                            });
-                          }
-                            else{
-                            twentyFourHourTimer = Timer(Duration(seconds: ((startTime + (60 * 60 * 24)) - currentTime).toInt()), ()=>{
-                              showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context){
-                                    return AlertDialog(
-                                        title: Text("You're banned!"),
-                                        content: SingleChildScrollView(
-                                            child: ListBody(
-                                                children: <Widget>[
-                                                  Text("You've kept the bike for more than "
-                                                      "24 hours and are now banned from The Kollective. "
-                                                      "Get lost!")
-                                                ]
-                                            )
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: Text('Well, that sucks'),
-                                            onPressed: () async {
-                                              final q1 = await FirebaseFirestore.instance
-                                                  .collection('users')
-                                                  .where('username', isEqualTo: username)
-                                                  .get();
-                                              final userId = q1.docs[0].id;
-                                              final q2 = await FirebaseFirestore.instance
-                                                  .collection('users')
-                                                  .doc(userId)
-                                                  .update({'lockedOut': true});
-                                              await Authentication.signOut(context: context);
-                                              SharedPreferences preferences =
-                                              await SharedPreferences.getInstance();
-                                              preferences.setBool('loggedIn', false);
-                                              preferences.setString('username', 'no username');
-                                              print('SIGNED OUT');
-                                              Navigator.of(context).pop();
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(builder: (context) => SplashScreen()),
-                                              );
-                                            },
-                                          )
-                                        ]
-                                    );
-                                  }
-                              )
-                            });
-                          }
-                          timeLeftTimer = Timer.periodic(Duration(seconds: 1), (t) {
-                            timeLeft--;
-                            _notifier.value = timeLeft;
-                          });
-                          print(((startTime + (60 * 60 * 8)) - currentTime).toString());
-                        };
-                        return Container(
-                            child: Column(
-                              children: [
-                                SizedBox(height: imageHeadSpace),
-                                rideScreenTextSmaller("Time Left to Ride:"),
-                                SizedBox(height: buttonSpacing),
 
-                                Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(width: 3, color: Color(s_jungleGreen)),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(s_disabledGray),
-                                          spreadRadius: 2,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 3),
-                                        )
-                                      ],
-                                    ),
-                                    child:
-                                    Container(
-                                      color: Colors.white,
-                                      child: Padding(
-                                          padding: EdgeInsets.all(8),
-                                          child: ValueListenableBuilder(valueListenable: _notifier, builder: (BuildContext context, int tL, child){
-                                            // Format function from Frank Treacy's answer to 'Formatting a Duration like HH:mm:ss'
-                                            // on StackOverflow
-                                            // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
-                                            format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
-                                            if( tL >= 0 && tL > (60 * 60 * 2)){
-                                              return rideScreenText(format(Duration(seconds: tL)));
-                                            } else if ( tL >= 0 ){
-                                              return rideScreenTextOrange(format(Duration(seconds: tL)));
-                                            }
-                                            else {
-                                              return Column(
-                                                children: [
-                                                  rideScreenTextRed(format(Duration(seconds: 0))),
-                                                  SizedBox(height: buttonSpacing),
-                                                  rideScreenTextRedSmall("LATE"),
-                                                ],
-                                              );
-                                            }
 
-                                          })
-
-                                      ),
-                                    )
-                                ),
-                                SizedBox(height: buttonSpacing * 3),
-                                endRideButton(context, rideId, bikeId, 'End Ride', buttonWidth, buttonHeight),
-                                SizedBox(height: buttonSpacing * 2),
-
-                              ],
-                            ));
-                      };
-                      return Center();
-                    }),]
-            )
 
 
           ],)
@@ -431,6 +488,50 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       size: s_fontSizeMedLarge,
       font: s_font_IBMPlexSans,
       weight: FontWeight.w500,
+    );
+  }
+
+  Widget countdownText(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Colors.white70,
+      size: s_fontSizeMedLarge,
+      font: s_font_NovaMono,
+      weight: FontWeight.w500,
+    );
+  }
+
+  Widget countdownTextSmall(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Colors.white70,
+      size: s_fontSizeSmall,
+      font: s_font_NovaMono,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget countdownTextRed(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Color(s_declineRed),
+      size: s_fontSizeMedLarge,
+      font: s_font_NovaMono,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget countdownTextOrange(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Color(s_cadmiumOrange),
+      size: s_fontSizeMedLarge,
+      font: s_font_NovaMono,
+      weight: FontWeight.bold,
     );
   }
 
@@ -473,7 +574,19 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       align: TextAlign.center,
       size: s_fontSizeSmall,
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
+      color: Color(s_darkGray)
+    );
+  }
+
+  Widget rideScreenTextExtraSmall(String text) {
+    return FormattedText(
+        text: text,
+        align: TextAlign.center,
+        size: s_fontSizeExtraSmall,
+        font: s_font_IBMPlexSans,
+        weight: FontWeight.w500,
+        color: Color(s_darkGray)
     );
   }
 
@@ -484,6 +597,16 @@ class _RideScreenBodyState extends State<RideScreenBody> {
       size: s_fontSizeMedium,
       font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
+    );
+  }
+
+  Widget rideScreenTextSmallerNorm(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      size: s_fontSizeMedium,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.w500,
     );
   }
 
