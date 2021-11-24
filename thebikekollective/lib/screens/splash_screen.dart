@@ -25,9 +25,9 @@ class SplashScreen extends StatelessWidget {
 Widget splashTitle() {
   return FormattedText(
     text: 'The Bike Kollective',
-    size: s_fontSizeMedLarge,
+    size: s_fontSizeExtraLarge,
     color: Colors.white,
-    font: s_font_RedOctober,
+    font: s_font_AmaticSC,
     weight: FontWeight.bold,
   );
 }

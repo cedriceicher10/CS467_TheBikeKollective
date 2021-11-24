@@ -49,9 +49,12 @@ class _RideScreenBodyState extends State<RideScreenBody> {
   Timer? eightHourTimer;
   Timer? twentyFourHourTimer;
   Timer? timeLeftTimer;
+  Timer? timeUntilBanTimer;
   var timeLeft;
+  var timeUntilBan;
 
   ValueNotifier<int> _notifier = ValueNotifier(9999999999);
+  ValueNotifier<int> _banNotifier = ValueNotifier(9999999999);
 
   @override
   void initState() {
@@ -63,6 +66,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     eightHourTimer?.cancel();
     twentyFourHourTimer?.cancel();
     timeLeftTimer?.cancel();
+    timeUntilBanTimer?.cancel();
 
     super.dispose();
   }
@@ -271,7 +275,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                             timeLeft = ((startTime + (60 * 60 * 8)) - currentTime).toInt();
                                                             _notifier.value = timeLeft;
                                                             print(currentTime);
-                                                            if (timeLeft > -(60 * 60 * 24)) {
+                                                            if (timeLeft > -(60 * 60 * 16)) {
                                                               eightHourTimer = Timer(Duration(
                                                                   seconds: ((startTime + (60 * 60 * 8)) -
                                                                       currentTime).toInt()), () =>
@@ -306,60 +310,63 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                                 )
                                                               });
                                                             }
-                                                            else{
-                                                              twentyFourHourTimer = Timer(Duration(seconds: ((startTime + (60 * 60 * 24)) - currentTime).toInt()), ()=>{
-                                                                showDialog(
-                                                                    context: context,
-                                                                    barrierDismissible: false,
-                                                                    builder: (BuildContext context){
-                                                                      return AlertDialog(
-                                                                          title: Text("You're banned!"),
-                                                                          content: SingleChildScrollView(
-                                                                              child: ListBody(
-                                                                                  children: <Widget>[
-                                                                                    Text("You've kept the bike for more than "
-                                                                                        "24 hours and are now banned from The Kollective. "
-                                                                                        "Get lost!")
-                                                                                  ]
-                                                                              )
-                                                                          ),
-                                                                          actions: <Widget>[
-                                                                            TextButton(
-                                                                              child: Text('Well, that sucks'),
-                                                                              onPressed: () async {
-                                                                                final q1 = await FirebaseFirestore.instance
-                                                                                    .collection('users')
-                                                                                    .where('username', isEqualTo: username)
-                                                                                    .get();
-                                                                                final userId = q1.docs[0].id;
-                                                                                final q2 = await FirebaseFirestore.instance
-                                                                                    .collection('users')
-                                                                                    .doc(userId)
-                                                                                    .update({'lockedOut': true});
-                                                                                await Authentication.signOut(context: context);
-                                                                                SharedPreferences preferences =
-                                                                                await SharedPreferences.getInstance();
-                                                                                preferences.setBool('loggedIn', false);
-                                                                                preferences.setString('username', 'no username');
-                                                                                print('SIGNED OUT');
-                                                                                Navigator.of(context).pop();
-                                                                                Navigator.push(
-                                                                                  context,
-                                                                                  MaterialPageRoute(builder: (context) => SplashScreen()),
-                                                                                );
-                                                                              },
+                                                            timeUntilBan = ((startTime + (60 * 60 * 24)) - currentTime).toInt();
+                                                            twentyFourHourTimer = Timer(Duration(seconds: ((startTime + (60 * 60 * 24)) - currentTime).toInt()), ()=>{
+                                                              showDialog(
+                                                                  context: context,
+                                                                  barrierDismissible: false,
+                                                                  builder: (BuildContext context){
+                                                                    return AlertDialog(
+                                                                        title: Text("You're banned!"),
+                                                                        content: SingleChildScrollView(
+                                                                            child: ListBody(
+                                                                                children: <Widget>[
+                                                                                  Text("You've kept the bike for more than "
+                                                                                      "24 hours and are now banned from The Kollective. "
+                                                                                      "Get lost!")
+                                                                                ]
                                                                             )
-                                                                          ]
-                                                                      );
-                                                                    }
-                                                                )
-                                                              });
-                                                            }
+                                                                        ),
+                                                                        actions: <Widget>[
+                                                                          TextButton(
+                                                                            child: Text('Well, that sucks'),
+                                                                            onPressed: () async {
+                                                                              final q1 = await FirebaseFirestore.instance
+                                                                                  .collection('users')
+                                                                                  .where('username', isEqualTo: username)
+                                                                                  .get();
+                                                                              final userId = q1.docs[0].id;
+                                                                              final q2 = await FirebaseFirestore.instance
+                                                                                  .collection('users')
+                                                                                  .doc(userId)
+                                                                                  .update({'lockedOut': true});
+                                                                              await Authentication.signOut(context: context);
+                                                                              SharedPreferences preferences =
+                                                                              await SharedPreferences.getInstance();
+                                                                              preferences.setBool('loggedIn', false);
+                                                                              preferences.setString('username', 'no username');
+                                                                              print('SIGNED OUT');
+                                                                              Navigator.of(context).pop();
+                                                                              Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(builder: (context) => SplashScreen()),
+                                                                              );
+                                                                            },
+                                                                          )
+                                                                        ]
+                                                                    );
+                                                                  }
+                                                              )
+                                                            });
+
                                                             timeLeftTimer = Timer.periodic(Duration(seconds: 1), (t) {
                                                               timeLeft--;
                                                               _notifier.value = timeLeft;
                                                             });
-                                                            print(((startTime + (60 * 60 * 8)) - currentTime).toString());
+                                                            timeUntilBanTimer = Timer.periodic(Duration(seconds: 1), (t) {
+                                                              timeUntilBan--;
+                                                              _banNotifier.value = timeUntilBan;
+                                                            });
                                                           };
                                                           return Column(
                                                             children: [
@@ -410,7 +417,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                                               ),
                                                                               child:
                                                                               Container(
-                                                                                color: Colors.black87,
+                                                                                color: Color(s_raisinBlack),
 
                                                                                 child: Padding(
                                                                                     padding: EdgeInsets.all(8),
@@ -425,14 +432,32 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                                                           if( tL >= 0 && tL > (60 * 60 * 2)){
                                                                                             return countdownText(format(Duration(seconds: tL)));
                                                                                           } else if ( tL >= 0 ){
-                                                                                            return countdownTextOrange(format(Duration(seconds: tL)));
+                                                                                            return countdownTextYellow(format(Duration(seconds: tL)));
                                                                                           }
                                                                                           else {
                                                                                             return Column(
                                                                                               children: [
                                                                                                 countdownTextRed(format(Duration(seconds: 0))),
-                                                                                                SizedBox(height: buttonSpacing),
                                                                                                 rideScreenTextRedSmall("LATE"),
+                                                                                                ValueListenableBuilder(valueListenable: _banNotifier, builder: (BuildContext context, int tL, child){
+                                                                                                  format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+                                                                                                  if (tL <= 0){
+                                                                                                    return Column(
+                                                                                                      children: [
+                                                                                                        SizedBox(height: buttonSpacing),
+                                                                                                        countdownTextRedSmallest("BANNED IN " + format(Duration(seconds: 0))),
+                                                                                                      ],
+                                                                                                    );
+                                                                                                  }
+                                                                                                  else if( tL <= (60 * 60 * 16) ){
+                                                                                                    return Column(
+                                                                                                      children: [
+                                                                                                        SizedBox(height: buttonSpacing),
+                                                                                                        countdownTextRedSmallest("BANNED IN " + format(Duration(seconds: tL))),
+                                                                                                      ],
+                                                                                                    );
+                                                                                                  }  else return Center();
+                                                                                                })
                                                                                               ],
                                                                                             );
                                                                                           }
@@ -524,11 +549,33 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     );
   }
 
+  Widget countdownTextRedSmallest(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Color(s_declineRed),
+      size: s_fontSizeSmall,
+      font: s_font_NovaMono,
+      weight: FontWeight.bold,
+    );
+  }
+
   Widget countdownTextOrange(String text) {
     return FormattedText(
       text: text,
       align: TextAlign.center,
       color: Color(s_cadmiumOrange),
+      size: s_fontSizeMedLarge,
+      font: s_font_NovaMono,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget countdownTextYellow(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      color: Color(s_mustard),
       size: s_fontSizeMedLarge,
       font: s_font_NovaMono,
       weight: FontWeight.bold,

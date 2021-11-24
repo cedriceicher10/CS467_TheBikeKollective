@@ -24,6 +24,7 @@ const int s_grayGreen = 0xFF89A894;
 const int s_darkGray = 0xFF333333;
 const int s_raisinBlack = 0xFF2A2D34;
 const int s_jungleGreen_faded = 0xEEbac261;
+const int s_mustard = 0xFFFFD700;
 const int s_declineRed = 0xFFf2301b;
 const int s_fadedDeclineRed = 0xCCbe5b50;
 const int s_periwinkleBlue = 0xFF4aa8ff;

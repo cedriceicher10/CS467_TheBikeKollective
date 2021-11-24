@@ -45,46 +45,54 @@ class _HomeBodyState extends State<HomeBody> {
                   userRiding = isRidingData;
                 }
                 if (userRiding != 'none') {
-                  return Center(
-                    child:
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-
-                          Padding(
-                            padding: EdgeInsets.all(20),
-                            child:  Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(width: 3, color: Color(s_jungleGreen)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(s_disabledGray),
-                                    spreadRadius: 2,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 3),
-                                  )
-                                ],
-                              ),
-                            child: Container(
-                              color: Colors.white,
-                              child:
-                              Padding(
-                                padding: EdgeInsets.all(24),
-                                child: Column(
-                                  children: [
-                                    rideAlertText("You currently have a ride in progress."),
-                                    SizedBox(height: buttonSpacing*3),
-                                    goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
-                                  ],
-                                )
-                              )
-                            )
-                          ),
+                  return Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage("assets/images/elena-m.jpg"),
+                          fit: BoxFit.cover,
                         ),
+                      ),
+                    child: Center(
+                        child:
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+
+                              Padding(
+                                padding: EdgeInsets.all(20),
+                                child:  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 3, color: Color(s_jungleGreen)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(s_disabledGray),
+                                          spreadRadius: 2,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ],
+                                    ),
+                                    child: Container(
+                                        color: Colors.white,
+                                        child:
+                                        Padding(
+                                            padding: EdgeInsets.all(24),
+                                            child: Column(
+                                              children: [
+                                                rideAlertText("You currently have a ride in progress."),
+                                                SizedBox(height: buttonSpacing*3),
+                                                goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
+                                              ],
+                                            )
+                                        )
+                                    )
+                                ),
+                              ),
 
 
 
-                      ]
+                            ]
+                        )
                     )
                   );
 
