@@ -103,7 +103,13 @@ class _HomeBodyState extends State<HomeBody> {
                   return ListViewBody();
                 }
               }
-              return Center();
+              return Container(
+                  decoration: BoxDecoration(
+                  image: DecorationImage(
+                  image: AssetImage("assets/images/elena-m.jpg"),
+                  fit: BoxFit.cover,
+              ),
+              ));
             }
 
         );
