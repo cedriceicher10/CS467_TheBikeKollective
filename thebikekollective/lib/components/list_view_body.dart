@@ -117,6 +117,21 @@ class _ListViewBodyState extends State<ListViewBody> {
     userLat = locationUser.latitude!;
     userLon = locationUser.longitude!;
     print('User Location: ${locationUser.latitude}, ${locationUser.longitude}');
+    // This allows the user location to update in real time
+    locationService.onLocationChanged
+        .listen((LocationData currentLocation) async {
+      locationUser = await locationService.getLocation();
+      var userLatTemp = locationUser.latitude!;
+      var userLonTemp = locationUser.longitude!;
+      if ((userLatTemp != userLat) && (userLonTemp != userLon)) {
+        if (this.mounted) {
+          setState(() {
+            userLat = userLatTemp;
+            userLon = userLonTemp;
+          });
+        }
+      }
+    });
     return locationUser;
   }
 
