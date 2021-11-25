@@ -10,6 +10,7 @@ import '../utils/haversine_calculator.dart';
 import '../utils/multi_select_alert_dialog.dart';
 
 const GEOFENCE_DISTANCE = 0.1; // mi
+const GRAY_BIKE_DISTANCE = 5.0; // mi
 
 class PostTile {
   String id;
@@ -25,6 +26,7 @@ class PostTile {
   List<dynamic> tags;
   double distanceToUser;
   double rating;
+  bool gray;
   PostTile(
       {required this.id,
       required this.name,
@@ -38,7 +40,8 @@ class PostTile {
       required this.checkedOut,
       required this.tags,
       required this.distanceToUser,
-      required this.rating});
+      required this.rating,
+      required this.gray});
 }
 
 class ListViewBody extends StatefulWidget {
@@ -114,6 +117,21 @@ class _ListViewBodyState extends State<ListViewBody> {
     userLat = locationUser.latitude!;
     userLon = locationUser.longitude!;
     print('User Location: ${locationUser.latitude}, ${locationUser.longitude}');
+    // This allows the user location to update in real time
+    locationService.onLocationChanged
+        .listen((LocationData currentLocation) async {
+      locationUser = await locationService.getLocation();
+      var userLatTemp = locationUser.latitude!;
+      var userLonTemp = locationUser.longitude!;
+      if ((userLatTemp != userLat) && (userLonTemp != userLon)) {
+        if (this.mounted) {
+          setState(() {
+            userLat = userLatTemp;
+            userLon = userLonTemp;
+          });
+        }
+      }
+    });
     return locationUser;
   }
 
@@ -233,54 +251,11 @@ class _ListViewBodyState extends State<ListViewBody> {
                                         itemCount: posts.length,
                                         itemBuilder: (context, index) {
                                           var post = posts[index];
-                                          return Card(
-                                              elevation: 2,
-                                              shape: RoundedRectangleBorder(
-                                                  side: BorderSide(
-                                                      color: Color(s_grayGreen),
-                                                      width: 1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15)),
-                                              child: ListTile(
-                                                  isThreeLine: true,
-                                                  title: entryName(
-                                                      '${post.name} (${post.distanceToUser.toStringAsFixed(2)} mi)'),
-                                                  subtitle: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        entryDescription(
-                                                            post.description),
-                                                        postSecondLineText(
-                                                            'Condition: ${post.condition} | Rating: ${post.rating.toStringAsFixed(1)}'),
-                                                        postThirdLineText(
-                                                            '${post.street}'),
-                                                      ]),
-                                                  trailing: Image(
-                                                      image: NetworkImage(
-                                                          post.imageURL)),
-                                                  onTap: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        // Take note of chosen bike for Ride screen
-                                                        bikeId = post.id;
-                                                        return AlertDialog(
-                                                          title: alertTitle(
-                                                              "Start Ride"),
-                                                          content: alertText(
-                                                              "Would you like to start a ride with this bike?"),
-                                                          actions: [
-                                                            reportStolenButton(),
-                                                            startRideButton(),
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  }));
+                                          if (post.gray) {
+                                            return grayCard(post);
+                                          } else {
+                                            return rideableCard(post);
+                                          }
                                         },
                                       ));
                                     }
@@ -303,6 +278,66 @@ class _ListViewBodyState extends State<ListViewBody> {
         });
   }
 
+  Card rideableCard(PostTile post) {
+    return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+            side: BorderSide(color: Color(s_grayGreen), width: 1),
+            borderRadius: BorderRadius.circular(15)),
+        child: ListTile(
+            isThreeLine: true,
+            title: entryName(
+                '${post.name} (${post.distanceToUser.toStringAsFixed(2)} mi)'),
+            subtitle:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              entryDescription(post.description),
+              postSecondLineText(
+                  'Condition: ${post.condition} | Rating: ${post.rating.toStringAsFixed(1)}'),
+              postThirdLineText('${post.street}'),
+            ]),
+            trailing: Image(image: NetworkImage(post.imageURL)),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  // Take note of chosen bike for Ride screen
+                  bikeId = post.id;
+                  return AlertDialog(
+                    title: alertTitle("Start Ride"),
+                    content: alertText(
+                        "Would you like to start a ride with this bike?"),
+                    actions: [
+                      reportStolenButton(),
+                      startRideButton(),
+                    ],
+                  );
+                },
+              );
+            }));
+  }
+
+  Card grayCard(PostTile post) {
+    return Card(
+        elevation: 2,
+        color: Color(s_disabledGray),
+        shape: RoundedRectangleBorder(
+            side: BorderSide(color: Color(s_grayGreen), width: 1),
+            borderRadius: BorderRadius.circular(15)),
+        child: ListTile(
+            isThreeLine: true,
+            title: entryName(
+                '${post.name} (${post.distanceToUser.toStringAsFixed(2)} mi)'),
+            subtitle:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              entryDescription(post.description),
+              postSecondLineText(
+                  'Condition: ${post.condition} | Rating: ${post.rating.toStringAsFixed(1)}'),
+              postThirdLineText('${post.street}'),
+            ]),
+            trailing: Image(image: NetworkImage(post.imageURL)),
+            onTap: () {}));
+  }
+
   List<PostTile> postBuilder(
       AsyncSnapshot<QuerySnapshot<Object?>> snapshotBikes,
       AsyncSnapshot<QuerySnapshot<Object?>> snapshotRatings) {
@@ -322,7 +357,8 @@ class _ListViewBodyState extends State<ListViewBody> {
           checkedOut: snapshotBikes.data!.docs[index]['checkedOut'],
           tags: snapshotBikes.data!.docs[index]['Tags'],
           distanceToUser: 0.0,
-          rating: 0.0);
+          rating: 0.0,
+          gray: false);
       // Add ratings (average from rides table)
       double sum = 0;
       double count = 0;
@@ -406,6 +442,11 @@ class _ListViewBodyState extends State<ListViewBody> {
       // Cut off bikes that are more than GEOFENCE_DISTANCE or Checked-Out (in a current ride)
       if ((bike.distanceToUser < GEOFENCE_DISTANCE) &&
           (bike.condition != 'Stolen')) {
+        geoFencedPosts.add(bike);
+        // Gray bikes are those to bolster the bike list but are unavailable to check out
+      } else if ((bike.distanceToUser < GRAY_BIKE_DISTANCE) &&
+          (bike.condition != 'Stolen')) {
+        bike.gray = true;
         geoFencedPosts.add(bike);
       }
     });
@@ -669,7 +710,8 @@ class _ListViewBodyState extends State<ListViewBody> {
   Widget showBikeText() {
     return Center(
         child: FormattedText(
-            text: 'Showing eligible bikes within $GEOFENCE_DISTANCE mi',
+            text:
+                'Showing eligible bikes (non-gray) within $GEOFENCE_DISTANCE mi',
             size: s_fontSizeSmall,
             color: Color(s_grayGreen),
             font: s_font_BonaNova,

@@ -58,8 +58,10 @@ class _CreateMapBody extends State<CreateMapBody>
   }
 
   void getBikeSnapshot() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('bikes').where('checkedOut', isEqualTo: false).get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('bikes')
+        .where('checkedOut', isEqualTo: false)
+        .get();
 
     print('DATABASE QUERIED');
 
@@ -89,8 +91,9 @@ class _CreateMapBody extends State<CreateMapBody>
 
         final lat = locationData?.latitude ?? 0.0;
         final long = locationData?.longitude ?? 0.0;
-        if ( doc['Condition'] != 'Stolen'){
-          if (haversineCalculator(lat, long, doc['Latitude'], doc['Longitude']) <
+        if (doc['Condition'] != 'Stolen') {
+          if (haversineCalculator(
+                  lat, long, doc['Latitude'], doc['Longitude']) <
               HAVERSINE_CUTOFF_RANGE) {
             bikeMarkers.add(
                 new BikeMarker(bike: bike, markerColor: ActiveMarkerColor));
@@ -99,7 +102,6 @@ class _CreateMapBody extends State<CreateMapBody>
                 new BikeMarker(bike: bike, markerColor: DisabledMarkerColor));
           }
         }
-
       });
     }
 
@@ -110,8 +112,11 @@ class _CreateMapBody extends State<CreateMapBody>
     var oldLocationData = locationData;
     locationData = await locationService.getLocation();
 
+    // Merge conflicts: if ((locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001) {
     if (oldLocationData != null && (locationData!.latitude! - oldLocationData.latitude!).abs() > 0.0001) {
-      setState(() {});
+      if (this.mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -494,6 +499,22 @@ class BikeMarkerPopup extends StatelessWidget {
         style: ElevatedButton.styleFrom(
             primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
   }
+
+  // From merge conflicts
+ // return ElevatedButton(
+ //     onPressed: () {
+ //       if (inRange) {
+ //         Navigator.of(context).pushNamedAndRemoveUntil(
+ //             'rideScreen', (_) => false,
+ //             arguments: id);
+ //       }
+//        return;
+ //     },
+//      child: rideButtonText(text),
+ //     style: ElevatedButton.styleFrom(
+ //         primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
+//}
+
 
   Widget rideButtonText(String text) {
     return FormattedText(
