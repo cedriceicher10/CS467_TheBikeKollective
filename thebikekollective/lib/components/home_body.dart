@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:practice1/components/styles.dart';
 import 'list_view_body.dart';
 import 'create_map_body.dart';
-import '../utils/late_bike_check.dart';
-import 'late_notice.dart';
 import '../utils/user_is_riding_check.dart';
 import '../screens/ride_screen.dart';
 import '../screens/home_screen.dart';
@@ -34,54 +32,102 @@ class _HomeBodyState extends State<HomeBody> {
   @override
 
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: LateBikeCheck(),
-        builder: (context, snapshot) {
-          String? returnData;
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              returnData = snapshot.data;
-              lateType = returnData;
-            }
-            if (lateType == 'banned'){
-              return Center(
-                child: bannedText("You are banned from the Kollective for keeping a "
-                    "bike over 24 hours! Get lost!")
-              );
-            }
-            else if (lateType == 'warning' && widget.showWarning != false){
-              return LateNotice();
-            }
-            else return FutureBuilder<String>(
-                future: UserIsRiding(),
+      return FutureBuilder<String>(
+            future: UserIsRiding(),
 
-                builder: (context, snapshot) {
-                  String? isRidingData;
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasData) {
-                      isRidingData = snapshot.data;
-                      userRiding = isRidingData;
-                    }
-                    if (userRiding != 'none') {
-                      return Center(
-                        child: goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
-                      );
-
-                    }
-                    else if (widget.map) {
-                      return CreateMapBody();
-                    } else {
-                      return ListViewBody();
-                    }
-                  }
-                  return Center();
+            builder: (context, snapshot) {
+              String? isRidingData;
+              Widget child;
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  isRidingData = snapshot.data;
+                  userRiding = isRidingData;
                 }
+                if (userRiding != 'none') {
+                  child= Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage("assets/images/elena-m.jpg"),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    child: Center(
+                        child:
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
 
-            );
-          }
-          return Center();
-        });
-    }
+                              Padding(
+                                padding: EdgeInsets.all(20),
+                                child:  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 3, color: Color(s_jungleGreen)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(s_disabledGray),
+                                          spreadRadius: 2,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ],
+                                    ),
+                                    child: Container(
+                                        color: Colors.white,
+                                        child:
+                                        Padding(
+                                            padding: EdgeInsets.all(24),
+                                            child: Column(
+                                              children: [
+                                                rideAlertText("You currently have a ride in progress."),
+                                                SizedBox(height: buttonSpacing*3),
+                                                goToRideButton(context, userRiding, "Go To Ride", buttonWidth, buttonHeight)
+                                              ],
+                                            )
+                                        )
+                                    )
+                                ),
+                              ),
+
+
+
+                            ]
+                        )
+                    )
+                  );
+
+                }
+                else if (widget.map) {
+                  child= CreateMapBody();
+                } else {
+                  child= ListViewBody();
+                }
+              }
+              else child= Container(
+                  decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/images/elena-m.jpg"),
+                    fit: BoxFit.cover,
+                    ),
+                  ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      loadingText("Loading..."),
+                      SizedBox(height: buttonSpacing*3),
+                      CircularProgressIndicator(color: Colors.white70)
+                    ],
+                  )
+                )
+              );
+              return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 500),
+                  child: child,
+                  switchInCurve: Curves.easeInOutSine,);
+            }
+
+        );
+      }
 
   Widget goToRideButton(BuildContext context, rideId, String text, double buttonWidth,
       double buttonHeight) {
@@ -102,6 +148,26 @@ class _HomeBodyState extends State<HomeBody> {
       color: Colors.white,
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
+    );
+  }
+
+  Widget loadingText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeExtraLarge,
+      color: Colors.white,
+      font: s_font_AmaticSC,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget rideAlertText(String text) {
+    return FormattedText(
+      text: text,
+      align: TextAlign.center,
+      size: s_fontSizeLarge,
+      font: s_font_IBMPlexSans,
+      color: Colors.black,
     );
   }
 

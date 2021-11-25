@@ -30,44 +30,75 @@ class _SplashBodyState extends State<SplashBody> {
     final double buttonWidth = 260;
     final double buttonSpacing = 8;
 
-    return Center(
-        child: Column(children: [
-      SizedBox(height: imageHeadSpace),
-      FractionallySizedBox(
-          widthFactor: imageSizeFactor(context),
-          child: Container(
-              decoration: BoxDecoration(
-                  border: Border.all(width: 3, color: Color(s_jungleGreen)),
-                  borderRadius: BorderRadius.circular(5)),
-              child: Image(
-                image: AssetImage('assets/images/bike_clipart.jpg'),
-                loadingBuilder: (BuildContext context, Widget child,
-                    ImageChunkEvent? loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return Center(
-                      child: CircularProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(Color(s_jungleGreen)),
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ));
-                },
-              ))),
-      SizedBox(height: buttonSpacing * 2),
-      loginButton(context, 'Login', buttonWidth, buttonHeight),
-      SizedBox(height: buttonSpacing),
-      createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
-      SizedBox(height: buttonSpacing),
-      googleAuthButton(
-          context, 'Sign in with Google', buttonWidth, buttonHeight),
-      SizedBox(height: buttonSpacing),
-      testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
-      SizedBox(height: buttonSpacing)
-    ]));
+    return
+      Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/elena-m.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child:       Center(
+            child:
+            Container(
+                decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(s_disabledGray),
+                        spreadRadius: 2,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      )
+                    ],
+                    border: Border.all(width: 3, color: Color(s_jungleGreen)),
+                    borderRadius: BorderRadius.circular(5)),
+
+                child:
+                Container(
+                    color: Colors.white,
+                    child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+
+                          SizedBox(height: buttonSpacing*2),
+                          FractionallySizedBox(
+                              widthFactor: imageSizeFactor(context),
+                              child: Container(
+
+                                  child: Image(
+                                    image: AssetImage('assets/images/bike_clipart.jpg'),
+                                    loadingBuilder: (BuildContext context, Widget child,
+                                        ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) {
+                                        return child;
+                                      }
+                                      return Center(
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                            AlwaysStoppedAnimation<Color>(Color(s_jungleGreen)),
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                                : null,
+                                          ));
+                                    },
+                                  ))),
+                          SizedBox(height: buttonSpacing * 2),
+                          loginButton(context, 'Login', buttonWidth, buttonHeight),
+                          SizedBox(height: buttonSpacing),
+                          createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
+                          SizedBox(height: buttonSpacing),
+                          googleAuthButton(
+                              context, 'Sign in with Google', buttonWidth, buttonHeight),
+                          SizedBox(height: buttonSpacing * 2),
+                          testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
+                          SizedBox(height: buttonSpacing * 2),
+
+                        ])
+                )
+            )));
+
   }
 
   Widget twoColumn(BuildContext context) {
@@ -219,8 +250,8 @@ class _SplashBodyState extends State<SplashBody> {
       text: text,
       size: s_fontSizeSmall,
       color: Colors.white,
-      font: s_font_AmaticSC,
-      weight: FontWeight.bold,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.w500,
     );
   }
 }

@@ -110,7 +110,7 @@ class _CreateMapBody extends State<CreateMapBody>
     var oldLocationData = locationData;
     locationData = await locationService.getLocation();
 
-    if ((locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001) {
+    if (oldLocationData != null && (locationData!.latitude! - oldLocationData.latitude!).abs() > 0.0001) {
       setState(() {});
     }
   }
@@ -356,134 +356,197 @@ class BikeMarkerPopup extends StatelessWidget {
       return landscapeLayout(context, bike, inRange);
     }
   }
-}
-
-Container portraitLayout(BuildContext context, bike, inRange) {
-  return Container(
-    width: double.infinity,
-    child: Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+  Container portraitLayout(BuildContext context, bike, inRange) {
+    return Container(
+      width: double.infinity,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.all(8),
+                child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Column(children: <Widget>[
+                        Image(
+                            image: NetworkImage(bike.imagePath),
+                            width: 150 * imageSizeFactor(context),
+                            height: 150 * imageSizeFactor(context)),
+                      ]),
+                      Container(
+                        width: 150,
+                        child: Column(children: <Widget>[
+                              descriptionTitleText(bike.name),
+                              SizedBox(height: 8),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 60,
+                                child: SingleChildScrollView(
+                                  child: descriptionText('${bike.description}'),
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Center(
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:[
+                                      descriptionTextItalic('Condition: '),
+                                      descriptionText('${bike.condition}')
+                                    ]
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              rideButton(context, inRange, 100, 25, bike.id)
+                            ])
+                        )
+                    ]))
+          ],
+        ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Padding(
-              padding: EdgeInsets.all(8),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Column(children: <Widget>[
+    );
+  }
+
+  Container landscapeLayout(BuildContext context, bike, inRange) {
+    return Container(
+      alignment: Alignment.topLeft,
+      height: double.infinity,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
+                child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
                       Image(
                           image: NetworkImage(bike.imagePath),
-                          width: 150 * imageSizeFactor(context),
-                          height: 150 * imageSizeFactor(context)),
-                    ]),
-                    Column(children: <Widget>[
-                      Text(bike.name,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end),
-                      SizedBox(height: 8),
-                      Text('${bike.description}'),
-                      SizedBox(height: 8),
-                      Text('Condition: ${bike.condition}'),
-                      SizedBox(height: 8),
-                      rideButton(context, inRange, 100, 25, bike.id)
-                    ])
-                  ]))
-        ],
-      ),
-    ),
-  );
-}
+                          width: 100 * imageSizeFactor(context),
+                          height: 100 * imageSizeFactor(context)),
+                      Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                        descriptionTitleText(bike.name),
+                            SizedBox(height: 8),
+                        Container(
+                          width: 200,
+                          height: 40,
+                          child: SingleChildScrollView(
+                            child: Center(
+                              child: descriptionText('${bike.description}'),
+                            )
 
-Container landscapeLayout(BuildContext context, bike, inRange) {
-  return Container(
-    alignment: Alignment.topLeft,
-    height: double.infinity,
-    child: Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+                          )
+                        ),
+
+
+
+                        SizedBox(height: 8),
+                        Row(
+                          children:[
+                            descriptionTextItalic('Condition: '),
+                            descriptionText('${bike.condition}')
+                          ]
+                        ),
+
+                        SizedBox(height: 8),
+                        rideButton(context, inRange, 100, 25, bike.id)
+                      ])
+                    ]))
+          ],
+        ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-              padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image(
-                        image: NetworkImage(bike.imagePath),
-                        width: 150 * imageSizeFactor(context),
-                        height: 150 * imageSizeFactor(context)),
-                    Column(children: <Widget>[
-                      Text(bike.name,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end),
-                      SizedBox(height: 8),
-                      Text('${bike.description}'),
-                      SizedBox(height: 8),
-                      Text('Condition: ${bike.condition}'),
-                      SizedBox(height: 8),
-                      rideButton(context, inRange, 100, 25, bike.id)
-                    ])
-                  ]))
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 
 //This will become the Start Ride button
-Widget rideButton(BuildContext context, bool inRange, double buttonWidth,
-    double buttonHeight, String id) {
-  var text = '';
-  var color;
+  Widget rideButton(BuildContext context, bool inRange, double buttonWidth,
+      double buttonHeight, String id) {
+    var text = '';
+    var color;
 
-  if (inRange) {
-    text = 'Ride Me!';
-    color = Color(s_jungleGreen);
-  } else {
-    text = 'Too Far';
-    color = Color(s_disabledGray);
+    if (inRange) {
+      text = 'Ride Me!';
+      color = Color(s_jungleGreen);
+    } else {
+      text = 'Too Far';
+      color = Color(s_disabledGray);
+    }
+    return ElevatedButton(
+        onPressed: () {
+          if (inRange) {
+            Navigator.of(context).pushNamedAndRemoveUntil('rideScreen', (_) => false, arguments: id);
+          }
+          return;
+        },
+        child: rideButtonText(text),
+        style: ElevatedButton.styleFrom(
+            primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
   }
-  return ElevatedButton(
-      onPressed: () {
-        if (inRange) {
-          Navigator.of(context).pushNamedAndRemoveUntil('rideScreen', (_) => false, arguments: id);
-        }
-        return;
-      },
-      child: rideButtonText(text),
-      style: ElevatedButton.styleFrom(
-          primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
+
+  Widget rideButtonText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Colors.white,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.w500,
+    );
+  }
+
+  Widget descriptionTextBold(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Colors.black,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget descriptionTextItalic(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Colors.black,
+      font: s_font_IBMPlexSans,
+      style: FontStyle.italic,
+    );
+  }
+
+  Widget descriptionTitleText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Colors.black,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.bold,
+      align: TextAlign.end
+    );
+  }
+
+  Widget descriptionText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
+      color: Colors.black,
+      font: s_font_IBMPlexSans,
+    );
+  }
 }
 
-/*
-Widget rideButton(BuildContext context, String text,
-    double buttonWidth, double buttonHeight) {
-  return ElevatedButton(
-      onPressed: () {
-        return;
-      },
-      child: rideButtonText(text),
-      style: ElevatedButton.styleFrom(
-          primary: Color(s_jungleGreen),
-          fixedSize: Size(buttonWidth, buttonHeight)));
-}
-*/
 
-Widget rideButtonText(String text) {
-  return FormattedText(
-    text: text,
-    size: s_fontSizeSmall,
-    color: Colors.white,
-    weight: FontWeight.bold,
-  );
-}
 
 double imageSizeFactor(BuildContext context) {
   if (MediaQuery.of(context).orientation == Orientation.portrait) {
