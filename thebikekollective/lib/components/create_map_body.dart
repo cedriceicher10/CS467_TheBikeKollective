@@ -110,7 +110,7 @@ class _CreateMapBody extends State<CreateMapBody>
     var oldLocationData = locationData;
     locationData = await locationService.getLocation();
 
-    if ((locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001) {
+    if (oldLocationData != null && (locationData!.latitude! - oldLocationData.latitude!).abs() > 0.0001) {
       setState(() {});
     }
   }
@@ -370,6 +370,7 @@ class BikeMarkerPopup extends StatelessWidget {
             Padding(
                 padding: EdgeInsets.all(8),
                 child: Row(
+                    mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       Column(children: <Widget>[
@@ -378,20 +379,32 @@ class BikeMarkerPopup extends StatelessWidget {
                             width: 150 * imageSizeFactor(context),
                             height: 150 * imageSizeFactor(context)),
                       ]),
-                      Column(children: <Widget>[
-                        descriptionTitleText(bike.name),
-                        SizedBox(height: 8),
-                        descriptionText('${bike.description}'),
-                        SizedBox(height: 8),
-                        Row(
-                            children:[
-                              descriptionTextItalic('Condition: '),
-                              descriptionText('${bike.condition}')
-                            ]
-                        ),
-                        SizedBox(height: 8),
-                        rideButton(context, inRange, 100, 25, bike.id)
-                      ])
+                      Container(
+                        width: 150,
+                        child: Column(children: <Widget>[
+                              descriptionTitleText(bike.name),
+                              SizedBox(height: 8),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 60,
+                                child: SingleChildScrollView(
+                                  child: descriptionText('${bike.description}'),
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Center(
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:[
+                                      descriptionTextItalic('Condition: '),
+                                      descriptionText('${bike.condition}')
+                                    ]
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              rideButton(context, inRange, 100, 25, bike.id)
+                            ])
+                        )
                     ]))
           ],
         ),
@@ -414,16 +427,31 @@ class BikeMarkerPopup extends StatelessWidget {
             Padding(
                 padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
                 child: Column(
+                    mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       Image(
                           image: NetworkImage(bike.imagePath),
-                          width: 150 * imageSizeFactor(context),
-                          height: 150 * imageSizeFactor(context)),
-                      Column(children: <Widget>[
+                          width: 100 * imageSizeFactor(context),
+                          height: 100 * imageSizeFactor(context)),
+                      Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
                         descriptionTitleText(bike.name),
-                        SizedBox(height: 8),
-                        descriptionText('${bike.description}'),
+                            SizedBox(height: 8),
+                        Container(
+                          width: 200,
+                          height: 40,
+                          child: SingleChildScrollView(
+                            child: Center(
+                              child: descriptionText('${bike.description}'),
+                            )
+
+                          )
+                        ),
+
+
+
                         SizedBox(height: 8),
                         Row(
                           children:[

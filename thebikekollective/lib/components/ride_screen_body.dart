@@ -8,6 +8,7 @@ import 'package:location/location.dart';
 import 'package:practice1/components/formatted_text.dart';
 import '../components/styles.dart';
 import '../screens/splash_screen.dart';
+import '../utils/preload_image.dart';
 
 const WARNING_ALERT_TIME = 20; // Official: 8 hr, Testing: 10 sec
 const MAX_ALERT_TIME = 40; // Official: 24 hr, Testing: 30 sec
@@ -71,6 +72,8 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     twentyFourHourTimer?.cancel();
     timeLeftTimer?.cancel();
     timeUntilBanTimer?.cancel();
+    _notifier.dispose();
+    _banNotifier.dispose();
 
     super.dispose();
   }
@@ -100,6 +103,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     if (req.exists) {
       Map<String, dynamic>? data = req.data();
       var c = data?['imageURL'];
+      // await loadImage(NetworkImage(c));
       return c;
     } else {
       return '';
@@ -156,7 +160,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
     final double buttonWidth = 175;
     final double buttonSpacing = 10;
 
-    final bikeId = ModalRoute.of(context)!.settings.arguments;
+    final bikeId = ModalRoute.of(context)!.settings.arguments.toString();
 
     final riderName = username;
     var comboNum;
@@ -218,26 +222,6 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                           widthFactor: imageSizeFactor(context),
                           child: Column(children: [
                             Container(
-                              // Don't delete; may come back to this.
-/*                                    child: Image(
-                                      height: 200,
-                                      image: NetworkImage(imageURL),
-                                      loadingBuilder: (BuildContext context, Widget child,
-                                          ImageChunkEvent? loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return Center(
-                                            child: CircularProgressIndicator(
-                                              valueColor:
-                                              AlwaysStoppedAnimation<Color>(Color(s_jungleGreen)),
-                                              value: loadingProgress.expectedTotalBytes != null
-                                                  ? loadingProgress.cumulativeBytesLoaded /
-                                                  loadingProgress.expectedTotalBytes!
-                                                  : null,
-                                            ));
-                                      },
-                                    )*/
                               child: Column(children: [
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -246,6 +230,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                           future:
                                               startRide(bikeId, widget.newRide),
                                           builder: (context, snapshot) {
+                                            Widget child;
                                             String? returnData;
                                             if (snapshot.connectionState ==
                                                 ConnectionState.done) {
@@ -264,147 +249,26 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                         currentTime)
                                                     .toInt();
                                                 _notifier.value = timeLeft;
-                                                print(currentTime);
                                                 if (timeLeft > -(TIME_TO_BAN)) {
-                                                  eightHourTimer = Timer(
-                                                      Duration(
-                                                          seconds: ((startTime +
-                                                                      (WARNING_ALERT_TIME)) -
-                                                                  currentTime)
-                                                              .toInt()),
-                                                      () => {
-                                                            showDialog(
-                                                                context:
-                                                                    context,
-                                                                barrierDismissible:
-                                                                    false,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                      title: Text(
-                                                                          "You're late!"),
-                                                                      content:
-                                                                          SingleChildScrollView(
-                                                                              child: ListBody(children: <
-                                                                                  Widget>[
-                                                                        Text(
-                                                                            "You've kept the bike for more than "
-                                                                            "8 hours and are now late to return it. "
-                                                                            "If you keep the bike longer than 24 "
-                                                                            "hours, you will be banned from the Kollective.")
-                                                                      ])),
-                                                                      actions: <
-                                                                          Widget>[
-                                                                        TextButton(
-                                                                          child:
-                                                                              Text('Got it'),
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.of(context).pop();
-                                                                          },
-                                                                        )
-                                                                      ]);
-                                                                })
-                                                          });
+                                                  eightHourTimer = makeEightHourTimer(context, currentTime);
                                                 }
                                                 timeUntilBan = ((startTime +
                                                             (MAX_ALERT_TIME)) -
                                                         currentTime)
                                                     .toInt();
-                                                twentyFourHourTimer = Timer(
-                                                    Duration(
-                                                        seconds: ((startTime +
-                                                                    (MAX_ALERT_TIME)) -
-                                                                currentTime)
-                                                            .toInt()),
-                                                    () => {
-                                                          showDialog(
-                                                              context: context,
-                                                              barrierDismissible:
-                                                                  false,
-                                                              builder:
-                                                                  (BuildContext
-                                                                      context) {
-                                                                return AlertDialog(
-                                                                    title: Text(
-                                                                        "You're banned!"),
-                                                                    content:
-                                                                        SingleChildScrollView(
-                                                                            child: ListBody(children: <
-                                                                                Widget>[
-                                                                      Text(
-                                                                          "You've kept the bike for more than "
-                                                                          "24 hours and are now banned from The Kollective. "
-                                                                          "Get lost!")
-                                                                    ])),
-                                                                    actions: <
-                                                                        Widget>[
-                                                                      TextButton(
-                                                                        child: Text(
-                                                                            'Well, that sucks'),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          final q1 = await FirebaseFirestore
-                                                                              .instance
-                                                                              .collection('users')
-                                                                              .where('username', isEqualTo: username)
-                                                                              .get();
-                                                                          final userId = q1
-                                                                              .docs[0]
-                                                                              .id;
-                                                                          final q2 = await FirebaseFirestore
-                                                                              .instance
-                                                                              .collection(
-                                                                                  'users')
-                                                                              .doc(
-                                                                                  userId)
-                                                                              .update({
-                                                                            'lockedOut':
-                                                                                true
-                                                                          });
-                                                                          await Authentication.signOut(
-                                                                              context: context);
-                                                                          SharedPreferences
-                                                                              preferences =
-                                                                              await SharedPreferences.getInstance();
-                                                                          preferences.setBool(
-                                                                              'loggedIn',
-                                                                              false);
-                                                                          preferences.setString(
-                                                                              'username',
-                                                                              'no username');
-                                                                          print(
-                                                                              'SIGNED OUT');
-                                                                          Navigator.of(context)
-                                                                              .pop();
-                                                                          Navigator
-                                                                              .push(
-                                                                            context,
-                                                                            MaterialPageRoute(builder: (context) => SplashScreen()),
-                                                                          );
-                                                                        },
-                                                                      )
-                                                                    ]);
-                                                              })
-                                                        });
+                                                twentyFourHourTimer = makeTwentyFourHourTimer(context,
+                                                    currentTime,
+                                                    bikeId);
 
-                                                timeLeftTimer = Timer.periodic(
-                                                    Duration(seconds: 1), (t) {
-                                                  timeLeft--;
-                                                  _notifier.value = timeLeft;
-                                                });
-                                                timeUntilBanTimer =
-                                                    Timer.periodic(
-                                                        Duration(seconds: 1),
-                                                        (t) {
-                                                  timeUntilBan--;
-                                                  _banNotifier.value =
-                                                      timeUntilBan;
-                                                });
+                                                timeLeftTimer = makeCountdownTicker(context,
+                                                    _notifier,
+                                                    timeLeft);
+                                                timeUntilBanTimer = makeCountdownTicker(context,
+                                                    _banNotifier,
+                                                    timeUntilBan);
                                               }
                                               ;
-                                              return Column(
+                                              child = Column(
                                                 children: [
                                                   Container(
                                                     height: 300,
@@ -476,47 +340,7 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                                         child: Column(
                                                                           children: [
                                                                             countdownTextSmall("TIME LEFT"),
-                                                                            ValueListenableBuilder(
-                                                                                valueListenable: _notifier,
-                                                                                builder: (BuildContext context, int tL, child) {
-                                                                                  // Format function from Frank Treacy's answer to 'Formatting a Duration like HH:mm:ss'
-                                                                                  // on StackOverflow
-                                                                                  // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
-                                                                                  format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
-                                                                                  if (tL >= 0 && tL > (60 * 60 * 2)) {
-                                                                                    return countdownText(format(Duration(seconds: tL)));
-                                                                                  } else if (tL >= 0) {
-                                                                                    return countdownTextYellow(format(Duration(seconds: tL)));
-                                                                                  } else {
-                                                                                    return Column(
-                                                                                      children: [
-                                                                                        countdownTextRed(format(Duration(seconds: 0))),
-                                                                                        rideScreenTextRedSmall("LATE"),
-                                                                                        ValueListenableBuilder(
-                                                                                            valueListenable: _banNotifier,
-                                                                                            builder: (BuildContext context, int tL, child) {
-                                                                                              format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
-                                                                                              if (tL <= 0) {
-                                                                                                return Column(
-                                                                                                  children: [
-                                                                                                    SizedBox(height: buttonSpacing),
-                                                                                                    countdownTextRedSmallest("BANNED IN " + format(Duration(seconds: 0))),
-                                                                                                  ],
-                                                                                                );
-                                                                                              } else if (tL <= (TIME_TO_BAN)) {
-                                                                                                return Column(
-                                                                                                  children: [
-                                                                                                    SizedBox(height: buttonSpacing),
-                                                                                                    countdownTextRedSmallest("BANNED IN " + format(Duration(seconds: tL))),
-                                                                                                  ],
-                                                                                                );
-                                                                                              } else
-                                                                                                return Center();
-                                                                                            })
-                                                                                      ],
-                                                                                    );
-                                                                                  }
-                                                                                }),
+                                                                            countdownBuilder(context, buttonSpacing)
                                                                           ],
                                                                         )),
                                                                   )),
@@ -536,9 +360,12 @@ class _RideScreenBodyState extends State<RideScreenBody> {
                                                       buttonHeight),
                                                 ],
                                               );
-                                            }
+                                            } else child = SizedBox(width: 300, height: 400);
                                             ;
-                                            return Center();
+                                            return AnimatedSwitcher(
+                                                duration: Duration(seconds: 1),
+                                                child: child,
+                                            );
                                           }),
                                     ])
                               ]),
@@ -551,6 +378,192 @@ class _RideScreenBodyState extends State<RideScreenBody> {
         ]),
       ],
     ));
+  }
+  
+  ValueListenableBuilder countdownBuilder(BuildContext context, buttonSpacing){
+    return ValueListenableBuilder(
+        valueListenable: _notifier,
+        builder: (BuildContext context, tL, child) {
+          // Format function from Frank Treacy's answer to 'Formatting a Duration like HH:mm:ss'
+          // on StackOverflow
+          // https://stackoverflow.com/questions/54775097/formatting-a-duration-like-hhmmss#answer-57897328
+          format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+          if (tL >= 0 && tL > (60 * 60 * 2)) {
+            return countdownText(format(Duration(seconds: tL)));
+          } else if (tL >= 0) {
+            return countdownTextYellow(format(Duration(seconds: tL)));
+          } else {
+            return Column(
+              children: [
+                countdownTextRed(format(Duration(seconds: 0))),
+                rideScreenTextRedSmall("LATE"),
+                ValueListenableBuilder(
+                    valueListenable: _banNotifier,
+                    builder: (BuildContext context, int tL, child) {
+                      format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+                      if (tL <= 0) {
+                        return Column(
+                          children: [
+                            SizedBox(height: buttonSpacing),
+                            countdownTextRedSmallest("BANNED IN " + format(Duration(seconds: 0))),
+                          ],
+                        );
+                      } else if (tL <= (TIME_TO_BAN)) {
+                        return Column(
+                          children: [
+                            SizedBox(height: buttonSpacing),
+                            countdownTextRedSmallest("BANNED IN " + format(Duration(seconds: tL))),
+                          ],
+                        );
+                      } else
+                        return Center();
+                    })
+              ],
+            );
+          }
+        });
+  }
+  
+  void handleBan(BuildContext context, bikeId) async {
+    final q1 = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .get();
+    final userId = q1
+        .docs[0]
+        .id;
+    final q2 = await FirebaseFirestore
+        .instance
+        .collection(
+        'users')
+        .doc(
+        userId)
+        .update({
+      'lockedOut':
+      true
+    });
+    final q3 = await FirebaseFirestore
+        .instance
+        .collection('bikes')
+        .doc(bikeId)
+        .update({'Condition': 'Stolen', 'checkedOut': false});
+    await Authentication.signOut(
+        context: context);
+    SharedPreferences
+    preferences =
+    await SharedPreferences.getInstance();
+    preferences.setBool(
+        'loggedIn',
+        false);
+    preferences.setString(
+        'username',
+        'no username');
+    print(
+        'SIGNED OUT');
+    dispose();
+    Navigator.of(context)
+        .pop();
+    Navigator
+        .push(
+      context,
+      MaterialPageRoute(builder: (context) => SplashScreen()),
+    );
+  }
+  
+  Timer makeCountdownTicker(BuildContext context, notifier, val){
+    return Timer.periodic(
+        Duration(seconds: 1),
+            (t) {
+          val--;
+          notifier.value =
+              val;
+        });
+  }
+  
+  Timer makeTwentyFourHourTimer(BuildContext context, currentTime, bikeId){
+    return Timer(
+        Duration(
+            seconds: ((startTime +
+                (MAX_ALERT_TIME)) -
+                currentTime)
+                .toInt()),
+            () => {
+          showDialog(
+              context: context,
+              barrierDismissible:
+              false,
+              builder:
+                  (BuildContext
+              context) {
+                return WillPopScope(child: AlertDialog(
+                    title: Text(
+                        "You're banned!"),
+                    content:
+                    SingleChildScrollView(
+                        child: ListBody(children: <
+                            Widget>[
+                          Text(
+                              "You've kept the bike for more than "
+                                  "24 hours and are now banned from The Kollective. "
+                                  "Begone thief!")
+                        ])),
+                    actions: <
+                        Widget>[
+                      TextButton(
+                        child: Text(
+                            'Accept Banishment'),
+                        onPressed: () async=> handleBan(context, bikeId),
+                      )
+                    ]),
+                    onWillPop: () async => false);
+
+              })
+        });
+  }
+  
+  Timer makeEightHourTimer(BuildContext context, currentTime){
+    return Timer(
+        Duration(
+            seconds: ((startTime +
+                (WARNING_ALERT_TIME)) -
+                currentTime)
+                .toInt()),
+            () => {
+          showDialog(
+              context:
+              context,
+              barrierDismissible:
+              false,
+              builder:
+                  (BuildContext
+              context) {
+                return AlertDialog(
+                    title: Text(
+                        "You're late!"),
+                    content:
+                    SingleChildScrollView(
+                        child: ListBody(children: <
+                            Widget>[
+                          Text(
+                              "You've kept the bike for more than "
+                                  "8 hours and are now late to return it. "
+                                  "If you keep the bike longer than 24 "
+                                  "hours, you will be banned from the Kollective.")
+                        ])),
+                    actions: <
+                        Widget>[
+                      TextButton(
+                        child:
+                        Text('Got it'),
+                        onPressed:
+                            () {
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ]);
+              })
+        });
   }
 
   Widget rideScreenText(String text) {

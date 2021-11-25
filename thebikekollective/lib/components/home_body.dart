@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:practice1/components/styles.dart';
 import 'list_view_body.dart';
 import 'create_map_body.dart';
-import '../utils/late_bike_check.dart';
-import 'late_notice.dart';
 import '../utils/user_is_riding_check.dart';
 import '../screens/ride_screen.dart';
 import '../screens/home_screen.dart';
@@ -39,13 +37,14 @@ class _HomeBodyState extends State<HomeBody> {
 
             builder: (context, snapshot) {
               String? isRidingData;
+              Widget child;
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.hasData) {
                   isRidingData = snapshot.data;
                   userRiding = isRidingData;
                 }
                 if (userRiding != 'none') {
-                  return Container(
+                  child= Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage("assets/images/elena-m.jpg"),
@@ -98,18 +97,33 @@ class _HomeBodyState extends State<HomeBody> {
 
                 }
                 else if (widget.map) {
-                  return CreateMapBody();
+                  child= CreateMapBody();
                 } else {
-                  return ListViewBody();
+                  child= ListViewBody();
                 }
               }
-              return Container(
+              else child= Container(
                   decoration: BoxDecoration(
                   image: DecorationImage(
-                  image: AssetImage("assets/images/elena-m.jpg"),
-                  fit: BoxFit.cover,
-              ),
-              ));
+                    image: AssetImage("assets/images/elena-m.jpg"),
+                    fit: BoxFit.cover,
+                    ),
+                  ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      loadingText("Loading..."),
+                      SizedBox(height: buttonSpacing*3),
+                      CircularProgressIndicator(color: Colors.white70)
+                    ],
+                  )
+                )
+              );
+              return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 500),
+                  child: child,
+                  switchInCurve: Curves.easeInOutSine,);
             }
 
         );
@@ -131,6 +145,16 @@ class _HomeBodyState extends State<HomeBody> {
     return FormattedText(
       text: text,
       size: s_fontSizeLarge,
+      color: Colors.white,
+      font: s_font_AmaticSC,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget loadingText(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeExtraLarge,
       color: Colors.white,
       font: s_font_AmaticSC,
       weight: FontWeight.bold,
