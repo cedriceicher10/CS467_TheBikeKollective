@@ -282,7 +282,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     return Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
-            side: BorderSide(color: Color(s_grayGreen), width: 1),
+            side: BorderSide(color: Color(s_jungleGreen), width: 3),
             borderRadius: BorderRadius.circular(15)),
         child: ListTile(
             isThreeLine: true,
@@ -642,7 +642,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       size: s_fontSizeSmall,
       color: textColor,
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 
@@ -687,7 +687,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       size: s_fontSizeSmall,
       color: Color(s_jungleGreen),
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 
@@ -736,7 +736,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       size: s_fontSizeSmall,
       color: Color(s_raisinBlack),
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 
@@ -766,7 +766,7 @@ class _ListViewBodyState extends State<ListViewBody> {
         size: s_fontSizeExtraSmall,
         color: Color(s_raisinBlack),
         font: s_font_IBMPlexSans,
-        style: FontStyle.italic,
+        //style: FontStyle.italic,
         weight: FontWeight.bold);
   }
 
@@ -776,7 +776,7 @@ class _ListViewBodyState extends State<ListViewBody> {
         size: s_fontSizeExtraSmall,
         color: Color(s_disabledGray),
         font: s_font_IBMPlexSans,
-        style: FontStyle.italic,
+        //style: FontStyle.italic,
         weight: FontWeight.bold);
   }
 
@@ -786,7 +786,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       size: s_fontSizeExtraSmall,
       color: Color(s_raisinBlack),
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 
@@ -796,7 +796,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       size: s_fontSizeExtraSmall,
       color: Color(s_disabledGray),
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 
@@ -807,7 +807,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       size: s_fontSizeExtraSmall,
       color: Color(s_raisinBlack),
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 
@@ -817,7 +817,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       size: s_fontSizeExtraSmall,
       color: Color(s_disabledGray),
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 }

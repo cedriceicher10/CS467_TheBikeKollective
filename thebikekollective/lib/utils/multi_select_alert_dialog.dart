@@ -129,7 +129,7 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
       size: s_fontSizeSmall,
       color: Color(s_raisinBlack),
       font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
+      weight: FontWeight.w500,
     );
   }
 }
