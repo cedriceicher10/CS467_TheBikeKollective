@@ -694,16 +694,18 @@ class _ListViewBodyState extends State<ListViewBody> {
   Widget bikesLoading(String text) {
     return Center(
         child: Column(children: [
-      CircularProgressIndicator(
-        color: Color(s_jungleGreen),
-      ),
-      FormattedText(
-        text: text,
-        size: s_fontSizeMedium,
-        color: Color(s_jungleGreen),
-        font: s_font_IBMPlexSans,
-        weight: FontWeight.bold,
-      )
+          SizedBox(height: 20),
+          CircularProgressIndicator(
+            color: Color(s_jungleGreen),
+          ),
+          SizedBox(height: 20),
+          FormattedText(
+            text: text,
+            size: s_fontSizeMedium,
+            color: Color(s_jungleGreen),
+            font: s_font_IBMPlexSans,
+            weight: FontWeight.bold,
+          )
     ]));
   }
 
