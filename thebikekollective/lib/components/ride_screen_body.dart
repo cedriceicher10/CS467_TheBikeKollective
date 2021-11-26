@@ -10,8 +10,8 @@ import '../components/styles.dart';
 import '../screens/splash_screen.dart';
 import '../utils/preload_image.dart';
 
-const WARNING_ALERT_TIME = 5; // Official: 8 hr, Testing: 10 sec
-const MAX_ALERT_TIME = 10; // Official: 24 hr, Testing: 30 sec
+const WARNING_ALERT_TIME = 8 * 60 * 60; // Official: 8 hr, Testing: 10 sec
+const MAX_ALERT_TIME = 24 * 60 * 60; // Official: 24 hr, Testing: 30 sec
 const TIME_TO_BAN = MAX_ALERT_TIME - WARNING_ALERT_TIME;
 
 class RideFields {

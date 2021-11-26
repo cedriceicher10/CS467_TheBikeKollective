@@ -685,7 +685,7 @@ class _ListViewBodyState extends State<ListViewBody> {
     return FormattedText(
       text: text,
       size: s_fontSizeSmall,
-      color: Color(s_jungleGreen),
+      color: Color(s_raisinBlack),
       font: s_font_IBMPlexSans,
       weight: FontWeight.w500,
     );
@@ -694,26 +694,25 @@ class _ListViewBodyState extends State<ListViewBody> {
   Widget bikesLoading(String text) {
     return Center(
         child: Column(children: [
-          SizedBox(height: 20),
-          CircularProgressIndicator(
-            color: Color(s_jungleGreen),
-          ),
-          SizedBox(height: 20),
-          FormattedText(
-            text: text,
-            size: s_fontSizeMedium,
-            color: Color(s_jungleGreen),
-            font: s_font_IBMPlexSans,
-            weight: FontWeight.bold,
-          )
+      SizedBox(height: 20),
+      CircularProgressIndicator(
+        color: Color(s_jungleGreen),
+      ),
+      SizedBox(height: 20),
+      FormattedText(
+        text: text,
+        size: s_fontSizeMedium,
+        color: Color(s_jungleGreen),
+        font: s_font_IBMPlexSans,
+        weight: FontWeight.bold,
+      )
     ]));
   }
 
   Widget showBikeText() {
     return Center(
         child: FormattedText(
-            text:
-                'Showing bikes within $GRAY_BIKE_DISTANCE mi.',
+            text: 'Showing bikes within $GRAY_BIKE_DISTANCE mi.',
             size: s_fontSizeSmall,
             color: Color(s_periwinkleBlue),
             font: s_font_IBMPlexSans,
@@ -801,7 +800,6 @@ class _ListViewBodyState extends State<ListViewBody> {
       weight: FontWeight.w500,
     );
   }
-
 
   Widget postThirdLineText(String text) {
     return FormattedText(

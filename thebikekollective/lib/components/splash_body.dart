@@ -30,17 +30,15 @@ class _SplashBodyState extends State<SplashBody> {
     final double buttonWidth = 260;
     final double buttonSpacing = 8;
 
-    return
-      Container(
+    return Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/elena-m.jpg"),
             fit: BoxFit.cover,
           ),
         ),
-        child:       Center(
-            child:
-            Container(
+        child: Center(
+            child: Container(
                 decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
@@ -52,53 +50,52 @@ class _SplashBodyState extends State<SplashBody> {
                     ],
                     border: Border.all(width: 3, color: Color(s_jungleGreen)),
                     borderRadius: BorderRadius.circular(5)),
-
-                child:
-                Container(
+                child: Container(
                     color: Colors.white,
                     child: Column(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-
-                          SizedBox(height: buttonSpacing*2),
+                          SizedBox(height: buttonSpacing * 2),
                           FractionallySizedBox(
                               widthFactor: imageSizeFactor(context),
                               child: Container(
-
                                   child: Image(
-                                    image: AssetImage('assets/images/bike_clipart.jpg'),
-                                    loadingBuilder: (BuildContext context, Widget child,
-                                        ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
-                                      return Center(
-                                          child: CircularProgressIndicator(
-                                            valueColor:
-                                            AlwaysStoppedAnimation<Color>(Color(s_jungleGreen)),
-                                            value: loadingProgress.expectedTotalBytes != null
-                                                ? loadingProgress.cumulativeBytesLoaded /
-                                                loadingProgress.expectedTotalBytes!
-                                                : null,
-                                          ));
-                                    },
-                                  ))),
+                                image: AssetImage(
+                                    'assets/images/bike_clipart.jpg'),
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  }
+                                  return Center(
+                                      child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Color(s_jungleGreen)),
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ));
+                                },
+                              ))),
                           SizedBox(height: buttonSpacing * 2),
-                          loginButton(context, 'Login', buttonWidth, buttonHeight),
+                          loginButton(
+                              context, 'Login', buttonWidth, buttonHeight),
                           SizedBox(height: buttonSpacing),
-                          createAccountButton(context, 'Create Account', buttonWidth, buttonHeight),
+                          createAccountButton(context, 'Create Account',
+                              buttonWidth, buttonHeight),
                           SizedBox(height: buttonSpacing),
-                          googleAuthButton(
-                              context, 'Sign in with Google', buttonWidth, buttonHeight),
+                          googleAuthButton(context, 'Sign in with Google',
+                              buttonWidth, buttonHeight),
                           SizedBox(height: buttonSpacing * 2),
-                          testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
-                          SizedBox(height: buttonSpacing * 2),
-
-                        ])
-                )
-            )));
-
+                          // Login bypass for testing
+                          // testUserButton(context, 'Test User', buttonWidth / 2, buttonHeight / 2),
+                          // SizedBox(height: buttonSpacing * 2),
+                        ])))));
   }
 
   Widget twoColumn(BuildContext context) {
@@ -151,8 +148,9 @@ class _SplashBodyState extends State<SplashBody> {
                         googleAuthButton(context, 'Sign in with Google',
                             buttonWidth, buttonHeight),
                         SizedBox(height: buttonSpacing),
-                        testUserButton(context, 'Test User', buttonWidth / 2,
-                            buttonHeight / 2),
+                        // Login bypass for testing
+                        // testUserButton(context, 'Test User', buttonWidth / 2,
+                        //     buttonHeight / 2),
                       ]))))
     ]);
   }

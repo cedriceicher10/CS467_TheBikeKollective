@@ -44,7 +44,7 @@ class _HomeScreenToggle extends State<HomeScreenToggle> {
     if (widget.map) {
       return Color(s_periwinkleBlue);
     } else {
-      return Color(s_cadmiumOrange);
+      return Color(s_raisinBlack);
     }
   }
 }
