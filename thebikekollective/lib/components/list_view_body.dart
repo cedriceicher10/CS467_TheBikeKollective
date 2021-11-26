@@ -196,9 +196,9 @@ class _ListViewBodyState extends State<ListViewBody> {
               );
             }).toList(),
           )),
-      SizedBox(width: 20),
+      SizedBox(width: 16),
       filterConditionButton(),
-      SizedBox(width: 20),
+      SizedBox(width: 16),
       filterTagsButton(),
     ]);
   }
@@ -319,20 +319,20 @@ class _ListViewBodyState extends State<ListViewBody> {
   Card grayCard(PostTile post) {
     return Card(
         elevation: 2,
-        color: Color(s_disabledGray),
+        //color: Color(s_disabledGray),
         shape: RoundedRectangleBorder(
-            side: BorderSide(color: Color(s_grayGreen), width: 1),
+            side: BorderSide(color: Color(s_disabledGray), width: 3),
             borderRadius: BorderRadius.circular(15)),
         child: ListTile(
             isThreeLine: true,
-            title: entryName(
+            title: entryNameDisabled(
                 '${post.name} (${post.distanceToUser.toStringAsFixed(2)} mi)'),
             subtitle:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              entryDescription(post.description),
-              postSecondLineText(
+              entryDescriptionDisabled(post.description),
+              postSecondLineTextDisabled(
                   'Condition: ${post.condition} | Rating: ${post.rating.toStringAsFixed(1)}'),
-              postThirdLineText('${post.street}'),
+              postThirdLineTextDisabled('${post.street}'),
             ]),
             trailing: Image(image: NetworkImage(post.imageURL)),
             onTap: () {}));
@@ -514,7 +514,7 @@ class _ListViewBodyState extends State<ListViewBody> {
 
   Widget filterConditionButton() {
     return ElevatedButton(
-        child: filterAlertText('Filter by Condition', filterConditionOn),
+        child: filterAlertText('Condition', filterConditionOn),
         onPressed: (() async {
           _showConditionsDialog();
         }),
@@ -564,7 +564,7 @@ class _ListViewBodyState extends State<ListViewBody> {
 
   Widget filterTagsButton() {
     return ElevatedButton(
-        child: filterAlertText('Filter by Tags', filterTagsOn),
+        child: filterAlertText('Tags', filterTagsOn),
         onPressed: (() async {
           _showTagsDialog();
         }),
@@ -618,7 +618,7 @@ class _ListViewBodyState extends State<ListViewBody> {
         text: 'Report Stolen',
         size: s_fontSizeSmall,
         color: Colors.white,
-        font: s_font_BonaNova,
+        font: s_font_IBMPlexSans,
         weight: FontWeight.bold,
       ),
       style: ElevatedButton.styleFrom(primary: Color(s_declineRed)),
@@ -641,7 +641,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: text,
       size: s_fontSizeSmall,
       color: textColor,
-      font: s_font_AmaticSC,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -652,7 +652,7 @@ class _ListViewBodyState extends State<ListViewBody> {
         text: 'Start Ride',
         size: s_fontSizeSmall,
         color: Colors.white,
-        font: s_font_BonaNova,
+        font: s_font_IBMPlexSans,
         weight: FontWeight.bold,
       ),
       style: ElevatedButton.styleFrom(primary: Color(s_jungleGreen)),
@@ -676,7 +676,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: text,
       size: s_fontSizeMedium,
       color: Color(s_jungleGreen),
-      font: s_font_BonaNova,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -686,7 +686,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: text,
       size: s_fontSizeSmall,
       color: Color(s_jungleGreen),
-      font: s_font_BonaNova,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -701,7 +701,7 @@ class _ListViewBodyState extends State<ListViewBody> {
         text: text,
         size: s_fontSizeMedium,
         color: Color(s_jungleGreen),
-        font: s_font_AmaticSC,
+        font: s_font_IBMPlexSans,
         weight: FontWeight.bold,
       )
     ]));
@@ -711,10 +711,10 @@ class _ListViewBodyState extends State<ListViewBody> {
     return Center(
         child: FormattedText(
             text:
-                'Showing eligible bikes (non-gray) within $GEOFENCE_DISTANCE mi',
+                'Showing bikes within $GRAY_BIKE_DISTANCE mi.',
             size: s_fontSizeSmall,
-            color: Color(s_grayGreen),
-            font: s_font_BonaNova,
+            color: Color(s_periwinkleBlue),
+            font: s_font_IBMPlexSans,
             weight: FontWeight.bold,
             align: TextAlign.center));
   }
@@ -725,7 +725,7 @@ class _ListViewBodyState extends State<ListViewBody> {
             text: 'No Bikes Found In Your Area!',
             size: s_fontSizeLarge,
             color: Color(s_declineRed),
-            font: s_font_AmaticSC,
+            font: s_font_IBMPlexSans,
             weight: FontWeight.bold,
             align: TextAlign.center));
   }
@@ -735,7 +735,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: text,
       size: s_fontSizeSmall,
       color: Color(s_raisinBlack),
-      font: s_font_AmaticSC,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -745,7 +745,17 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: text,
       size: s_fontSizeMedium,
       color: Color(s_jungleGreen),
-      font: s_font_BonaNova,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget entryNameDisabled(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeMedium,
+      color: Color(s_disabledGray),
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -755,7 +765,17 @@ class _ListViewBodyState extends State<ListViewBody> {
         text: text,
         size: s_fontSizeExtraSmall,
         color: Color(s_raisinBlack),
-        font: s_font_BonaNova,
+        font: s_font_IBMPlexSans,
+        style: FontStyle.italic,
+        weight: FontWeight.bold);
+  }
+
+  Widget entryDescriptionDisabled(String text) {
+    return FormattedText(
+        text: text,
+        size: s_fontSizeExtraSmall,
+        color: Color(s_disabledGray),
+        font: s_font_IBMPlexSans,
         style: FontStyle.italic,
         weight: FontWeight.bold);
   }
@@ -765,17 +785,38 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: text,
       size: s_fontSizeExtraSmall,
       color: Color(s_raisinBlack),
-      font: s_font_BonaNova,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
+
+  Widget postSecondLineTextDisabled(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeExtraSmall,
+      color: Color(s_disabledGray),
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.bold,
+    );
+  }
+
 
   Widget postThirdLineText(String text) {
     return FormattedText(
       text: text,
       size: s_fontSizeExtraSmall,
       color: Color(s_raisinBlack),
-      font: s_font_BonaNova,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget postThirdLineTextDisabled(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeExtraSmall,
+      color: Color(s_disabledGray),
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
