@@ -696,7 +696,7 @@ class _ListViewBodyState extends State<ListViewBody> {
       ),
       style: ElevatedButton.styleFrom(primary: Color(s_declineRed)),
       onPressed: () {
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop('dialog');
       },
     );
   }
