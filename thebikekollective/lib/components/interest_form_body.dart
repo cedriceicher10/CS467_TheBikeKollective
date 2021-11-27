@@ -108,7 +108,7 @@ class _InterestFormBodyState extends State<InterestFormBody> {
       align: TextAlign.center,
       size: s_fontSizeMedium,
       color: Colors.black,
-      font: s_font_BonaNova,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }

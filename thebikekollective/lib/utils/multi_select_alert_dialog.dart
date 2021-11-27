@@ -91,7 +91,7 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
         text: 'Reset',
         size: s_fontSizeSmall,
         color: Colors.white,
-        font: s_font_BonaNova,
+        font: s_font_IBMPlexSans,
         weight: FontWeight.bold,
       ),
       style: ElevatedButton.styleFrom(primary: Color(s_declineRed)),
@@ -105,7 +105,7 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
         text: 'Filter',
         size: s_fontSizeSmall,
         color: Colors.white,
-        font: s_font_BonaNova,
+        font: s_font_IBMPlexSans,
         weight: FontWeight.bold,
       ),
       style: ElevatedButton.styleFrom(primary: Color(s_raisinBlack)),
@@ -118,7 +118,7 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
       text: 'Select Filters',
       size: s_fontSizeMedium,
       color: Color(s_raisinBlack),
-      font: s_font_BonaNova,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
     );
   }
@@ -128,8 +128,8 @@ class _MultiSelectAlertDialogState extends State<MultiSelectAlertDialog> {
       text: item,
       size: s_fontSizeSmall,
       color: Color(s_raisinBlack),
-      font: s_font_BonaNova,
-      weight: FontWeight.bold,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.w500,
     );
   }
 }

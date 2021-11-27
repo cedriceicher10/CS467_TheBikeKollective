@@ -145,9 +145,9 @@ class _SideMenuState extends State<SideMenu> {
   Widget usernameText(String text) {
     return FormattedText(
       text: text,
-      size: s_fontSizeMedium,
+      size: s_fontSizeSmall,
       color: Colors.white,
-      font: s_font_AmaticSC,
+      font: s_font_IBMPlexSans,
       weight: FontWeight.bold,
       align: TextAlign.center,
     );

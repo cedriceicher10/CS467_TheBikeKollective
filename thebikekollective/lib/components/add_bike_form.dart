@@ -16,17 +16,17 @@ class BikeFields {
   String? imageURL;
   List<String?>? bikeTags;
   bool checkedOut;
-  BikeFields(
-      {this.bikeName,
-      this.bikeDescription,
-      this.bikeCondition,
-      this.bikeCombination,
-      this.latitude,
-      this.longitude,
-      this.imageURL,
-      this.bikeTags,
-      this.checkedOut = false,
-      });
+  BikeFields({
+    this.bikeName,
+    this.bikeDescription,
+    this.bikeCondition,
+    this.bikeCombination,
+    this.latitude,
+    this.longitude,
+    this.imageURL,
+    this.bikeTags,
+    this.checkedOut = false,
+  });
 }
 
 // Weird bug fix: For some reason having this not be absolute global scope made
@@ -112,11 +112,10 @@ class _AddBikeFormState extends State<AddBikeForm> {
           bikeFields.bikeName = value;
         },
         validator: (value) {
-
           if (value!.isEmpty) {
             return 'Please enter a name for the Bike';
           } else if (bikeNameTaken) {
-              return 'Bike Name is already taken!';
+            return 'Bike Name is already taken!';
           } else if (value.length > 20) {
             return 'The name of the Bike may not be greater than 20 characters';
           } else {
@@ -140,17 +139,17 @@ class _AddBikeFormState extends State<AddBikeForm> {
   Widget bikeConditionEntry() {
     String? value;
     List<String> colorList = [
-      'Totaled',
-      'Poor',
-      'Fair',
-      'Good',
+      'Excellent',
       'Great',
-      'Excellent'
+      'Good',
+      'Fair',
+      'Poor',
+      'Totaled',
     ];
     return DropdownButtonFormField(
       value: value,
       //decoration: InputDecoration(autofocus: true,
-      //style: TextStyle(color: Color(s_jungleGreen)),
+      style: TextStyle(color: Color(s_jungleGreen)),
       decoration: InputDecoration(
           labelText: 'Bike\'s Condition',
           labelStyle: TextStyle(
@@ -177,7 +176,9 @@ class _AddBikeFormState extends State<AddBikeForm> {
         }
       },
       items: colorList.map((String value) {
-        return DropdownMenuItem(value: value, child: Text(value));
+        return DropdownMenuItem(
+            value: value,
+            child: Text(value, style: TextStyle(color: Color(s_jungleGreen))));
       }).toList(),
     );
   }
@@ -209,8 +210,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
             return 'The combination may not be greater than 10 numbers.';
           } else if (value[0] == '0') {
             return 'The combination cannot start with 0.';
-          }
-          else {
+          } else {
             return null;
           }
         });
@@ -408,7 +408,7 @@ class _AddBikeFormState extends State<AddBikeForm> {
               'Latitude': bikeFields.latitude,
               'Longitude': bikeFields.longitude,
               'imageURL': bikeFields.imageURL,
-              'Tags' : bikeFields.bikeTags,
+              'Tags': bikeFields.bikeTags,
               'checkedOut': bikeFields.checkedOut,
             });
             Navigator.push(
