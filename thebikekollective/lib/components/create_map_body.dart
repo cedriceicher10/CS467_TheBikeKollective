@@ -134,7 +134,7 @@ class _CreateMapBody extends State<CreateMapBody>
 
   void _zoom() {
     currentZoom = currentZoom - 1;
-    mapController!.move(currentCenter, currentZoom);
+    mapController!.move(mapController!.center, currentZoom);
   }
 
   // This is pretty much entirely from the flutter_map's
@@ -211,7 +211,7 @@ class _CreateMapBody extends State<CreateMapBody>
                       zoom: currentZoom,
                       // Conzar! You can disable rotation using this,
                       // but try not to take the easy way out:
-                      interactiveFlags: InteractiveFlag.all,
+                      interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                       onTap: (a, b) {
                         _popupLayerController.hideAllPopups();
                       }

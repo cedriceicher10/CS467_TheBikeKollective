@@ -335,7 +335,21 @@ class _ListViewBodyState extends State<ListViewBody> {
               postThirdLineTextDisabled('${post.street}'),
             ]),
             trailing: Image(image: NetworkImage(post.imageURL)),
-            onTap: () {}));
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: alertTitleNeutral("Too Far"),
+                    content: alertTextNeutral(
+                        "You need to be within 0.1 mi. to start a ride."),
+                    actions: [
+                      okButton(),
+                    ],
+                  );
+                },
+              );
+            }));
   }
 
   List<PostTile> postBuilder(
@@ -671,6 +685,22 @@ class _ListViewBodyState extends State<ListViewBody> {
     );
   }
 
+  Widget okButton() {
+    return ElevatedButton(
+      child: FormattedText(
+        text: 'Dismiss',
+        size: s_fontSizeSmall,
+        color: Colors.white,
+        font: s_font_IBMPlexSans,
+        weight: FontWeight.bold,
+      ),
+      style: ElevatedButton.styleFrom(primary: Color(s_declineRed)),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+      },
+    );
+  }
+
   Widget alertTitle(String text) {
     return FormattedText(
       text: text,
@@ -686,6 +716,24 @@ class _ListViewBodyState extends State<ListViewBody> {
       text: text,
       size: s_fontSizeSmall,
       color: Color(s_raisinBlack),
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.w500,
+    );
+  }
+
+  Widget alertTitleNeutral(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeMedium,
+      font: s_font_IBMPlexSans,
+      weight: FontWeight.bold,
+    );
+  }
+
+  Widget alertTextNeutral(String text) {
+    return FormattedText(
+      text: text,
+      size: s_fontSizeSmall,
       font: s_font_IBMPlexSans,
       weight: FontWeight.w500,
     );
