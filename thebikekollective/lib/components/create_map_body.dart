@@ -113,7 +113,8 @@ class _CreateMapBody extends State<CreateMapBody>
     locationData = await locationService.getLocation();
 
     // Merge conflicts: if ((locationData!.latitude! - oldLocationData!.latitude!).abs() > 0.0001) {
-    if (oldLocationData != null && (locationData!.latitude! - oldLocationData.latitude!).abs() > 0.0001) {
+    if (oldLocationData != null &&
+        (locationData!.latitude! - oldLocationData.latitude!).abs() > 0.0001) {
       if (this.mounted) {
         setState(() {});
       }
@@ -211,7 +212,8 @@ class _CreateMapBody extends State<CreateMapBody>
                       zoom: currentZoom,
                       // Conzar! You can disable rotation using this,
                       // but try not to take the easy way out:
-                      interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                      interactiveFlags:
+                          InteractiveFlag.all & ~InteractiveFlag.rotate,
                       onTap: (a, b) {
                         _popupLayerController.hideAllPopups();
                       }
@@ -361,6 +363,7 @@ class BikeMarkerPopup extends StatelessWidget {
       return landscapeLayout(context, bike, inRange);
     }
   }
+
   Container portraitLayout(BuildContext context, bike, inRange) {
     return Container(
       width: double.infinity,
@@ -385,31 +388,29 @@ class BikeMarkerPopup extends StatelessWidget {
                             height: 150 * imageSizeFactor(context)),
                       ]),
                       Container(
-                        width: 150,
-                        child: Column(children: <Widget>[
-                              descriptionTitleText(bike.name),
-                              SizedBox(height: 8),
-                              Container(
-                                alignment: Alignment.center,
-                                height: 60,
-                                child: SingleChildScrollView(
-                                  child: descriptionText('${bike.description}'),
-                                ),
+                          width: 150,
+                          child: Column(children: <Widget>[
+                            descriptionTitleText(bike.name),
+                            SizedBox(height: 8),
+                            Container(
+                              alignment: Alignment.center,
+                              height: 60,
+                              child: SingleChildScrollView(
+                                child: descriptionText('${bike.description}'),
                               ),
-                              SizedBox(height: 8),
-                              Center(
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children:[
-                                      descriptionTextItalic('Condition: '),
-                                      descriptionText('${bike.condition}')
-                                    ]
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              rideButton(context, inRange, 100, 25, bike.id)
-                            ])
-                        )
+                            ),
+                            SizedBox(height: 8),
+                            Center(
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    descriptionTextItalic('Condition: '),
+                                    descriptionText('${bike.condition}')
+                                  ]),
+                            ),
+                            SizedBox(height: 8),
+                            rideButton(context, inRange, 100, 25, bike.id)
+                          ]))
                     ]))
           ],
         ),
@@ -439,32 +440,21 @@ class BikeMarkerPopup extends StatelessWidget {
                           image: NetworkImage(bike.imagePath),
                           width: 100 * imageSizeFactor(context),
                           height: 100 * imageSizeFactor(context)),
-                      Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                         descriptionTitleText(bike.name),
-                            SizedBox(height: 8),
-                        Container(
-                          width: 200,
-                          height: 40,
-                          child: SingleChildScrollView(
-                            child: Center(
-                              child: descriptionText('${bike.description}'),
-                            )
-
-                          )
-                        ),
-
-
-
                         SizedBox(height: 8),
-                        Row(
-                          children:[
-                            descriptionTextItalic('Condition: '),
-                            descriptionText('${bike.condition}')
-                          ]
-                        ),
-
+                        Container(
+                            width: 200,
+                            height: 40,
+                            child: SingleChildScrollView(
+                                child: Center(
+                              child: descriptionText('${bike.description}'),
+                            ))),
+                        SizedBox(height: 8),
+                        Row(children: [
+                          descriptionTextItalic('Condition: '),
+                          descriptionText('${bike.condition}')
+                        ]),
                         SizedBox(height: 8),
                         rideButton(context, inRange, 100, 25, bike.id)
                       ])
@@ -482,7 +472,7 @@ class BikeMarkerPopup extends StatelessWidget {
     var color;
 
     if (inRange) {
-      text = 'Ride Me!';
+      text = 'Start Ride';
       color = Color(s_jungleGreen);
     } else {
       text = 'Too Far';
@@ -491,30 +481,31 @@ class BikeMarkerPopup extends StatelessWidget {
     return ElevatedButton(
         onPressed: () {
           if (inRange) {
-            Navigator.of(context).pushNamedAndRemoveUntil('rideScreen', (_) => false, arguments: id);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                'rideScreen', (_) => false,
+                arguments: id);
           }
           return;
         },
         child: rideButtonText(text),
         style: ElevatedButton.styleFrom(
-            primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
+            primary: color, fixedSize: Size(buttonWidth * 1.25, buttonHeight)));
   }
 
   // From merge conflicts
- // return ElevatedButton(
- //     onPressed: () {
- //       if (inRange) {
- //         Navigator.of(context).pushNamedAndRemoveUntil(
- //             'rideScreen', (_) => false,
- //             arguments: id);
- //       }
+  // return ElevatedButton(
+  //     onPressed: () {
+  //       if (inRange) {
+  //         Navigator.of(context).pushNamedAndRemoveUntil(
+  //             'rideScreen', (_) => false,
+  //             arguments: id);
+  //       }
 //        return;
- //     },
+  //     },
 //      child: rideButtonText(text),
- //     style: ElevatedButton.styleFrom(
- //         primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
+  //     style: ElevatedButton.styleFrom(
+  //         primary: color, fixedSize: Size(buttonWidth, buttonHeight)));
 //}
-
 
   Widget rideButtonText(String text) {
     return FormattedText(
@@ -548,13 +539,12 @@ class BikeMarkerPopup extends StatelessWidget {
 
   Widget descriptionTitleText(String text) {
     return FormattedText(
-      text: text,
-      size: s_fontSizeSmall,
-      color: Colors.black,
-      font: s_font_IBMPlexSans,
-      weight: FontWeight.bold,
-      align: TextAlign.end
-    );
+        text: text,
+        size: s_fontSizeSmall,
+        color: Colors.black,
+        font: s_font_IBMPlexSans,
+        weight: FontWeight.bold,
+        align: TextAlign.end);
   }
 
   Widget descriptionText(String text) {
@@ -566,8 +556,6 @@ class BikeMarkerPopup extends StatelessWidget {
     );
   }
 }
-
-
 
 double imageSizeFactor(BuildContext context) {
   if (MediaQuery.of(context).orientation == Orientation.portrait) {
